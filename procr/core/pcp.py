@@ -24,6 +24,7 @@ def counter(x):
     consecutive integer, starting from x
     """
     x -= 1
+
     def _cnt():
         nonlocal x
         x += 1
@@ -51,7 +52,7 @@ def cmpv_int(vx, vy):
     """
     Compares vectors of integers using 'string semantics'
     """
-    nonzero_tail = list(it.dropwhile(lambda x: x == 0, list(map(lambda x, y: x - y, vx, vy))))
+    nonzero_tail = list(it.dropwhile(lambda x: x == 0, [x[0] - x[1] for x in zip(vx, vy)]))
     return len(vx) - len(vy) if nonzero_tail == [] else -1 if nonzero_tail[0] < 0 else 1
 
 
@@ -71,19 +72,52 @@ def cmpstr_naturally(str_x, str_y):
     return cmpv_int(num_x, num_y) if num_x != [] and num_y != [] else cmpstr_c(str_x, str_y)
 
 
+def compare_path(xp, yp):
+    """
+    Compares two paths
+    """
+    return cmpstr_naturally(sans_ext(xp), sans_ext(yp))
+
+
+def compare_file(xf, yf):
+    """
+    Compares two paths, filenames only
+    """
+    return cmpstr_naturally(sans_ext(os.path.basename(xf)), sans_ext(os.path.basename(yf)))
+
+
+def isaudiofile(x):
+    """
+    isfile for now
+    """
+    return os.path.isfile(x)
+
+
+def list_dir_groomed(dir):
+    """
+    Returns a tuple of: (0) naturally sorted list of
+    offspring directory paths (1) naturally sorted list
+    of offspring file paths.
+    """
+    lst = os.listdir(dir)
+    dirs = [x for x in lst if os.isdir(x)].sort(compare_path)
+    files = [x for x in lst if isaudiofile(x)].sort(compare_file)
+    return (dirs, files)
+
+
 def retrieve_args():
-    parser = argparse.ArgumentParser(description = utility_description)
-    parser.add_argument("-t",  "--tree-dst",  help = "copy as tree: keep source tree structure at destination",  action = "store_true")
-    parser.add_argument("-p",  "--drop-dst",  help = "do not create destination directory",  action = "store_true")
-    parser.add_argument("-r",  "--reverse",  help = "write files in reverse order (time sequence)",  action = "store_true")
-    parser.add_argument("-u",  "--unified-name",  help = "root substring for destination directory and file names")
-    parser.add_argument("-b",  "--album-num",  help = "album (book) start number, 0...99; omission means increment each call")
-    parser.add_argument("-a",  "--artist-tag",  help = "artist tag name")
-    parser.add_argument("-g",  "--album-tag",  help = "album tag name")
-    parser.add_argument('src_dir',  help = "source directory, to be copied itself as root directory")
-    parser.add_argument('dst_dir',  help = "destination directory")
+    parser = argparse.ArgumentParser(description=utility_description)
+    parser.add_argument("-t", "--tree-dst", help="copy as tree: keep source tree structure at destination", action="store_true")
+    parser.add_argument("-p", "--drop-dst", help="do not create destination directory", action="store_true")
+    parser.add_argument("-r", "--reverse", help="write files in reverse order (time sequence)", action="store_true")
+    parser.add_argument("-u", "--unified-name", help="root substring for destination directory and file names")
+    parser.add_argument("-b", "--album-num", help="album (book) start number, 0...99; omission means increment each call")
+    parser.add_argument("-a", "--artist-tag", help="artist tag name")
+    parser.add_argument("-g", "--album-tag", help="album tag name")
+    parser.add_argument('src_dir', help="source directory, to be copied itself as root directory")
+    parser.add_argument('dst_dir', help="destination directory")
     return parser.parse_args()
-    
+
 
 if __name__ == '__main__':
     args = retrieve_args()
