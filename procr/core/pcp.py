@@ -3,11 +3,8 @@
 #import mutagen
 import os
 import re
+import argparse
 import itertools as it
-
-
-def hello(msg="Hello, World!"):
-    print(msg)
 
 utility_description = '''
 pcp \"Procrustes\" SmArT is a CLI utility for copying subtrees containing audio (mp3)
@@ -74,5 +71,19 @@ def cmpstr_naturally(str_x, str_y):
     return cmpv_int(num_x, num_y) if num_x != [] and num_y != [] else cmpstr_c(str_x, str_y)
 
 
+def retrieve_args():
+    parser = argparse.ArgumentParser(description = utility_description)
+    parser.add_argument("-t",  "--tree-dst",  help = "copy as tree: keep source tree structure at destination",  action = "store_true")
+    parser.add_argument("-p",  "--drop-dst",  help = "do not create destination directory",  action = "store_true")
+    parser.add_argument("-r",  "--reverse",  help = "write files in reverse order (time sequence)",  action = "store_true")
+    parser.add_argument("-u",  "--unified-name",  help = "root substring for destination directory and file names")
+    parser.add_argument("-b",  "--album-num",  help = "album (book) start number, 0...99; omission means increment each call")
+    parser.add_argument("-a",  "--artist-tag",  help = "artist tag name")
+    parser.add_argument("-g",  "--album-tag",  help = "album tag name")
+    parser.add_argument('src_dir',  help = "source directory, to be copied itself as root directory")
+    parser.add_argument('dst_dir',  help = "destination directory")
+    return parser.parse_args()
+    
+
 if __name__ == '__main__':
-    hello("Main!")
+    args = retrieve_args()
