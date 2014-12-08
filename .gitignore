@@ -1,0 +1,95 @@
+*.py[cod]
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin/
+var
+include/
+sdist
+develop-eggs
+.installed.cfg
+lib/
+lib64/
+share/
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+#
+# django-oscar sample below
+#
+
+# Packaging
+*.pyc
+*.egg-info
+/dist/
+/build/
+
+# Vagrant
+.vagrant
+
+# Temporary/OS files
+*.swp
+*.swo
+*.*~
+.~lock.*
+*.DS_Store
+
+# IDE files
+.project
+.pydevproject
+.settings
+.idea
+.eric5project
+*.e4p
+
+# Docs
+/docs/build/*
+*.pdf
+TODO
+
+# Test files
+.coverage
+.noseids
+coverage.xml
+violations.txt
+nosetests.xml
+/htmlcov/*
+/.tox/*
+
+# Example sites
+settings_local.py
+/sites/sandbox/*.sqlite
+/sites/sandbox/assets/
+/sites/sandbox/public/
+/sites/sandbox/whoosh_index/
+/sites/sandbox/logs/
+/sites/demo/*.sqlite
+/sites/demo/assets/
+/sites/demo/public/
+/sites/demo/whoosh_index/
+/sites/demo/logs/
+/sites/us/public/
+/sites/us/logs/
+sites/puppet/modules/
