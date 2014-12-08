@@ -5,7 +5,7 @@ from procr.core.pcp import *
 class TestHelpers(unittest.TestCase):
 
     def setUp(self):
-        self.alfa = "bravo"
+        pass
 
     def test_zero_pad(self):
         self.assertEqual(str(3).zfill(5), "00003")
@@ -37,6 +37,9 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(cmpstr_naturally("", ""), 0)
         self.assertEqual(cmpstr_naturally("2a", "10a"), -1)
         self.assertEqual(cmpstr_naturally("alfa", "bravo"), -1)
+
+    def tearDown(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()
