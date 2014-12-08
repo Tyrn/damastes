@@ -74,14 +74,14 @@ def cmpstr_naturally(str_x, str_y):
 
 def compare_path(xp, yp):
     """
-    Compares two paths
+    Compares two paths, ignoring extensions
     """
     return cmpstr_naturally(sans_ext(xp), sans_ext(yp))
 
 
 def compare_file(xf, yf):
     """
-    Compares two paths, filenames only
+    Compares two paths, filenames only, ignoring extensions
     """
     return cmpstr_naturally(sans_ext(os.path.basename(xf)), sans_ext(os.path.basename(yf)))
 

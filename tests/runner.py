@@ -5,7 +5,7 @@ from procr.core.pcp import *
 class TestHelpers(unittest.TestCase):
 
     def setUp(self):
-        pass
+        self.alfa = "bravo"
 
     def test_zero_pad(self):
         self.assertEqual(str(3).zfill(5), "00003")
