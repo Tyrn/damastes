@@ -38,6 +38,12 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(cmpstr_naturally("2a", "10a"), -1)
         self.assertEqual(cmpstr_naturally("alfa", "bravo"), -1)
 
+    def test_list_dir_groomed(self):
+        r = "/home/alexey/dir-test/"
+        self.assertEqual(list_dir_groom(r),
+                ([r + "a2", r + "a3", r + "a10"],
+                [r + "f4.mp3", r + "f5.mp3", r + "f12.mp3"]))
+
     def tearDown(self):
         pass
 

@@ -3,8 +3,10 @@
 #import mutagen
 import os
 import re
+import shutil
 import argparse
 import itertools as it
+import functools as ft
 
 utility_description = '''
 pcp \"Procrustes\" SmArT is a CLI utility for copying subtrees containing audio (mp3)
@@ -16,6 +18,34 @@ get set, tags 'Artist' and 'Album' can be replaced optionally.
 The writing process is strictly sequential: either starting with the number one file,
 or in the reversed order. This can be important for some mobile devices.
 '''
+
+
+def flatten(lst):
+    """
+    Returns a flattened list; strings left as is
+    """
+    flat = []
+    for x in lst:
+        if hasattr(x, '__iter__') and not isinstance(x, str):
+            flat.extend(flatten(x))
+        else:
+            flat.append(x)
+    return flat
+
+
+def part(iterable, n, fillvalue=None):
+    """
+    Collects data into fixed-length chunks or blocks (partition in Clojure)
+    """
+    args = [iter(iterable)] * n
+    return it.zip_longest(*args, fillvalue=fillvalue)
+
+
+def groom(lst):
+    """
+    Returns a flat list of [src, dst] pairs
+    """
+    return list(part(flatten(lst), 2))
 
 
 def counter(x):
@@ -88,21 +118,97 @@ def compare_file(xf, yf):
 
 def isaudiofile(x):
     """
-    isfile for now
+    NB Not quite correct detection by extension
     """
-    return os.path.isfile(x)
+    root, ext = os.path.splitext(x)
+    return ext.upper() == ".MP3"
 
 
-def list_dir_groomed(dir):
+def list_dir_groom(abs_path):
     """
     Returns a tuple of: (0) naturally sorted list of
     offspring directory paths (1) naturally sorted list
     of offspring file paths.
     """
-    lst = os.listdir(dir)
-    dirs = [x for x in lst if os.isdir(x)].sort(compare_path)
-    files = [x for x in lst if isaudiofile(x)].sort(compare_file)
+    lst = [os.path.join(abs_path, x) for x in os.listdir(abs_path)]
+    dirs = sorted([x for x in lst if os.path.isdir(x)], key=ft.cmp_to_key(compare_path))
+    files = sorted([x for x in lst if isaudiofile(x)], key=ft.cmp_to_key(compare_file))
     return (dirs, files)
+
+
+def traverse_dir(src_dir, dst_root, dst_step, ffc):
+    """
+    """
+    global args
+    dirs, files = list_dir_groom(src_dir)
+
+    def decorate_dir_name(i, name):
+        return str(i + 1).zfill(3) + "-" + name
+
+    def decorate_file_name(i, name):
+        return str(i + 1).zfill(4) + "-" + (name if args.unified_name is None
+                                                else args.unified_name + ".mp3")
+
+    def dir_tree_handler(i, abs_path):
+        step = os.path.join(dst_step, decorate_dir_name(i, os.path.basename(abs_path)))
+        os.mkdir(os.path.join(dst_root, step))
+        return traverse_dir(abs_path, dst_root, step, ffc)
+
+    def dir_flat_handler(i, abs_path):
+        return traverse_dir(abs_path, dst_root, "", ffc)
+
+    def file_tree_handler(i, abs_path):
+        dst_path = os.path.join(dst_root,
+                            os.path.join(dst_step, decorate_file_name(i, os.path.basename(abs_path))))
+#        shutil.copy(abs_path, dst_path)
+        ffc()
+        return (abs_path, dst_path)
+
+    def file_flat_handler(i, abs_path):
+        dst_path = os.path.join(dst_root, decorate_file_name(ffc(), os.path.basename(abs_path)))
+#        shutil.copy(abs_path, dst_path)
+        return (abs_path, dst_path)
+
+    dh = dir_tree_handler if args.tree_dst else dir_flat_handler
+    fh = file_tree_handler if args.tree_dst else file_flat_handler
+
+    return [dh(i, x) for i, x in enumerate(dirs)] + [fh(i, x) for i, x in enumerate(files)]
+
+
+def build_album():
+    """
+    Sets up boilerplate required by the options and returns the ammo belt
+    """
+    global args
+    src_name = os.path.basename(args.src_dir)
+    prefix = "" if args.album_num is None else (str(args.album_num).zfill(2) + "-")
+    base_dst = prefix + (src_name if args.unified_name is None else args.unified_name)
+    executive_dst = os.path.join(args.dst_dir, "" if args.drop_dst else base_dst)
+    file_counter = counter(0)
+
+    if not args.drop_dst:
+        os.mkdir(executive_dst)
+
+    return (file_counter, groom(traverse_dir(args.src_dir, executive_dst, "", file_counter)))
+
+
+def copy_album():
+    """
+    Runs through the ammo belt and does copying, in the reverse order if necessary
+    """
+    global args
+    file_counter, ready_belt = build_album()
+    fcount = file_counter()
+    belt = reversed(ready_belt) if args.reverse else ready_belt
+
+    def _cp(entry, tg):
+        src, dst = entry
+        shutil.copy(src, dst)
+        return entry
+
+    copy = (lambda i, x: _cp(x, fcount - i - 1)) if args.reverse else (lambda i, x: _cp(x, i))
+
+    return [copy(i, x) for i, x in enumerate(belt)]
 
 
 def retrieve_args():
@@ -116,8 +222,12 @@ def retrieve_args():
     parser.add_argument("-g", "--album-tag", help="album tag name")
     parser.add_argument('src_dir', help="source directory, to be copied itself as root directory")
     parser.add_argument('dst_dir', help="destination directory")
-    return parser.parse_args()
+    rg = parser.parse_args()
+    rg.src_dir = rg.src_dir.rstrip(os.sep)
+    rg.dst_dir = rg.dst_dir.rstrip(os.sep)
+    return rg
 
 
 if __name__ == '__main__':
     args = retrieve_args()
+    res = copy_album()
