@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#import mutagen
+from mutagen.easyid3 import EasyID3
 import os
 import re
 import shutil
@@ -201,9 +201,19 @@ def copy_album():
     fcount = file_counter()
     belt = reversed(ready_belt) if args.reverse else ready_belt
 
-    def _cp(entry, tg):
+    def _set_tags(path, track):
+        audio = EasyID3(path)
+        audio["tracknumber"] = str(track + 1) + "/" + str(fcount)
+        if args.artist_tag is not None:
+            audio["artist"] = args.artist_tag
+        if args.album_tag is not None:
+            audio["album"] = args.album_tag
+        audio.save()
+
+    def _cp(entry, i):
         src, dst = entry
         shutil.copy(src, dst)
+        _set_tags(dst, i)
         return entry
 
     copy = (lambda i, x: _cp(x, fcount - i - 1)) if args.reverse else (lambda i, x: _cp(x, i))
