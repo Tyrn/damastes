@@ -41,13 +41,6 @@ def part(iterable, n, fillvalue=None):
     return it.zip_longest(*args, fillvalue=fillvalue)
 
 
-def groom(lst):
-    """
-    Returns a flat list of [src, dst] pairs
-    """
-    return list(part(flatten(lst), 2))
-
-
 def counter(x):
     """
     Provides a function returning next
@@ -138,6 +131,8 @@ def list_dir_groom(abs_path):
 
 def traverse_dir(src_dir, dst_root, dst_step, ffc):
     """
+    Recursively traverses the source directory and returns the _recursive_ list of (src, dst) pairs;
+    the destination directory and file names get decorated according to options
     """
     global args
     dirs, files = list_dir_groom(src_dir)
@@ -160,13 +155,11 @@ def traverse_dir(src_dir, dst_root, dst_step, ffc):
     def file_tree_handler(i, abs_path):
         dst_path = os.path.join(dst_root,
                             os.path.join(dst_step, decorate_file_name(i, os.path.basename(abs_path))))
-#        shutil.copy(abs_path, dst_path)
         ffc()
         return (abs_path, dst_path)
 
     def file_flat_handler(i, abs_path):
         dst_path = os.path.join(dst_root, decorate_file_name(ffc(), os.path.basename(abs_path)))
-#        shutil.copy(abs_path, dst_path)
         return (abs_path, dst_path)
 
     dh = dir_tree_handler if args.tree_dst else dir_flat_handler
@@ -178,6 +171,7 @@ def traverse_dir(src_dir, dst_root, dst_step, ffc):
 def build_album():
     """
     Sets up boilerplate required by the options and returns the ammo belt
+    (flat list of (src, dst) pairs)
     """
     global args
     src_name = os.path.basename(args.src_dir)
@@ -188,6 +182,8 @@ def build_album():
 
     if not args.drop_dst:
         os.mkdir(executive_dst)
+
+    groom = lambda lst: list(part(flatten(lst), 2))    # Returns the flat ammo belt
 
     return (file_counter, groom(traverse_dir(args.src_dir, executive_dst, "", file_counter)))
 
@@ -210,13 +206,14 @@ def copy_album():
             audio["album"] = args.album_tag
         audio.save()
 
-    def _cp(entry, i):
+    def _cp(i, entry):
         src, dst = entry
         shutil.copy(src, dst)
         _set_tags(dst, i)
+        print("{:>4}/{:<4} {}".format(i + 1, fcount, dst))
         return entry
 
-    copy = (lambda i, x: _cp(x, fcount - i - 1)) if args.reverse else (lambda i, x: _cp(x, i))
+    copy = (lambda i, x: _cp(fcount - i - 1, x)) if args.reverse else lambda i, x: _cp(i, x)
 
     return [copy(i, x) for i, x in enumerate(belt)]
 
