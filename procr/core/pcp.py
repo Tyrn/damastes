@@ -200,7 +200,7 @@ def copy_album():
     """
     global args, fcount
     belt = reversed(build_album()) if args.reverse else build_album()
-    
+
     def make_initials(name, separator):
         return ft.reduce(lambda x, y: x[0] + separator + y[0], re.split("\s+", name)).upper()
 
