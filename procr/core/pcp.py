@@ -5,6 +5,7 @@ import os
 import re
 import shutil
 import argparse
+import warnings
 import itertools as it
 import functools as ft
 
@@ -238,5 +239,8 @@ def retrieve_args():
 
 
 if __name__ == '__main__':
+    warnings.resetwarnings()
+    warnings.simplefilter('ignore')
+
     args = retrieve_args()
     copy_album()
