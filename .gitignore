@@ -64,6 +64,7 @@ nosetests.xml
 .idea
 .eric5project
 *.e4p
+*.geany
 
 # Docs
 /docs/build/*
