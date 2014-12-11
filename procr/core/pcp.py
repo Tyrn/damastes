@@ -6,7 +6,7 @@ if sys.version_info < (3, 4, 0):
     sys.stderr.write("You need python 3.4 or later to run this script\n")
     sys.exit(1)
 
-from mutagen.easyid3 import EasyID3
+from mutagen import File
 import os
 import re
 import shutil
@@ -102,20 +102,15 @@ def compare_file(xf, yf):
     return cmpstr_naturally(sans_ext(os.path.basename(xf)), sans_ext(os.path.basename(yf)))
 
 
-def isaudiofile(x):
-    """
-    NB Not quite correct detection by extension
-    """
-    root, ext = os.path.splitext(x)
-    return ext.upper() == ".MP3"
-
-
 def list_dir_groom(abs_path):
     """
     Returns a tuple of: (0) naturally sorted list of
     offspring directory paths (1) naturally sorted list
     of offspring file paths.
     """
+    def isaudiofile(x):
+        return not os.path.isdir(x) and File(x, easy=True) is not None
+
     lst = [os.path.join(abs_path, x) for x in os.listdir(abs_path)]
     dirs = sorted([x for x in lst if os.path.isdir(x)], key=ft.cmp_to_key(compare_path))
     files = sorted([x for x in lst if isaudiofile(x)], key=ft.cmp_to_key(compare_file))
@@ -138,8 +133,9 @@ def traverse_dir(src_dir, dst_root, dst_step):
 
     def decorate_file_name(i, name):
         global args
+        root, ext = os.path.splitext(name)
         return str(i).zfill(4) + "-" + (name if args.unified_name is None
-                                                else args.unified_name + ".mp3")
+                                                else args.unified_name + ext)
 
     def dir_tree_handler(i, abs_path):
         step = os.path.join(dst_step, decorate_dir_name(i, os.path.basename(abs_path)))
@@ -210,7 +206,9 @@ def copy_album():
         return ft.reduce(lambda x, y: x[0] + separator + y[0], re.split("\s+", name)).upper()
 
     def _set_tags(i, total, path):
-        audio = EasyID3(path)
+        audio = File(path, easy=True)
+        if audio is None:
+            return
         audio["tracknumber"] = str(i) + "/" + str(total)
         if args.artist_tag is not None and args.album_tag is not None:
             audio["title"] = str(i) + " " + make_initials(args.artist_tag, ".") + ". - " + args.album_tag
