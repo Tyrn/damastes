@@ -209,7 +209,7 @@ def copy_album():
             audio["album"] = args.album_tag
             audio["title"] = str(i) + " " + args.album_tag
         if args.artist_tag is not None and args.album_tag is not None:
-            audio["title"] = str(i) + " " + make_initials(args.artist_tag, "") + " - " + args.album_tag
+            audio["title"] = str(i) + " " + make_initials(args.artist_tag, ". ") + ". - " + args.album_tag
         audio.save()
 
     def _cp(i, total, entry):
