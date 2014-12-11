@@ -195,6 +195,9 @@ def copy_album():
     """
     global args, fcount
     belt = reversed(build_album()) if args.reverse else build_album()
+    
+    def make_initials(name, separator):
+        return ft.reduce(lambda x, y: x[0] + separator + y[0], re.split("\s+", name)).upper()
 
     def _set_tags(i, total, path):
         audio = EasyID3(path)
@@ -206,7 +209,7 @@ def copy_album():
             audio["album"] = args.album_tag
             audio["title"] = str(i) + " " + args.album_tag
         if args.artist_tag is not None and args.album_tag is not None:
-            audio["title"] = str(i) + " " + args.artist_tag + " - " + args.album_tag
+            audio["title"] = str(i) + " " + make_initials(args.artist_tag, "") + " - " + args.album_tag
         audio.save()
 
     def _cp(i, total, entry):
