@@ -230,8 +230,8 @@ def retrieve_args():
     parser.add_argument('src_dir', help="source directory, to be copied itself as root directory")
     parser.add_argument('dst_dir', help="destination directory")
     rg = parser.parse_args()
-    rg.src_dir = rg.src_dir.rstrip(os.sep)
-    rg.dst_dir = rg.dst_dir.rstrip(os.sep)
+    rg.src_dir = os.path.abspath(rg.src_dir)    # Takes care of the trailing slash, too
+    rg.dst_dir = os.path.abspath(rg.dst_dir)
     return rg
 
 
