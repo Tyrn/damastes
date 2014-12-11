@@ -3,6 +3,7 @@
 from mutagen.easyid3 import EasyID3
 import os
 import re
+import sys
 import shutil
 import argparse
 import warnings
@@ -184,7 +185,11 @@ def build_album():
     executive_dst = os.path.join(args.dst_dir, "" if args.drop_dst else base_dst)
 
     if not args.drop_dst:
-        os.mkdir(executive_dst)
+        if os.path.exists(executive_dst):
+            print('Destination directory "{}" already exists.'.format(executive_dst))
+            sys.exit()
+        else:
+            os.mkdir(executive_dst)
 
     return groom(args.src_dir, executive_dst)
 
@@ -209,7 +214,7 @@ def copy_album():
             audio["album"] = args.album_tag
             audio["title"] = str(i) + " " + args.album_tag
         if args.artist_tag is not None and args.album_tag is not None:
-            audio["title"] = str(i) + " " + make_initials(args.artist_tag, ". ") + ". - " + args.album_tag
+            audio["title"] = str(i) + " " + make_initials(args.artist_tag, ".") + ". - " + args.album_tag
         audio.save()
 
     def _cp(i, total, entry):
