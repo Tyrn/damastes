@@ -207,14 +207,16 @@ def copy_album():
     def _set_tags(i, total, path):
         audio = EasyID3(path)
         audio["tracknumber"] = str(i) + "/" + str(total)
-        if args.artist_tag is not None:
-            audio["artist"] = args.artist_tag
-            audio["title"] = str(i) + " " + args.artist_tag
-        if args.album_tag is not None:
-            audio["album"] = args.album_tag
-            audio["title"] = str(i) + " " + args.album_tag
         if args.artist_tag is not None and args.album_tag is not None:
             audio["title"] = str(i) + " " + make_initials(args.artist_tag, ".") + ". - " + args.album_tag
+            audio["artist"] = args.artist_tag
+            audio["album"] = args.album_tag
+        elif args.artist_tag is not None:
+            audio["title"] = str(i) + " " + args.artist_tag
+            audio["artist"] = args.artist_tag
+        elif args.album_tag is not None:
+            audio["title"] = str(i) + " " + args.album_tag
+            audio["album"] = args.album_tag
         audio.save()
 
     def _cp(i, total, entry):
