@@ -192,7 +192,14 @@ def build_album():
         else:
             os.mkdir(executive_dst)
 
-    return groom(args.src_dir, executive_dst)
+    belt = groom(args.src_dir, executive_dst)
+
+    if not args.drop_dst and belt == []:
+        shutil.rmtree(executive_dst)
+        print('There are no recognized audio files in the source directory "{}".'.format(args.src_dir))
+        sys.exit()
+
+    return belt
 
 
 def copy_album():
