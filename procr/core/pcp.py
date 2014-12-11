@@ -204,6 +204,8 @@ def copy_album():
             audio["artist"] = args.artist_tag
         if args.album_tag is not None:
             audio["album"] = args.album_tag
+        if args.artist_tag is not None and args.album_tag is not None:
+            audio["title"] = args.artist_tag + " - " + args.album_tag
         audio.save()
 
     def _cp(i, entry):
