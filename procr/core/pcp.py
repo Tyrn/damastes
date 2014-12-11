@@ -41,20 +41,6 @@ def part(iterable, n, fillvalue=None):
     return it.zip_longest(*args, fillvalue=fillvalue)
 
 
-def counter(x):
-    """
-    Provides a function returning next
-    consecutive integer, starting from x
-    """
-    x -= 1
-
-    def _cnt():
-        nonlocal x
-        x += 1
-        return x
-    return _cnt
-
-
 def sans_ext(s):
     """
     Discards file extension
@@ -129,37 +115,44 @@ def list_dir_groom(abs_path):
     return (dirs, files)
 
 
-def traverse_dir(src_dir, dst_root, dst_step, ffc):
+fcount = 0                # File counter: mutable by design!
+
+
+def traverse_dir(src_dir, dst_root, dst_step):
     """
     Recursively traverses the source directory and returns the _recursive_ list of (src, dst) pairs;
     the destination directory and file names get decorated according to options
+    MODIFIES fcount
     """
-    global args
     dirs, files = list_dir_groom(src_dir)
 
     def decorate_dir_name(i, name):
-        return str(i + 1).zfill(3) + "-" + name
+        return str(i).zfill(3) + "-" + name
 
     def decorate_file_name(i, name):
-        return str(i + 1).zfill(4) + "-" + (name if args.unified_name is None
+        global args
+        return str(i).zfill(4) + "-" + (name if args.unified_name is None
                                                 else args.unified_name + ".mp3")
 
     def dir_tree_handler(i, abs_path):
         step = os.path.join(dst_step, decorate_dir_name(i, os.path.basename(abs_path)))
         os.mkdir(os.path.join(dst_root, step))
-        return traverse_dir(abs_path, dst_root, step, ffc)
+        return traverse_dir(abs_path, dst_root, step)
 
     def dir_flat_handler(i, abs_path):
-        return traverse_dir(abs_path, dst_root, "", ffc)
+        return traverse_dir(abs_path, dst_root, "")
 
     def file_tree_handler(i, abs_path):
+        global fcount
         dst_path = os.path.join(dst_root,
                             os.path.join(dst_step, decorate_file_name(i, os.path.basename(abs_path))))
-        ffc()
+        fcount += 1
         return (abs_path, dst_path)
 
     def file_flat_handler(i, abs_path):
-        dst_path = os.path.join(dst_root, decorate_file_name(ffc(), os.path.basename(abs_path)))
+        global fcount
+        dst_path = os.path.join(dst_root, decorate_file_name(fcount, os.path.basename(abs_path)))
+        fcount += 1
         return (abs_path, dst_path)
 
     dh = dir_tree_handler if args.tree_dst else dir_flat_handler
@@ -172,50 +165,52 @@ def build_album():
     """
     Sets up boilerplate required by the options and returns the ammo belt
     (flat list of (src, dst) pairs)
+    MODIFIES fcount
     """
-    global args
+    global args, fcount
     src_name = os.path.basename(args.src_dir)
     prefix = "" if args.album_num is None else (str(args.album_num).zfill(2) + "-")
     base_dst = prefix + (src_name if args.unified_name is None else args.unified_name)
     executive_dst = os.path.join(args.dst_dir, "" if args.drop_dst else base_dst)
-    file_counter = counter(0)
 
     if not args.drop_dst:
         os.mkdir(executive_dst)
 
     groom = lambda lst: list(part(flatten(lst), 2))    # Returns the flat ammo belt
 
-    return (file_counter, groom(traverse_dir(args.src_dir, executive_dst, "", file_counter)))
+    fcount = 1
+
+    return groom(traverse_dir(args.src_dir, executive_dst, ""))
 
 
 def copy_album():
     """
     Runs through the ammo belt and does copying, in the reverse order if necessary
     """
-    global args
-    file_counter, ready_belt = build_album()
-    fcount = file_counter()
-    belt = reversed(ready_belt) if args.reverse else ready_belt
+    global args, fcount
+    belt = reversed(build_album()) if args.reverse else build_album()
 
-    def _set_tags(path, track):
+    def _set_tags(i, total, path):
         audio = EasyID3(path)
-        audio["tracknumber"] = str(track + 1) + "/" + str(fcount)
+        audio["tracknumber"] = str(i) + "/" + str(total)
         if args.artist_tag is not None:
             audio["artist"] = args.artist_tag
+            audio["title"] = str(i) + " " + args.artist_tag
         if args.album_tag is not None:
             audio["album"] = args.album_tag
+            audio["title"] = str(i) + " " + args.album_tag
         if args.artist_tag is not None and args.album_tag is not None:
-            audio["title"] = str(track + 1) + " " + args.artist_tag + " - " + args.album_tag
+            audio["title"] = str(i) + " " + args.artist_tag + " - " + args.album_tag
         audio.save()
 
-    def _cp(i, entry):
+    def _cp(i, total, entry):
         src, dst = entry
         shutil.copy(src, dst)
-        _set_tags(dst, i)
-        print("{:>4}/{:<4} {}".format(i + 1, fcount, dst))
+        _set_tags(i, total, dst)
+        print("{:>4}/{:<4} {}".format(i, total, dst))
         return entry
 
-    copy = (lambda i, x: _cp(fcount - i - 1, x)) if args.reverse else lambda i, x: _cp(i, x)
+    copy = (lambda i, x: _cp(fcount - i - 1, fcount - 1, x)) if args.reverse else lambda i, x: _cp(i + 1, fcount - 1, x)
 
     return [copy(i, x) for i, x in enumerate(belt)]
 
@@ -239,4 +234,4 @@ def retrieve_args():
 
 if __name__ == '__main__':
     args = retrieve_args()
-    res = copy_album()
+    copy_album()
