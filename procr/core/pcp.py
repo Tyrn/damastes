@@ -9,12 +9,12 @@ import itertools as it
 import functools as ft
 
 utility_description = '''
-pcp \"Procrustes\" SmArT is a CLI utility for copying subtrees containing audio (mp3)
-files in sequence (preorder of the source subtree, alphabetically sorted by default).
-The end result is a \"flattened\" copy of the source subtree. \"Flattened\" means
+pcp "Procrustes" SmArT is a CLI utility for copying subtrees containing audio (mp3)
+files in sequence (preorder of the source subtree, naturally sorted).
+The end result is a "flattened" copy of the source subtree. "Flattened" means
 that only a namesake of the root source directory is created, where all the files get
-copied to, names prefixed with a serial number. Mp3 tags 'Track' and 'Tracks Total'
-get set, tags 'Artist' and 'Album' can be replaced optionally.
+copied to, names prefixed with a serial number. Mp3 tags "Track" and "Tracks Total"
+get set, tags "Artist" and "Album" can be replaced optionally.
 The writing process is strictly sequential: either starting with the number one file,
 or in the reversed order. This can be important for some mobile devices.
 '''
@@ -161,13 +161,22 @@ def traverse_dir(src_dir, dst_root, dst_step):
     return [dh(i, x) for i, x in enumerate(dirs)] + [fh(i, x) for i, x in enumerate(files)]
 
 
+def groom(src, dst):
+    """
+    Makes an 'executive' run of traversing the source directory
+    MODIFIES fcount
+    """
+    global fcount
+    fcount = 1
+    return list(part(flatten(traverse_dir(src, dst, "")), 2))
+
+
 def build_album():
     """
     Sets up boilerplate required by the options and returns the ammo belt
     (flat list of (src, dst) pairs)
-    MODIFIES fcount
     """
-    global args, fcount
+    global args
     src_name = os.path.basename(args.src_dir)
     prefix = "" if args.album_num is None else (str(args.album_num).zfill(2) + "-")
     base_dst = prefix + (src_name if args.unified_name is None else args.unified_name)
@@ -176,11 +185,7 @@ def build_album():
     if not args.drop_dst:
         os.mkdir(executive_dst)
 
-    groom = lambda lst: list(part(flatten(lst), 2))    # Returns the flat ammo belt
-
-    fcount = 1
-
-    return groom(traverse_dir(args.src_dir, executive_dst, ""))
+    return groom(args.src_dir, executive_dst)
 
 
 def copy_album():
