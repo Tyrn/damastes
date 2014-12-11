@@ -1,20 +1,19 @@
 #!/usr/bin/env python
 
-from mutagen.easyid3 import EasyID3
-import os
-import re
 import sys
-import shutil
-import argparse
-import warnings
-import itertools as it
-import functools as ft
-
 
 if sys.version_info < (3, 4, 0):
     sys.stderr.write("You need python 3.4 or later to run this script\n")
     sys.exit(1)
 
+from mutagen.easyid3 import EasyID3
+import os
+import re
+import shutil
+import argparse
+import warnings
+import itertools as it
+import functools as ft
 
 utility_description = '''
 pcp "Procrustes" SmArT is a CLI utility for copying subtrees containing audio (mp3)
