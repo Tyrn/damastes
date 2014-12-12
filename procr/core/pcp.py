@@ -16,11 +16,11 @@ import itertools as it
 import functools as ft
 
 utility_description = '''
-pcp "Procrustes" SmArT is a CLI utility for copying subtrees containing audio (mp3)
+pcp "Procrustes" SmArT is a CLI utility for copying subtrees containing supported audio
 files in sequence (preorder of the source subtree, naturally sorted).
 The end result is a "flattened" copy of the source subtree. "Flattened" means
 that only a namesake of the root source directory is created, where all the files get
-copied to, names prefixed with a serial number. Mp3 tags "Track" and "Tracks Total"
+copied to, names prefixed with a serial number. Tags "Track" and "Tracks Total"
 get set, tags "Artist" and "Album" can be replaced optionally.
 The writing process is strictly sequential: either starting with the number one file,
 or in the reversed order. This can be important for some mobile devices.
@@ -196,7 +196,7 @@ def build_album():
 
     if not args.drop_dst and belt == []:
         shutil.rmtree(executive_dst)
-        print('There are no recognized audio files in the source directory "{}".'.format(args.src_dir))
+        print('There are no supported audio files in the source directory "{}".'.format(args.src_dir))
         sys.exit()
 
     return belt
