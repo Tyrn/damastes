@@ -202,15 +202,19 @@ def build_album():
     return belt
 
 
+def make_initials(name, separator):
+    """
+    Reduces a string of names to initials. Trailing separator is not appended
+    """
+    return separator.join([x[0] for x in re.split("\s+", name)])
+
+
 def copy_album():
     """
     Runs through the ammo belt and does copying, in the reverse order if necessary
     """
     global args, fcount
     belt = reversed(build_album()) if args.reverse else build_album()
-
-    def make_initials(name, separator):
-        return ft.reduce(lambda x, y: x[0] + separator + y[0], re.split("\s+", name)).upper()
 
     def _set_tags(i, total, path):
         audio = File(path, easy=True)
