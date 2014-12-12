@@ -39,8 +39,8 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(cmpstr_naturally("alfa", "bravo"), -1)
 
     def test_make_initials(self):
-        self.assertEqual(make_initials("John Ronald Reuel Tolkien", "."), "J.R.R.T")
-        self.assertEqual(make_initials("E. B. Sledge", "."), "E.B.S")
+        self.assertEqual(make_initials("John ronald reuel Tolkien", "."), "J.R.R.T")
+        self.assertEqual(make_initials("e. B. Sledge", "."), "E.B.S")
 
     def test_list_dir_groom(self):
         r = "/home/alexey/dir-test/"
