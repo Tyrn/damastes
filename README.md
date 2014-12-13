@@ -16,7 +16,8 @@ and directories are not modified in any way.
 Options
 -------
 
--h,--help short description and options
+-h, --help  short description and options
+-t, --tree-dst  copy as tree
 
 Examples
 --------
