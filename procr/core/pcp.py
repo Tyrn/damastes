@@ -251,7 +251,7 @@ def retrieve_args():
     parser.add_argument("-p", "--drop-dst", help="do not create destination directory", action="store_true")
     parser.add_argument("-r", "--reverse", help="copy files in reverse order (number one file is the last to be copied)", action="store_true")
     parser.add_argument("-u", "--unified-name",
-        help="destination root directory name and file names are based on UNIFIED_NAME,serial nuber prepended, file extentions retained")
+        help="destination root directory name and file names are based on UNIFIED_NAME,serial number prepended, file extentions retained")
     parser.add_argument("-b", "--album-num", help="0..99; prepend ALBUM_NUM to the destination root directory name")
     parser.add_argument("-a", "--artist-tag", help="artist tag name")
     parser.add_argument("-g", "--album-tag", help="album tag name")
