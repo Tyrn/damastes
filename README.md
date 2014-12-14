@@ -13,11 +13,19 @@ without leading zeroes, etc.
 if necessary, while copying the album to destination. Source files
 and directories are not modified in any way.
 
+General syntax
+--------------
+
+``$ pcp [<options>] <source directory> <destination directory>``
+
 Options
 -------
 
--h, --help  short description and options
--t, --tree-dst  copy as tree
+``-h, --help``
+short description and options
+
+``-t, --tree-dst``
+copy as tree
 
 Examples
 --------
