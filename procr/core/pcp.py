@@ -247,15 +247,16 @@ def copy_album():
 
 def retrieve_args():
     parser = argparse.ArgumentParser(description=utility_description)
-    parser.add_argument("-t", "--tree-dst", help="copy as tree: keep source tree structure at destination", action="store_true")
+    parser.add_argument("-t", "--tree-dst", help="retain the tree structure of the source album at destination", action="store_true")
     parser.add_argument("-p", "--drop-dst", help="do not create destination directory", action="store_true")
-    parser.add_argument("-r", "--reverse", help="write files in reverse order (time sequence)", action="store_true")
-    parser.add_argument("-u", "--unified-name", help="root substring for destination directory and file names")
-    parser.add_argument("-b", "--album-num", help="album (book) start number, 0...99; omission means increment each call")
+    parser.add_argument("-r", "--reverse", help="copy files in reverse order (number one file is the last to be copied)", action="store_true")
+    parser.add_argument("-u", "--unified-name",
+        help="destination root directory name and file names are based on UNIFIED_NAME,serial nuber prepended, file extentions retained")
+    parser.add_argument("-b", "--album-num", help="0..99; prepend ALBUM_NUM to the destination root directory name")
     parser.add_argument("-a", "--artist-tag", help="artist tag name")
     parser.add_argument("-g", "--album-tag", help="album tag name")
-    parser.add_argument('src_dir', help="source directory, to be copied itself as root directory")
-    parser.add_argument('dst_dir', help="destination directory")
+    parser.add_argument('src_dir', help="source directory")
+    parser.add_argument('dst_dir', help="general destination directory")
     rg = parser.parse_args()
     rg.src_dir = os.path.abspath(rg.src_dir)    # Takes care of the trailing slash, too
     rg.dst_dir = os.path.abspath(rg.dst_dir)
