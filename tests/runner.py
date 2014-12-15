@@ -42,12 +42,6 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(make_initials("John ronald reuel Tolkien", "."), "J.R.R.T")
         self.assertEqual(make_initials("e. B. Sledge", "."), "E.B.S")
 
-    def test_list_dir_groom(self):
-        r = "/home/alexey/dir-test/"
-        self.assertEqual(list_dir_groom(r),
-                ([r + "a2", r + "a3", r + "a10"],
-                [r + "f4.mp3", r + "f5.mp3", r + "f12.mp3"]))
-
     def tearDown(self):
         pass
 
