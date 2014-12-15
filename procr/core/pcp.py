@@ -118,6 +118,7 @@ def list_dir_groom(abs_path):
 
 
 fcount = 0                # File counter: mutable by design!
+args = None
 
 
 def traverse_dir(src_dir, dst_root, dst_step):
@@ -263,9 +264,15 @@ def retrieve_args():
     return rg
 
 
-if __name__ == '__main__':
+def main():
+    global args
+
     warnings.resetwarnings()
     warnings.simplefilter('ignore')
 
     args = retrieve_args()
     copy_album()
+
+
+if __name__ == '__main__':
+    main()
