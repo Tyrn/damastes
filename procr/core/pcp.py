@@ -117,8 +117,48 @@ def list_dir_groom(abs_path):
     return (dirs, files)
 
 
-fcount = 0                # File counter: mutable by design!
 args = None
+fcount = 0                # File counter: mutable by design!
+
+
+def decorate_dir_name(i, name):
+    return str(i).zfill(3) + "-" + name
+
+
+def decorate_file_name(i, name):
+    global args
+    root, ext = os.path.splitext(name)
+    return str(i).zfill(4) + "-" + (name if args.unified_name is None
+                                            else args.unified_name + ext)
+
+
+def traverse_gen(src_dir, dst_root, dst_step):
+    """
+    Recursively traverses the source directory and yields a sequence of (src, dst) pairs;
+    the destination directory and file names get decorated according to options
+    MODIFIES fcount
+    """
+    global args, fcount
+    dirs, files = list_dir_groom(src_dir)
+
+    for i, d in enumerate(dirs):
+        if args.tree_dst:
+            step = os.path.join(dst_step, decorate_dir_name(i, os.path.basename(d)))
+            os.mkdir(os.path.join(dst_root, step))
+            yield from traverse_gen(d, dst_root, step)
+        else:
+            yield from traverse_gen(d, dst_root, "")
+
+    for i, f in enumerate(files):
+        if args.tree_dst:
+            dst_path = os.path.join(dst_root,
+                                os.path.join(dst_step, decorate_file_name(i, os.path.basename(f))))
+            fcount += 1
+            yield (f, dst_path)
+        else:
+            dst_path = os.path.join(dst_root, decorate_file_name(fcount, os.path.basename(f)))
+            fcount += 1
+            yield (f, dst_path)
 
 
 def traverse_dir(src_dir, dst_root, dst_step):
@@ -128,15 +168,6 @@ def traverse_dir(src_dir, dst_root, dst_step):
     MODIFIES fcount
     """
     dirs, files = list_dir_groom(src_dir)
-
-    def decorate_dir_name(i, name):
-        return str(i).zfill(3) + "-" + name
-
-    def decorate_file_name(i, name):
-        global args
-        root, ext = os.path.splitext(name)
-        return str(i).zfill(4) + "-" + (name if args.unified_name is None
-                                                else args.unified_name + ext)
 
     def dir_tree_handler(i, abs_path):
         step = os.path.join(dst_step, decorate_dir_name(i, os.path.basename(abs_path)))
@@ -175,6 +206,16 @@ def groom(src, dst):
     return list(part(flatten(traverse_dir(src, dst, "")), 2))
 
 
+def groom_gen(src, dst):
+    """
+    Makes an 'executive' run of traversing the source directory
+    MODIFIES fcount
+    """
+    global fcount
+    fcount = 1
+    return list(traverse_gen(src, dst, ""))
+
+
 def build_album():
     """
     Sets up boilerplate required by the options and returns the ammo belt
@@ -193,7 +234,7 @@ def build_album():
         else:
             os.mkdir(executive_dst)
 
-    belt = groom(args.src_dir, executive_dst)
+    belt = groom_gen(args.src_dir, executive_dst)
 
     if not args.drop_dst and belt == []:
         shutil.rmtree(executive_dst)
