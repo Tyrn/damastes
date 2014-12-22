@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='Procrustes SmArT',
-    version='0.8.0',
+    version='0.8.2',
     packages=['procr', 'procr.core'],
     entry_points={
         'console_scripts': [

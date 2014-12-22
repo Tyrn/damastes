@@ -27,27 +27,6 @@ or in the reversed order. This can be important for some mobile devices.
 '''
 
 
-def flatten(lst):
-    """
-    Returns a flattened list; strings left as is
-    """
-    flat = []
-    for x in lst:
-        if hasattr(x, '__iter__') and not isinstance(x, str):
-            flat.extend(flatten(x))
-        else:
-            flat.append(x)
-    return flat
-
-
-def part(iterable, n, fillvalue=None):
-    """
-    Collects data into fixed-length chunks or blocks (partition in Clojure)
-    """
-    args = [iter(iterable)] * n
-    return it.zip_longest(*args, fillvalue=fillvalue)
-
-
 def sans_ext(s):
     """
     Discards file extension
@@ -128,72 +107,45 @@ def decorate_dir_name(i, name):
 def decorate_file_name(i, name):
     global args
     root, ext = os.path.splitext(name)
-    return str(i).zfill(4) + "-" + (name if args.unified_name is None
-                                            else args.unified_name + ext)
+    return str(i).zfill(4) + "-" + (name if args.unified_name is None else args.unified_name + ext)
 
 
-def traverse_gen(src_dir, dst_root, dst_step):
+def traverse_tree_dst(src_dir, dst_root, dst_step):
     """
-    Recursively traverses the source directory and yields a sequence of (src, dst) pairs;
+    Recursively traverses the source directory and yields a sequence of (src, tree dst) pairs;
     the destination directory and file names get decorated according to options
     MODIFIES fcount
     """
-    global args, fcount
+    global fcount
     dirs, files = list_dir_groom(src_dir)
 
     for i, d in enumerate(dirs):
-        if args.tree_dst:
-            step = os.path.join(dst_step, decorate_dir_name(i, os.path.basename(d)))
-            os.mkdir(os.path.join(dst_root, step))
-            yield from traverse_gen(d, dst_root, step)
-        else:
-            yield from traverse_gen(d, dst_root, "")
+        step = os.path.join(dst_step, decorate_dir_name(i, os.path.basename(d)))
+        os.mkdir(os.path.join(dst_root, step))
+        yield from traverse_tree_dst(d, dst_root, step)
 
     for i, f in enumerate(files):
-        if args.tree_dst:
-            dst_path = os.path.join(dst_root,
-                                os.path.join(dst_step, decorate_file_name(i, os.path.basename(f))))
-            fcount += 1
-            yield (f, dst_path)
-        else:
-            dst_path = os.path.join(dst_root, decorate_file_name(fcount, os.path.basename(f)))
-            fcount += 1
-            yield (f, dst_path)
+        dst_path = os.path.join(dst_root, os.path.join(dst_step, decorate_file_name(i, os.path.basename(f))))
+        fcount += 1
+        yield (f, dst_path)
 
 
-def traverse_dir(src_dir, dst_root, dst_step):
+def traverse_flat_dst(src_dir, dst_root):
     """
-    Recursively traverses the source directory and returns the _recursive_ list of (src, dst) pairs;
+    Recursively traverses the source directory and yields a sequence of (src, flat dst) pairs;
     the destination directory and file names get decorated according to options
     MODIFIES fcount
     """
+    global fcount
     dirs, files = list_dir_groom(src_dir)
 
-    def dir_tree_handler(i, abs_path):
-        step = os.path.join(dst_step, decorate_dir_name(i, os.path.basename(abs_path)))
-        os.mkdir(os.path.join(dst_root, step))
-        return traverse_dir(abs_path, dst_root, step)
+    for i, d in enumerate(dirs):
+        yield from traverse_flat_dst(d, dst_root)
 
-    def dir_flat_handler(i, abs_path):
-        return traverse_dir(abs_path, dst_root, "")
-
-    def file_tree_handler(i, abs_path):
-        global fcount
-        dst_path = os.path.join(dst_root,
-                            os.path.join(dst_step, decorate_file_name(i, os.path.basename(abs_path))))
+    for i, f in enumerate(files):
+        dst_path = os.path.join(dst_root, decorate_file_name(fcount, os.path.basename(f)))
         fcount += 1
-        return (abs_path, dst_path)
-
-    def file_flat_handler(i, abs_path):
-        global fcount
-        dst_path = os.path.join(dst_root, decorate_file_name(fcount, os.path.basename(abs_path)))
-        fcount += 1
-        return (abs_path, dst_path)
-
-    dh = dir_tree_handler if args.tree_dst else dir_flat_handler
-    fh = file_tree_handler if args.tree_dst else file_flat_handler
-
-    return [dh(i, x) for i, x in enumerate(dirs)] + [fh(i, x) for i, x in enumerate(files)]
+        yield (f, dst_path)
 
 
 def groom(src, dst):
@@ -201,19 +153,9 @@ def groom(src, dst):
     Makes an 'executive' run of traversing the source directory
     MODIFIES fcount
     """
-    global fcount
+    global args, fcount
     fcount = 1
-    return list(part(flatten(traverse_dir(src, dst, "")), 2))
-
-
-def groom_gen(src, dst):
-    """
-    Makes an 'executive' run of traversing the source directory
-    MODIFIES fcount
-    """
-    global fcount
-    fcount = 1
-    return list(traverse_gen(src, dst, ""))
+    return list(traverse_tree_dst(src, dst, "") if args.tree_dst else traverse_flat_dst(src, dst))
 
 
 def build_album():
@@ -234,7 +176,7 @@ def build_album():
         else:
             os.mkdir(executive_dst)
 
-    belt = groom_gen(args.src_dir, executive_dst)
+    belt = groom(args.src_dir, executive_dst)
 
     if not args.drop_dst and belt == []:
         shutil.rmtree(executive_dst)
