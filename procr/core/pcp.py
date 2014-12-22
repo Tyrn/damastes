@@ -150,7 +150,8 @@ def traverse_flat_dst(src_dir, dst_root):
 
 def groom(src, dst):
     """
-    Makes an 'executive' run of traversing the source directory
+    Makes an 'executive' run of traversing the source directory; returns the 'ammo belt'
+    list, to be consumed from any end according to options (straight or reverse)
     MODIFIES fcount
     """
     global args, fcount
