@@ -81,19 +81,20 @@ def compare_file(xf, yf):
     return cmpstr_naturally(sans_ext(os.path.basename(xf)), sans_ext(os.path.basename(yf)))
 
 
+def isaudiofile(x):
+    return not os.path.isdir(x) and File(x, easy=True) is not None
+
+
 def list_dir_groom(abs_path):
     """
     Returns a tuple of: (0) naturally sorted list of
     offspring directory paths (1) naturally sorted list
     of offspring file paths.
     """
-    def isaudiofile(x):
-        return not os.path.isdir(x) and File(x, easy=True) is not None
-
     lst = [os.path.join(abs_path, x) for x in os.listdir(abs_path)]
     dirs = sorted([x for x in lst if os.path.isdir(x)], key=ft.cmp_to_key(compare_path))
     files = sorted([x for x in lst if isaudiofile(x)], key=ft.cmp_to_key(compare_file))
-    return (dirs, files)
+    return dirs, files
 
 
 args = None
@@ -127,7 +128,7 @@ def traverse_tree_dst(src_dir, dst_root, dst_step):
     for i, f in enumerate(files):
         dst_path = os.path.join(dst_root, os.path.join(dst_step, decorate_file_name(i, os.path.basename(f))))
         fcount += 1
-        yield (f, dst_path)
+        yield f, dst_path
 
 
 def traverse_flat_dst(src_dir, dst_root):
@@ -145,30 +146,41 @@ def traverse_flat_dst(src_dir, dst_root):
     for i, f in enumerate(files):
         dst_path = os.path.join(dst_root, decorate_file_name(fcount, os.path.basename(f)))
         fcount += 1
-        yield (f, dst_path)
+        yield f, dst_path
 
 
 def groom(src, dst):
     """
-    Makes an 'executive' run of traversing the source directory; returns the 'ammo belt'
-    list, to be consumed from any end according to options (straight or reverse)
+    Makes an 'executive' run of traversing the source directory; returns the 'ammo belt' generator
     MODIFIES fcount
     """
     global args, fcount
     fcount = 1
-    return list(traverse_tree_dst(src, dst, "") if args.tree_dst else traverse_flat_dst(src, dst))
+    return traverse_tree_dst(src, dst, "") if args.tree_dst else traverse_flat_dst(src, dst)
 
 
 def build_album():
     """
-    Sets up boilerplate required by the options and returns the ammo belt
-    (flat list of (src, dst) pairs)
+    Sets up boilerplate required by the options and returns the ammo belt generator
+    of (src, dst) pairs
     """
     global args
     src_name = os.path.basename(args.src_dir)
     prefix = "" if args.album_num is None else (str(args.album_num).zfill(2) + "-")
     base_dst = prefix + (src_name if args.unified_name is None else args.unified_name)
     executive_dst = os.path.join(args.dst_dir, "" if args.drop_dst else base_dst)
+
+    def audiofiles_count(dir):
+        """
+        Returns full recursive count of audiofiles in dir
+        """
+        cnt = 0
+        
+        for root, dirs, files in os.walk(dir):
+            for name in files:
+                if isaudiofile(os.path.join(root, name)):
+                    cnt += 1
+        return cnt
 
     if not args.drop_dst:
         if os.path.exists(executive_dst):
@@ -177,14 +189,15 @@ def build_album():
         else:
             os.mkdir(executive_dst)
 
+    tot = audiofiles_count(args.src_dir)
     belt = groom(args.src_dir, executive_dst)
 
-    if not args.drop_dst and belt == []:
+    if not args.drop_dst and tot == 0:
         shutil.rmtree(executive_dst)
         print('There are no supported audio files in the source directory "{}".'.format(args.src_dir))
         sys.exit()
 
-    return belt
+    return tot, belt
 
 
 def make_initials(name, separator):
@@ -198,8 +211,7 @@ def copy_album():
     """
     Runs through the ammo belt and does copying, in the reverse order if necessary
     """
-    global args, fcount
-    belt = reversed(build_album()) if args.reverse else build_album()
+    global args
 
     def _set_tags(i, total, path):
         audio = File(path, easy=True)
@@ -225,9 +237,14 @@ def copy_album():
         print("{:>4}/{:<4} {}".format(i, total, dst))
         return entry
 
-    copy = (lambda i, x: _cp(fcount - i - 1, fcount - 1, x)) if args.reverse else lambda i, x: _cp(i + 1, fcount - 1, x)
+    tot, belt = build_album()
 
-    return [copy(i, x) for i, x in enumerate(belt)]
+    if args.reverse:
+        for i, x in enumerate(reversed(list(belt))):
+            _cp(tot - i, tot, x)
+    else:
+        for i, x in enumerate(belt):
+            _cp(i + 1, tot, x)
 
 
 def retrieve_args():
@@ -245,11 +262,6 @@ def retrieve_args():
     rg = parser.parse_args()
     rg.src_dir = os.path.abspath(rg.src_dir)    # Takes care of the trailing slash, too
     rg.dst_dir = os.path.abspath(rg.dst_dir)
-    
-    if rg.reverse and rg.tree_dst:
-        print("  *** -t option ignored **")
-        rg.tree_dst = False
-        
     return rg
 
 

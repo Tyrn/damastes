@@ -41,7 +41,7 @@ class TestHelpers(unittest.TestCase):
     def test_make_initials(self):
         self.assertEqual(make_initials("John ronald reuel Tolkien", "."), "J.R.R.T")
         self.assertEqual(make_initials("e. B. Sledge", "."), "E.B.S")
-
+        
     def tearDown(self):
         pass
 
