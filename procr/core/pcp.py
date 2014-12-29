@@ -92,8 +92,10 @@ def list_dir_groom(abs_path, rev=False):
     of offspring file paths.
     """
     lst = [os.path.join(abs_path, x) for x in os.listdir(abs_path)]
-    dirs = sorted([x for x in lst if os.path.isdir(x)], key=ft.cmp_to_key((lambda xp, yp: -compare_path(xp, yp)) if rev else compare_path))
-    files = sorted([x for x in lst if isaudiofile(x)], key=ft.cmp_to_key((lambda xf, yf: -compare_file(xf, yf)) if rev else compare_file))
+    dirs = sorted([x for x in lst if os.path.isdir(x)],
+                   key=ft.cmp_to_key((lambda xp, yp: -compare_path(xp, yp)) if rev else compare_path))
+    files = sorted([x for x in lst if isaudiofile(x)],
+                    key=ft.cmp_to_key((lambda xf, yf: -compare_file(xf, yf)) if rev else compare_file))
     return dirs, files
 
 
