@@ -98,7 +98,6 @@ def list_dir_groom(abs_path):
 
 
 args = None
-fcount = 0                # File counter: mutable by design!
 
 
 def decorate_dir_name(i, name):
@@ -115,9 +114,7 @@ def traverse_tree_dst(src_dir, dst_root, dst_step):
     """
     Recursively traverses the source directory and yields a sequence of (src, tree dst) pairs;
     the destination directory and file names get decorated according to options
-    MODIFIES fcount
     """
-    global fcount
     dirs, files = list_dir_groom(src_dir)
 
     for i, d in enumerate(dirs):
@@ -127,36 +124,31 @@ def traverse_tree_dst(src_dir, dst_root, dst_step):
 
     for i, f in enumerate(files):
         dst_path = os.path.join(dst_root, os.path.join(dst_step, decorate_file_name(i, os.path.basename(f))))
-        fcount += 1
         yield f, dst_path
 
 
-def traverse_flat_dst(src_dir, dst_root):
+def traverse_flat_dst(src_dir, dst_root, fcount):
     """
     Recursively traverses the source directory and yields a sequence of (src, flat dst) pairs;
     the destination directory and file names get decorated according to options
-    MODIFIES fcount
     """
-    global fcount
     dirs, files = list_dir_groom(src_dir)
 
     for i, d in enumerate(dirs):
-        yield from traverse_flat_dst(d, dst_root)
+        yield from traverse_flat_dst(d, dst_root, fcount)
 
     for i, f in enumerate(files):
-        dst_path = os.path.join(dst_root, decorate_file_name(fcount, os.path.basename(f)))
-        fcount += 1
+        dst_path = os.path.join(dst_root, decorate_file_name(fcount[0], os.path.basename(f)))
+        fcount[0] += 1
         yield f, dst_path
 
 
 def groom(src, dst):
     """
     Makes an 'executive' run of traversing the source directory; returns the 'ammo belt' generator
-    MODIFIES fcount
     """
-    global args, fcount
-    fcount = 1
-    return traverse_tree_dst(src, dst, "") if args.tree_dst else traverse_flat_dst(src, dst)
+    global args
+    return traverse_tree_dst(src, dst, "") if args.tree_dst else traverse_flat_dst(src, dst, [1])
 
 
 def build_album():
