@@ -85,15 +85,15 @@ def isaudiofile(x):
     return not os.path.isdir(x) and File(x, easy=True) is not None
 
 
-def list_dir_groom(abs_path):
+def list_dir_groom(abs_path, rev=False):
     """
     Returns a tuple of: (0) naturally sorted list of
     offspring directory paths (1) naturally sorted list
     of offspring file paths.
     """
     lst = [os.path.join(abs_path, x) for x in os.listdir(abs_path)]
-    dirs = sorted([x for x in lst if os.path.isdir(x)], key=ft.cmp_to_key(compare_path))
-    files = sorted([x for x in lst if isaudiofile(x)], key=ft.cmp_to_key(compare_file))
+    dirs = sorted([x for x in lst if os.path.isdir(x)], key=ft.cmp_to_key((lambda xp, yp: -compare_path(xp, yp)) if rev else compare_path))
+    files = sorted([x for x in lst if isaudiofile(x)], key=ft.cmp_to_key((lambda xf, yf: -compare_file(xf, yf)) if rev else compare_file))
     return dirs, files
 
 
@@ -143,12 +143,34 @@ def traverse_flat_dst(src_dir, dst_root, fcount):
         yield f, dst_path
 
 
-def groom(src, dst):
+def traverse_flat_dst_r(src_dir, dst_root, fcount):
+    """
+    Recursively traverses the source directory backwards (-r) and yields a sequence of (src, flat dst) pairs;
+    the destination directory and file names get decorated according to options
+    """
+    dirs, files = list_dir_groom(src_dir, rev=True)
+
+    for i, f in enumerate(files):
+        dst_path = os.path.join(dst_root, decorate_file_name(fcount[0], os.path.basename(f)))
+        fcount[0] -= 1
+        yield f, dst_path
+        
+    for i, d in enumerate(dirs):
+        yield from traverse_flat_dst_r(d, dst_root, fcount)
+
+
+def groom(src, dst, cnt):
     """
     Makes an 'executive' run of traversing the source directory; returns the 'ammo belt' generator
     """
     global args
-    return traverse_tree_dst(src, dst, "") if args.tree_dst else traverse_flat_dst(src, dst, [1])
+    if args.tree_dst:
+        return traverse_tree_dst(src, dst, "")
+    else:
+        if args.reverse:
+            return traverse_flat_dst_r(src, dst, [cnt])
+        else:
+            return traverse_flat_dst(src, dst, [1])
 
 
 def build_album():
@@ -182,7 +204,7 @@ def build_album():
             os.mkdir(executive_dst)
 
     tot = audiofiles_count(args.src_dir)
-    belt = groom(args.src_dir, executive_dst)
+    belt = groom(args.src_dir, executive_dst, tot)
 
     if not args.drop_dst and tot == 0:
         shutil.rmtree(executive_dst)
@@ -227,12 +249,11 @@ def copy_album():
         shutil.copy(src, dst)
         _set_tags(i, total, dst)
         print("{:>4}/{:<4} {}".format(i, total, dst))
-        return entry
 
     tot, belt = build_album()
 
     if args.reverse:
-        for i, x in enumerate(reversed(list(belt))):
+        for i, x in enumerate(belt):
             _cp(tot - i, tot, x)
     else:
         for i, x in enumerate(belt):
@@ -254,6 +275,11 @@ def retrieve_args():
     rg = parser.parse_args()
     rg.src_dir = os.path.abspath(rg.src_dir)    # Takes care of the trailing slash, too
     rg.dst_dir = os.path.abspath(rg.dst_dir)
+    
+    if rg.tree_dst and rg.reverse:
+        print("  *** -t option ignored (conflicts with -r) ***")
+        rg.tree_dst = False
+        
     return rg
 
 
