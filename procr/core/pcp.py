@@ -245,6 +245,11 @@ def retrieve_args():
     rg = parser.parse_args()
     rg.src_dir = os.path.abspath(rg.src_dir)    # Takes care of the trailing slash, too
     rg.dst_dir = os.path.abspath(rg.dst_dir)
+    
+    if rg.reverse and rg.tree_dst:
+        print("  *** -t option ignored ***")
+        rg.tree_dst = False
+        
     return rg
 
 
