@@ -247,7 +247,7 @@ def retrieve_args():
     rg.dst_dir = os.path.abspath(rg.dst_dir)
     
     if rg.reverse and rg.tree_dst:
-        print("  *** -t option ignored ***")
+        print("  *** -t option ignored **")
         rg.tree_dst = False
         
     return rg
