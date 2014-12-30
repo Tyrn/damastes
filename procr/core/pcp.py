@@ -17,7 +17,7 @@ import functools as ft
 
 utility_description = '''
 pcp "Procrustes" SmArT is a CLI utility for copying subtrees containing supported audio
-files in sequence (preorder of the source subtree, naturally sorted).
+files in sequence, naturally sorted.
 The end result is a "flattened" copy of the source subtree. "Flattened" means
 that only a namesake of the root source directory is created, where all the files get
 copied to, names prefixed with a serial number. Tags "Track" and "Tracks Total"
@@ -93,9 +93,9 @@ def list_dir_groom(abs_path, rev=False):
     """
     lst = [os.path.join(abs_path, x) for x in os.listdir(abs_path)]
     dirs = sorted([x for x in lst if os.path.isdir(x)],
-                   key=ft.cmp_to_key((lambda xp, yp: -compare_path(xp, yp)) if rev else compare_path))
+                  key=ft.cmp_to_key((lambda xp, yp: -compare_path(xp, yp)) if rev else compare_path))
     files = sorted([x for x in lst if isaudiofile(x)],
-                    key=ft.cmp_to_key((lambda xf, yf: -compare_file(xf, yf)) if rev else compare_file))
+                   key=ft.cmp_to_key((lambda xf, yf: -compare_file(xf, yf)) if rev else compare_file))
     return dirs, files
 
 
@@ -156,7 +156,7 @@ def traverse_flat_dst_r(src_dir, dst_root, fcount):
         dst_path = os.path.join(dst_root, decorate_file_name(fcount[0], os.path.basename(f)))
         fcount[0] -= 1
         yield f, dst_path
-        
+
     for i, d in enumerate(dirs):
         yield from traverse_flat_dst_r(d, dst_root, fcount)
 
@@ -191,7 +191,7 @@ def build_album():
         Returns full recursive count of audiofiles in dir
         """
         cnt = 0
-        
+
         for root, dirs, files in os.walk(dir):
             for name in files:
                 if isaudiofile(os.path.join(root, name)):
@@ -264,11 +264,17 @@ def copy_album():
 
 def retrieve_args():
     parser = argparse.ArgumentParser(description=utility_description)
-    parser.add_argument("-t", "--tree-dst", help="retain the tree structure of the source album at destination", action="store_true")
-    parser.add_argument("-p", "--drop-dst", help="do not create destination directory", action="store_true")
-    parser.add_argument("-r", "--reverse", help="copy files in reverse order (number one file is the last to be copied)", action="store_true")
+    parser.add_argument("-t", "--tree-dst", help="retain the tree structure of the source album at destination",
+                        action="store_true")
+    parser.add_argument("-p", "--drop-dst", help="do not create destination directory",
+                        action="store_true")
+    parser.add_argument("-r", "--reverse", help="copy files in reverse order (number one file is the last to be copied)",
+                        action="store_true")
     parser.add_argument("-u", "--unified-name",
-        help="destination root directory name and file names are based on UNIFIED_NAME,serial number prepended, file extentions retained")
+                        help='''
+                        destination root directory name and file names are based on UNIFIED_NAME,
+                        serial number prepended, file extentions retained
+                        ''')
     parser.add_argument("-b", "--album-num", help="0..99; prepend ALBUM_NUM to the destination root directory name")
     parser.add_argument("-a", "--artist-tag", help="artist tag name")
     parser.add_argument("-g", "--album-tag", help="album tag name")
@@ -277,11 +283,11 @@ def retrieve_args():
     rg = parser.parse_args()
     rg.src_dir = os.path.abspath(rg.src_dir)    # Takes care of the trailing slash, too
     rg.dst_dir = os.path.abspath(rg.dst_dir)
-    
+
     if rg.tree_dst and rg.reverse:
         print("  *** -t option ignored (conflicts with -r) ***")
         rg.tree_dst = False
-        
+
     return rg
 
 
