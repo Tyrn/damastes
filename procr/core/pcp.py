@@ -71,14 +71,18 @@ def compare_path(xp, yp):
     """
     Compares two paths, ignoring extensions
     """
-    return cmpstr_naturally(sans_ext(xp), sans_ext(yp))
+    x = sans_ext(xp)
+    y = sans_ext(yp)
+    return cmpstr_c(x, y) if args.sort_lex else cmpstr_naturally(x, y)
 
 
 def compare_file(xf, yf):
     """
     Compares two paths, filenames only, ignoring extensions
     """
-    return cmpstr_naturally(sans_ext(os.path.basename(xf)), sans_ext(os.path.basename(yf)))
+    x = sans_ext(os.path.basename(xf))
+    y = sans_ext(os.path.basename(yf))
+    return cmpstr_c(x, y) if args.sort_lex else cmpstr_naturally(x, y)
 
 
 def isaudiofile(x):
@@ -229,27 +233,27 @@ def copy_album():
     """
     global args
 
-    def _set_tags(i, total, path):
+    def _set_tags(i, total, path, title):
         audio = File(path, easy=True)
         if audio is None:
             return
         audio["tracknumber"] = str(i) + "/" + str(total)
         if args.artist_tag is not None and args.album_tag is not None:
-            audio["title"] = str(i) + " " + make_initials(args.artist_tag, ".") + ". - " + args.album_tag
+            audio["title"] = str(i) + " " + make_initials(args.artist_tag, ".") + ". - " + args.album_tag if title is None else title
             audio["artist"] = args.artist_tag
             audio["album"] = args.album_tag
         elif args.artist_tag is not None:
-            audio["title"] = str(i) + " " + args.artist_tag
+            audio["title"] = str(i) + " " + args.artist_tag if title is None else title
             audio["artist"] = args.artist_tag
         elif args.album_tag is not None:
-            audio["title"] = str(i) + " " + args.album_tag
+            audio["title"] = str(i) + " " + args.album_tag if title is None else title
             audio["album"] = args.album_tag
         audio.save()
 
     def _cp(i, total, entry):
         src, dst = entry
         shutil.copy(src, dst)
-        _set_tags(i, total, dst)
+        _set_tags(i, total, dst, sans_ext(os.path.basename(dst)) if args.file_title else None)
         print("{:>4}/{:<4} {}".format(i, total, dst))
 
     tot, belt = build_album()
@@ -264,6 +268,10 @@ def copy_album():
 
 def retrieve_args():
     parser = argparse.ArgumentParser(description=utility_description)
+    parser.add_argument("-f", "--file-title", help="use file name for title tag",
+                        action="store_true")
+    parser.add_argument("-x", "--sort-lex", help="sort files lexicographically",
+                        action="store_true")
     parser.add_argument("-t", "--tree-dst", help="retain the tree structure of the source album at destination",
                         action="store_true")
     parser.add_argument("-p", "--drop-dst", help="do not create destination directory",
