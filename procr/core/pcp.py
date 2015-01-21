@@ -302,15 +302,15 @@ def retrieve_args():
 def main():
     global args
 
-    warnings.resetwarnings()
-    warnings.simplefilter('ignore')
+    try:
+        warnings.resetwarnings()
+        warnings.simplefilter('ignore')
 
-    args = retrieve_args()
-    copy_album()
+        args = retrieve_args()
+        copy_album()
+    except KeyboardInterrupt as e:
+        sys.exit(e)
 
 
 if __name__ == '__main__':
-    try:
         main()
-    except KeyboardInterrupt as e:
-        sys.exit(e)
