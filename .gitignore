@@ -64,6 +64,7 @@ nosetests.xml
 .idea
 .eric5project
 .eric6project
+.spyderproject
 *.e4p
 *.geany
 
