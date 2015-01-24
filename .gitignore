@@ -63,6 +63,7 @@ nosetests.xml
 .settings
 .idea
 .eric5project
+.eric6project
 *.e4p
 *.geany
 
