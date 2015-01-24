@@ -281,7 +281,7 @@ def retrieve_args():
     parser.add_argument("-u", "--unified-name",
                         help='''
                         destination root directory name and file names are based on UNIFIED_NAME,
-                        serial number prepended, file extentions retained
+                        serial number prepended, file extensions retained
                         ''')
     parser.add_argument("-b", "--album-num", help="0..99; prepend ALBUM_NUM to the destination root directory name")
     parser.add_argument("-a", "--artist-tag", help="artist tag name")
