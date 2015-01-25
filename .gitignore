@@ -62,6 +62,7 @@ nosetests.xml
 .pydevproject
 .settings
 .idea
+*.iml
 .eric5project
 .eric6project
 .spyderproject
