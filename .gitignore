@@ -67,6 +67,7 @@ nosetests.xml
 .spyderproject
 *.e4p
 *.geany
+*.iml
 
 # Docs
 /docs/build/*
