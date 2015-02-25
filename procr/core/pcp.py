@@ -110,13 +110,13 @@ def decorate_dir_name(i, name):
     return str(i).zfill(3) + "-" + name
 
 
-def decorate_file_name(i, name):
+def decorate_file_name(cntw, i, name):
     global args
     root, ext = os.path.splitext(name)
-    return str(i).zfill(4) + "-" + (name if args.unified_name is None else args.unified_name + ext)
+    return str(i).zfill(cntw) + "-" + (name if args.unified_name is None else args.unified_name + ext)
 
 
-def traverse_tree_dst(src_dir, dst_root, dst_step):
+def traverse_tree_dst(src_dir, dst_root, dst_step, cntw):
     """
     Recursively traverses the source directory and yields a sequence of (src, tree dst) pairs;
     the destination directory and file names get decorated according to options
@@ -126,14 +126,14 @@ def traverse_tree_dst(src_dir, dst_root, dst_step):
     for i, d in enumerate(dirs):
         step = os.path.join(dst_step, decorate_dir_name(i, os.path.basename(d)))
         os.mkdir(os.path.join(dst_root, step))
-        yield from traverse_tree_dst(d, dst_root, step)
+        yield from traverse_tree_dst(d, dst_root, step, cntw)
 
     for i, f in enumerate(files):
-        dst_path = os.path.join(dst_root, os.path.join(dst_step, decorate_file_name(i, os.path.basename(f))))
+        dst_path = os.path.join(dst_root, os.path.join(dst_step, decorate_file_name(cntw, i, os.path.basename(f))))
         yield f, dst_path
 
 
-def traverse_flat_dst(src_dir, dst_root, fcount):
+def traverse_flat_dst(src_dir, dst_root, fcount, cntw):
     """
     Recursively traverses the source directory and yields a sequence of (src, flat dst) pairs;
     the destination directory and file names get decorated according to options
@@ -141,15 +141,15 @@ def traverse_flat_dst(src_dir, dst_root, fcount):
     dirs, files = list_dir_groom(src_dir)
 
     for i, d in enumerate(dirs):
-        yield from traverse_flat_dst(d, dst_root, fcount)
+        yield from traverse_flat_dst(d, dst_root, fcount, cntw)
 
     for i, f in enumerate(files):
-        dst_path = os.path.join(dst_root, decorate_file_name(fcount[0], os.path.basename(f)))
+        dst_path = os.path.join(dst_root, decorate_file_name(cntw, fcount[0], os.path.basename(f)))
         fcount[0] += 1
         yield f, dst_path
 
 
-def traverse_flat_dst_r(src_dir, dst_root, fcount):
+def traverse_flat_dst_r(src_dir, dst_root, fcount, cntw):
     """
     Recursively traverses the source directory backwards (-r) and yields a sequence of (src, flat dst) pairs;
     the destination directory and file names get decorated according to options
@@ -157,12 +157,12 @@ def traverse_flat_dst_r(src_dir, dst_root, fcount):
     dirs, files = list_dir_groom(src_dir, rev=True)
 
     for i, f in enumerate(files):
-        dst_path = os.path.join(dst_root, decorate_file_name(fcount[0], os.path.basename(f)))
+        dst_path = os.path.join(dst_root, decorate_file_name(cntw, fcount[0], os.path.basename(f)))
         fcount[0] -= 1
         yield f, dst_path
 
     for i, d in enumerate(dirs):
-        yield from traverse_flat_dst_r(d, dst_root, fcount)
+        yield from traverse_flat_dst_r(d, dst_root, fcount, cntw)
 
 
 def groom(src, dst, cnt):
@@ -170,13 +170,15 @@ def groom(src, dst, cnt):
     Makes an 'executive' run of traversing the source directory; returns the 'ammo belt' generator
     """
     global args
+    cntw = len(str(cnt))      # File number substring need not be wider than this
+
     if args.tree_dst:
-        return traverse_tree_dst(src, dst, "")
+        return traverse_tree_dst(src, dst, "", cntw)
     else:
         if args.reverse:
-            return traverse_flat_dst_r(src, dst, [cnt])
+            return traverse_flat_dst_r(src, dst, [cnt], cntw)
         else:
-            return traverse_flat_dst(src, dst, [1])
+            return traverse_flat_dst(src, dst, [1], cntw)
 
 
 def build_album():
