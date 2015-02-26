@@ -85,8 +85,17 @@ def compare_file(xf, yf):
     return cmpstr_c(x, y) if args.sort_lex else cmpstr_naturally(x, y)
 
 
+def mutagen_file(x):
+    """
+    Returns Mutagen thing, if x is looks like audio file path, else returns None
+    """
+    return File(x, easy=True)
+
+
 def isaudiofile(x):
-    return not os.path.isdir(x) and File(x, easy=True) is not None
+    """
+    """
+    return not os.path.isdir(x) and mutagen_file(x) is not None
 
 
 def list_dir_groom(abs_path, rev=False):
@@ -236,7 +245,7 @@ def copy_album():
     global args
 
     def _set_tags(i, total, path, title):
-        audio = File(path, easy=True)
+        audio = mutagen_file(path)
         if audio is None:
             return
         audio["tracknumber"] = str(i) + "/" + str(total)
