@@ -26,6 +26,12 @@ Options
 ``-h, --help``
 short description and options
 
+``-f, --file-title``
+use file name for title tag
+
+``-x, --sort-lex``
+sort files lexicographically
+
 ``-t, --tree-dst``:
 retain the tree structure of the source album at destination
 
