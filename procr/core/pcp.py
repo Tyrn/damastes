@@ -87,7 +87,7 @@ def compare_file(xf, yf):
 
 def mutagen_file(x):
     """
-    Returns Mutagen thing, if x is looks like an audio file path, else returns None
+    Returns Mutagen thing, if x looks like an audio file path, else returns None
     """
     return File(x, easy=True)
 
