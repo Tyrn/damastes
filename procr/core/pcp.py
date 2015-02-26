@@ -94,6 +94,7 @@ def mutagen_file(x):
 
 def isaudiofile(x):
     """
+    Returns True, if x is an audio file, else returns False
     """
     return not os.path.isdir(x) and mutagen_file(x) is not None
 
