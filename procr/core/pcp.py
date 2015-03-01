@@ -27,13 +27,20 @@ or in the reversed order. This can be important for some mobile devices.
 '''
 
 
-def sans_ext(s):
+def sans_ext(path):
     """
     Discards file extension
     """
-    root, ext = os.path.splitext(s)
+    root, ext = os.path.splitext(path)
     return root
 
+
+def has_ext_of(path, ext):
+    """
+    Returns True, if path has extension ext, case and leading dot insensitive
+    """
+    r, e = os.path.splitext(path)
+    return e.lstrip(".").upper() == ext.lstrip(".").upper()
 
 def str_strip_numbers(s):
     """
@@ -94,11 +101,10 @@ def mutagen_file(x):
     """
     global args
 
-    root, ext = os.path.splitext(x)
     f = mt.File(x, easy=True)
     if args.file_type is None:
         return f
-    return f if ext.lstrip(".").upper() == args.file_type.lstrip(".").upper() else None
+    return f if has_ext_of(x, args.file_type) else None
 
 
 def isaudiofile(x):
