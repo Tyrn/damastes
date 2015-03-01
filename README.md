@@ -41,6 +41,9 @@ do not create destination directory
 ``-r, --reverse``
 copy files in reverse order (number one file is the last to be copied)
 
+``-e, --file-type FILE_TYPE``
+accept only audio files of the specified type
+
 ``-u, --unified-name UNIFIED_NAME``
 destination root directory name and file names are based on UNIFIED_NAME,
 serial nuber prepended, file extentions retained

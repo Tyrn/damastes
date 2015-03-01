@@ -6,7 +6,7 @@ if sys.version_info < (3, 4, 0):
     sys.stderr.write("You need python 3.4 or later to run this script\n")
     sys.exit(1)
 
-from mutagen import File
+import mutagen as mt
 import os
 import re
 import shutil
@@ -85,11 +85,20 @@ def compare_file(xf, yf):
     return cmpstr_c(x, y) if args.sort_lex else cmpstr_naturally(x, y)
 
 
+args = None
+
+
 def mutagen_file(x):
     """
     Returns Mutagen thing, if x looks like an audio file path, else returns None
     """
-    return File(x, easy=True)
+    global args
+
+    root, ext = os.path.splitext(x)
+    f = mt.File(x, easy=True)
+    if args.file_type is None:
+        return f
+    return f if ext.lstrip(".").upper() == args.file_type.lstrip(".").upper() else None
 
 
 def isaudiofile(x):
@@ -111,9 +120,6 @@ def list_dir_groom(abs_path, rev=False):
     files = sorted([x for x in lst if isaudiofile(x)],
                    key=ft.cmp_to_key((lambda xf, yf: -compare_file(xf, yf)) if rev else compare_file))
     return dirs, files
-
-
-args = None
 
 
 def decorate_dir_name(i, name):
@@ -290,6 +296,7 @@ def retrieve_args():
                         action="store_true")
     parser.add_argument("-r", "--reverse", help="copy files in reverse order (number one file is the last to be copied)",
                         action="store_true")
+    parser.add_argument("-e", "--file-type", help="accept only audio files of the specified type")
     parser.add_argument("-u", "--unified-name",
                         help='''
                         destination root directory name and file names are based on UNIFIED_NAME,
