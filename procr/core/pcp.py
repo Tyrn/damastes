@@ -42,6 +42,7 @@ def has_ext_of(path, ext):
     r, e = os.path.splitext(path)
     return e.lstrip(".").upper() == ext.lstrip(".").upper()
 
+
 def str_strip_numbers(s):
     """
     Returns a vector of integer numbers
