@@ -307,7 +307,8 @@ def retrieve_args():
     parser.add_argument("-u", "--unified-name",
                         help='''
                         destination root directory name and file names are based on UNIFIED_NAME,
-                        serial number prepended, file extensions retained
+                        serial number prepended, file extensions retained; also album tag,
+                        if the latter is not specified explicitly
                         ''')
     parser.add_argument("-b", "--album-num", help="0..99; prepend ALBUM_NUM to the destination root directory name")
     parser.add_argument("-a", "--artist-tag", help="artist tag name")
@@ -321,6 +322,9 @@ def retrieve_args():
     if rg.tree_dst and rg.reverse:
         print("  *** -t option ignored (conflicts with -r) ***")
         rg.tree_dst = False
+
+    if rg.unified_name is not None and rg.album_tag is None:
+        rg.album_tag = rg.unified_name
 
     return rg
 
