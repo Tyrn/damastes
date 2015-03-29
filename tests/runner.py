@@ -49,7 +49,7 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(make_initials("e. B. Sledge", "."), "E.B.S")
         self.assertEqual(make_initials("Apsley Cherry-Garrard", "."), "A.C-G")
         self.assertEqual(make_initials("Windsor Saxe-\tCoburg - Gotha", "."), "W.S-C-G")
-        self.assertEqual(make_initials("Elisabeth Kubler- - Ross", "."), "E.K--R")
+        self.assertEqual(make_initials("Elisabeth Kubler-- - Ross", "."), "E.K---R")
         self.assertEqual(make_initials("Fitz-Simmons Ashton-Burke Leigh", "."), "F-S.A-B.L")
 
     def tearDown(self):
