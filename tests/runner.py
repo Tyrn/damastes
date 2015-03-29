@@ -44,9 +44,13 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(cmpstr_naturally("alfa", "bravo"), -1)
 
     def test_make_initials(self):
+        self.assertEqual(make_initials(" ", "."), "")
         self.assertEqual(make_initials("John ronald reuel Tolkien", "."), "J.R.R.T")
         self.assertEqual(make_initials("e. B. Sledge", "."), "E.B.S")
-        
+        self.assertEqual(make_initials("Apsley Cherry-Garrard", "."), "A.C-G")
+        self.assertEqual(make_initials("Windsor Saxe-\tCoburg - Gotha", "."), "W.S-C-G")
+        self.assertEqual(make_initials("Elisabeth Kubler- - Ross", "."), "E.K--R")
+
     def tearDown(self):
         pass
 

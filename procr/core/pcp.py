@@ -249,7 +249,8 @@ def make_initials(name, separator):
     """
     Reduces a string of names to initials. Trailing separator is not appended
     """
-    return separator.join(x[0] for x in re.split("\s+", name)).upper()
+    by_space = lambda nm: separator.join(x[0] if x else "" for x in re.split("\s+", nm)).upper()
+    return "-".join(by_space(x.strip()) for x in re.split("-", name))
 
 
 def copy_album():
