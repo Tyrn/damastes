@@ -247,7 +247,7 @@ def build_album():
 
 def make_initials(name, sep=".", trail=".", hyph="-"):
     """
-    Reduces a string of names to initials. Trailing separator is not appended
+    Reduces a string of names to initials
     """
     by_space = lambda nm: sep.join(x[0] if x else "" for x in re.split("\s+", nm)).upper()
     return hyph.join(by_space(x.strip()) for x in re.split(hyph, name)) + trail
