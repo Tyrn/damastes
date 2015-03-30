@@ -245,12 +245,12 @@ def build_album():
     return tot, belt
 
 
-def make_initials(name, separator):
+def make_initials(name, sep=".", trail=".", hyph="-"):
     """
     Reduces a string of names to initials. Trailing separator is not appended
     """
-    by_space = lambda nm: separator.join(x[0] if x else "" for x in re.split("\s+", nm)).upper()
-    return "-".join(by_space(x.strip()) for x in re.split("-", name))
+    by_space = lambda nm: sep.join(x[0] if x else "" for x in re.split("\s+", nm)).upper()
+    return hyph.join(by_space(x.strip()) for x in re.split(hyph, name)) + trail
 
 
 def copy_album():
@@ -266,7 +266,7 @@ def copy_album():
             return
         audio["tracknumber"] = str(i) + "/" + str(total)
         if args.artist_tag is not None and args.album_tag is not None:
-            audio["title"] = _title(make_initials(args.artist_tag, ".") + ". - " + args.album_tag)
+            audio["title"] = _title(make_initials(args.artist_tag) + " - " + args.album_tag)
             audio["artist"] = args.artist_tag
             audio["album"] = args.album_tag
         elif args.artist_tag is not None:
