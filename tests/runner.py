@@ -27,16 +27,16 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(str_strip_numbers("ab11cdd2k.144"), [11, 2, 144])
         self.assertEqual(str_strip_numbers("Ignacio Vazquez-Abrams"), [])
 
-    def test_cmpv_int(self):
-        self.assertEqual(cmpv_int([], []), 0)
-        self.assertEqual(cmpv_int([1], []), 1)
-        self.assertEqual(cmpv_int([3], []), 1)
-        self.assertEqual(cmpv_int([1, 2, 3], [1, 2, 3, 4, 5]), -2)
-        self.assertEqual(cmpv_int([1, 4], [1, 4, 16]), -1)
-        self.assertEqual(cmpv_int([2, 8], [2, 2, 3]), 1)
-        self.assertEqual(cmpv_int([0, 0, 2, 4], [0, 0, 15]), -1)
-        self.assertEqual(cmpv_int([0, 13], [0, 2, 2]), 1)
-        self.assertEqual(cmpv_int([11, 2], [11, 2]), 0)
+    def test_cmpstr_c(self):
+        self.assertEqual(cmpstr_c([], []), 0)
+        self.assertEqual(cmpstr_c([1], []), 1)
+        self.assertEqual(cmpstr_c([3], []), 1)
+        self.assertEqual(cmpstr_c([1, 2, 3], [1, 2, 3, 4, 5]), -1)
+        self.assertEqual(cmpstr_c([1, 4], [1, 4, 16]), -1)
+        self.assertEqual(cmpstr_c([2, 8], [2, 2, 3]), 1)
+        self.assertEqual(cmpstr_c([0, 0, 2, 4], [0, 0, 15]), -1)
+        self.assertEqual(cmpstr_c([0, 13], [0, 2, 2]), 1)
+        self.assertEqual(cmpstr_c([11, 2], [11, 2]), 0)
 
     def test_cmpstr_naturally(self):
         self.assertEqual(cmpstr_naturally("", ""), 0)

@@ -51,15 +51,10 @@ def str_strip_numbers(s):
     return [int(x) for x in re.compile('\d+').findall(s)]
 
 
-def cmpv_int(vx, vy):
-    """
-    Compares vectors of integers using 'string semantics'
-    """
-    nonzero_tail = list(it.dropwhile(lambda x: x == 0, [x[0] - x[1] for x in zip(vx, vy)]))
-    return len(vx) - len(vy) if nonzero_tail == [] else -1 if nonzero_tail[0] < 0 else 1
-
-
 def cmpstr_c(x, y):
+    """
+    Compares strings; also lists of integers using 'string semantics'
+    """
     return 0 if x == y else -1 if x < y else 1
 
 
@@ -72,7 +67,7 @@ def cmpstr_naturally(str_x, str_y):
     """
     num_x = str_strip_numbers(str_x)
     num_y = str_strip_numbers(str_y)
-    return cmpv_int(num_x, num_y) if num_x != [] and num_y != [] else cmpstr_c(str_x, str_y)
+    return cmpstr_c(num_x, num_y) if num_x != [] and num_y != [] else cmpstr_c(str_x, str_y)
 
 
 def compare_path(xp, yp):
