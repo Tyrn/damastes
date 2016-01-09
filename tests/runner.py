@@ -51,6 +51,7 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(make_initials("Windsor Saxe-\tCoburg - Gotha"), "W.S-C-G.")
         self.assertEqual(make_initials("Elisabeth Kubler-- - Ross"), "E.K---R.")
         self.assertEqual(make_initials("Fitz-Simmons Ashton-Burke Leigh"), "F-S.A-B.L.")
+        self.assertEqual(make_initials('Arleigh"31-knot"Burke'), "A.B.")
 
     def tearDown(self):
         pass
