@@ -246,8 +246,13 @@ def make_initials(name, sep=".", trail=".", hyph="-"):
     """
     Reduces a string of names to initials
     """
+    # Remove double quoted substring, if any.
+    quotes = re.compile('"').findall(name)
+    qcnt = len(quotes)
+    enm = name if qcnt == 0 or qcnt % 2 != 0 else re.sub('"(.*?)"', ' ', name)
+
     by_space = lambda nm: sep.join(x[0] if x else "" for x in re.split("\s+", nm)).upper()
-    return hyph.join(by_space(x.strip()) for x in re.split(hyph, name)) + trail
+    return hyph.join(by_space(x.strip()) for x in re.split(hyph, enm)) + trail
 
 
 def copy_album():
@@ -256,8 +261,8 @@ def copy_album():
     """
     global args
 
-    def _set_tags(i, total, path, title):
-        _title = lambda s: str(i) + " " + s if title is None else title
+    def _set_tags(i, total, path):
+        _title = lambda s: sans_ext(os.path.basename(path)) if args.file_title else str(i) + " " + s
         audio = mutagen_file(path)
         if audio is None:
             return
@@ -277,7 +282,7 @@ def copy_album():
     def _cp(i, total, entry):
         src, dst = entry
         shutil.copy(src, dst)
-        _set_tags(i, total, dst, sans_ext(os.path.basename(dst)) if args.file_title else None)
+        _set_tags(i, total, dst)
         print("{:>4}/{:<4} {}".format(i, total, dst))
 
     tot, belt = build_album()
@@ -349,4 +354,4 @@ def main():
 
 
 if __name__ == '__main__':
-        main()
+    main()
