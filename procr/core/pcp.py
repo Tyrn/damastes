@@ -205,9 +205,11 @@ def build_album():
     of (src, dst) pairs
     """
     global args
+
     src_name = os.path.basename(args.src_dir)
     prefix = "" if args.album_num is None else (str(args.album_num).zfill(2) + "-")
     base_dst = prefix + (src_name if args.unified_name is None else args.unified_name)
+    
     executive_dst = os.path.join(args.dst_dir, "" if args.drop_dst else base_dst)
 
     def audiofiles_count(dir):
@@ -315,6 +317,13 @@ def retrieve_args():
     rg = parser.parse_args()
     rg.src_dir = os.path.abspath(rg.src_dir)    # Takes care of the trailing slash, too
     rg.dst_dir = os.path.abspath(rg.dst_dir)
+
+    if not os.path.isdir(rg.src_dir):
+        print('Source directory "{}" is not there.'.format(rg.src_dir))
+        sys.exit()
+    if not os.path.isdir(rg.dst_dir):
+        print('Destination path "{}" is not there.'.format(rg.dst_dir))
+        sys.exit()
 
     if rg.tree_dst and rg.reverse:
         print("  *** -t option ignored (conflicts with -r) ***")
