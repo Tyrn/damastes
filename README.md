@@ -26,6 +26,9 @@ Options
 ``-h, --help``
 short description and options
 
+``-v, --verbose``
+unless verbose, just progress bar is shown
+
 ``-f, --file-title``
 use file name for title tag
 

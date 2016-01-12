@@ -285,8 +285,13 @@ def copy_album():
         _set_tags(i, total, dst)
         if args.verbose:
             print("{:>4}/{:<4} {}".format(i, total, dst))
+        else:
+            sys.stdout.write('.')
+            sys.stdout.flush()
 
     tot, belt = build_album()
+
+    if not args.verbose: sys.stdout.write('Starting ')
 
     if args.reverse:
         for i, x in enumerate(belt):
@@ -294,6 +299,8 @@ def copy_album():
     else:
         for i, x in enumerate(belt):
             _cp(i + 1, tot, x)
+
+    if not args.verbose: print(' Done.')
 
 
 def retrieve_args():
@@ -326,9 +333,6 @@ def retrieve_args():
     rg = parser.parse_args()
     rg.src_dir = os.path.abspath(rg.src_dir)    # Takes care of the trailing slash, too
     rg.dst_dir = os.path.abspath(rg.dst_dir)
-
-# Comment the following line out if you prefer progress bar and -(-v)erbose option.
-    # rg.verbose = True
 
     if not os.path.isdir(rg.src_dir):
         print('Source directory "{}" is not there.'.format(rg.src_dir))
