@@ -300,7 +300,7 @@ def copy_album():
         for i, x in enumerate(belt):
             _cp(i + 1, tot, x)
 
-    if not args.verbose: print(' Done.')
+    if not args.verbose: print(' Done ({}).'.format(tot))
 
 
 def retrieve_args():
