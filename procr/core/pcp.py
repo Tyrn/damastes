@@ -283,7 +283,8 @@ def copy_album():
         src, dst = entry
         shutil.copy(src, dst)
         _set_tags(i, total, dst)
-        print("{:>4}/{:<4} {}".format(i, total, dst))
+        if args.verbose:
+            print("{:>4}/{:<4} {}".format(i, total, dst))
 
     tot, belt = build_album()
 
@@ -297,6 +298,9 @@ def copy_album():
 
 def retrieve_args():
     parser = argparse.ArgumentParser(description=utility_description)
+
+    parser.add_argument("-v", "--verbose", help="verbose output",
+                        action="store_true")
     parser.add_argument("-f", "--file-title", help="use file name for title tag",
                         action="store_true")
     parser.add_argument("-x", "--sort-lex", help="sort files lexicographically",
@@ -322,6 +326,9 @@ def retrieve_args():
     rg = parser.parse_args()
     rg.src_dir = os.path.abspath(rg.src_dir)    # Takes care of the trailing slash, too
     rg.dst_dir = os.path.abspath(rg.dst_dir)
+
+# Comment the following line out if you prefer progress bar and -(-v)erbose option.
+    # rg.verbose = True
 
     if not os.path.isdir(rg.src_dir):
         print('Source directory "{}" is not there.'.format(rg.src_dir))
