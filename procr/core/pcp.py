@@ -12,7 +12,7 @@ import re
 import shutil
 import argparse
 import warnings
-import itertools as it
+#import itertools as it
 import functools as ft
 
 utility_description = '''
@@ -224,6 +224,12 @@ def build_album():
                     cnt += 1
         return cnt
 
+    tot = audiofiles_count(args.src_dir)
+    
+    if tot < 1:
+        print('There are no supported audio files in the source directory "{}".'.format(args.src_dir))
+        sys.exit()
+
     if not args.drop_dst:
         if os.path.exists(executive_dst):
             print('Destination directory "{}" already exists.'.format(executive_dst))
@@ -231,15 +237,7 @@ def build_album():
         else:
             os.mkdir(executive_dst)
 
-    tot = audiofiles_count(args.src_dir)
-    belt = groom(args.src_dir, executive_dst, tot)
-
-    if not args.drop_dst and tot == 0:
-        shutil.rmtree(executive_dst)
-        print('There are no supported audio files in the source directory "{}".'.format(args.src_dir))
-        sys.exit()
-
-    return tot, belt
+    return tot, groom(args.src_dir, executive_dst, tot)
 
 
 def make_initials(name, sep=".", trail=".", hyph="-"):
