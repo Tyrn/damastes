@@ -134,7 +134,7 @@ def decorate_file_name(cntw, i, dst_step, name):
     root, ext = os.path.splitext(name)
     prefix = str(i).zfill(cntw) + "-"
     if args.prepend_subdir_name and not args.tree_dst and len(dst_step):
-        prefix += re.sub(os.sep, '-', dst_step) + "-"
+        prefix += re.sub(os.sep, '-', dst_step) + "_"
     return prefix + (args.unified_name + ext if args.unified_name else name)
 
 
