@@ -128,10 +128,14 @@ def decorate_dir_name(i, name):
     return str(i).zfill(3) + "-" + name
 
 
-def decorate_file_name(cntw, i, name):
+def decorate_file_name(cntw, i, dst_step, name):
     global args
+
     root, ext = os.path.splitext(name)
-    return str(i).zfill(cntw) + "-" + (name if args.unified_name is None else args.unified_name + ext)
+    prefix = str(i).zfill(cntw) + "-"
+    if args.prepend_subdir_name and not args.tree_dst and len(dst_step):
+        prefix += re.sub(os.sep, '-', dst_step) + "-"
+    return prefix + (args.unified_name + ext if args.unified_name else name)
 
 
 def traverse_tree_dst(src_dir, dst_root, dst_step, cntw):
@@ -147,11 +151,11 @@ def traverse_tree_dst(src_dir, dst_root, dst_step, cntw):
         yield from traverse_tree_dst(d, dst_root, step, cntw)
 
     for i, f in enumerate(files):
-        dst_path = os.path.join(dst_root, os.path.join(dst_step, decorate_file_name(cntw, i, os.path.basename(f))))
+        dst_path = os.path.join(dst_root, os.path.join(dst_step, decorate_file_name(cntw, i, dst_step, os.path.basename(f))))
         yield f, dst_path
 
 
-def traverse_flat_dst(src_dir, dst_root, fcount, cntw):
+def traverse_flat_dst(src_dir, dst_root, fcount, dst_step, cntw):
     """
     Recursively traverses the source directory and yields a sequence of (src, flat dst) pairs;
     the destination directory and file names get decorated according to options
@@ -159,15 +163,15 @@ def traverse_flat_dst(src_dir, dst_root, fcount, cntw):
     dirs, files = list_dir_groom(src_dir)
 
     for i, d in enumerate(dirs):
-        yield from traverse_flat_dst(d, dst_root, fcount, cntw)
+        yield from traverse_flat_dst(d, dst_root, fcount, os.path.join(dst_step, os.path.basename(d)), cntw)
 
     for i, f in enumerate(files):
-        dst_path = os.path.join(dst_root, decorate_file_name(cntw, fcount[0], os.path.basename(f)))
+        dst_path = os.path.join(dst_root, decorate_file_name(cntw, fcount[0], dst_step, os.path.basename(f)))
         fcount[0] += 1
         yield f, dst_path
 
 
-def traverse_flat_dst_r(src_dir, dst_root, fcount, cntw):
+def traverse_flat_dst_r(src_dir, dst_root, fcount, dst_step, cntw):
     """
     Recursively traverses the source directory backwards (-r) and yields a sequence of (src, flat dst) pairs;
     the destination directory and file names get decorated according to options
@@ -175,12 +179,12 @@ def traverse_flat_dst_r(src_dir, dst_root, fcount, cntw):
     dirs, files = list_dir_groom(src_dir, rev=True)
 
     for i, f in enumerate(files):
-        dst_path = os.path.join(dst_root, decorate_file_name(cntw, fcount[0], os.path.basename(f)))
+        dst_path = os.path.join(dst_root, decorate_file_name(cntw, fcount[0], dst_step, os.path.basename(f)))
         fcount[0] -= 1
         yield f, dst_path
 
     for i, d in enumerate(dirs):
-        yield from traverse_flat_dst_r(d, dst_root, fcount, cntw)
+        yield from traverse_flat_dst_r(d, dst_root, fcount, os.path.join(dst_step, os.path.basename(d)), cntw)
 
 
 def groom(src, dst, cnt):
@@ -194,9 +198,9 @@ def groom(src, dst, cnt):
         return traverse_tree_dst(src, dst, "", cntw)
     else:
         if args.reverse:
-            return traverse_flat_dst_r(src, dst, [cnt], cntw)
+            return traverse_flat_dst_r(src, dst, [cnt], "", cntw)
         else:
-            return traverse_flat_dst(src, dst, [1], cntw)
+            return traverse_flat_dst(src, dst, [1], "", cntw)
 
 
 def build_album():
@@ -317,6 +321,8 @@ def retrieve_args():
     parser.add_argument("-r", "--reverse", help="copy files in reverse order (number one file is the last to be copied)",
                         action="store_true")
     parser.add_argument("-e", "--file-type", help="accept only audio files of the specified type")
+    parser.add_argument("-i", "--prepend-subdir-name", help="prepend current subdirectory name to a file name",
+                        action="store_true")
     parser.add_argument("-u", "--unified-name",
                         help='''
                         destination root directory name and file names are based on UNIFIED_NAME,
