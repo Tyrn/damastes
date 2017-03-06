@@ -4,7 +4,7 @@ Procrustes SmArT
 Description
 -----------
 **Procrustes SmArT** is a CLI utility for basic processing and copying
-of audio albums, mostly audiobooks of unknown provenance to cheap mobile
+of audio albums, mostly audiobooks of uncertain provenance to cheap mobile
 devices. Audiobooks in question can be poorly designed: track number tags
 may be missing or incorrect, directory and/or file names enumerated
 without leading zeroes, etc.
@@ -31,6 +31,9 @@ unless verbose, just progress bar is shown
 
 ``-f, --file-title``
 use file name for title tag
+
+``-F, --file-title-num``
+use numbered file name for title tag
 
 ``-x, --sort-lex``
 sort files lexicographically

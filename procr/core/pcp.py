@@ -20,8 +20,8 @@ pcp "Procrustes" SmArT is a CLI utility for copying subtrees containing supporte
 files in sequence, naturally sorted.
 The end result is a "flattened" copy of the source subtree. "Flattened" means
 that only a namesake of the root source directory is created, where all the files get
-copied to, names prefixed with a serial number. Tags "Track" and "Tracks Total"
-get set, tags "Artist" and "Album" can be replaced optionally.
+copied to, names prefixed with a serial number. Tag "Track Number"
+is set, tags "Title", "Artist", and "Album" can be replaced optionally.
 The writing process is strictly sequential: either starting with the number one file,
 or in the reversed order. This can be important for some mobile devices.
 '''
@@ -264,19 +264,27 @@ def copy_album():
     global args
 
     def _set_tags(i, total, source, path):
-        _title = lambda s: sans_ext(os.path.basename(source)) if args.file_title else str(i) + " " + s
+
+        def _title(s):
+            if args.file_title_num:
+                return str(i) + '>' + sans_ext(os.path.basename(source))
+            if args.file_title:
+                return sans_ext(os.path.basename(source))
+            return str(i) + " " + s
+
         audio = mutagen_file(path)
         if audio is None:
             return
+
         audio["tracknumber"] = str(i) + "/" + str(total)
-        if args.artist_tag is not None and args.album_tag is not None:
+        if args.artist_tag and args.album_tag:
             audio["title"] = _title(make_initials(args.artist_tag) + " - " + args.album_tag)
             audio["artist"] = args.artist_tag
             audio["album"] = args.album_tag
-        elif args.artist_tag is not None:
+        elif args.artist_tag:
             audio["title"] = _title(args.artist_tag)
             audio["artist"] = args.artist_tag
-        elif args.album_tag is not None:
+        elif args.album_tag:
             audio["title"] = _title(args.album_tag)
             audio["album"] = args.album_tag
         audio.save()
@@ -311,6 +319,8 @@ def retrieve_args():
     parser.add_argument("-v", "--verbose", help="verbose output",
                         action="store_true")
     parser.add_argument("-f", "--file-title", help="use file name for title tag",
+                        action="store_true")
+    parser.add_argument("-F", "--file-title-num", help="use numbered file name for title tag",
                         action="store_true")
     parser.add_argument("-x", "--sort-lex", help="sort files lexicographically",
                         action="store_true")
