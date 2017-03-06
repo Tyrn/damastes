@@ -263,8 +263,8 @@ def copy_album():
     """
     global args
 
-    def _set_tags(i, total, path):
-        _title = lambda s: sans_ext(os.path.basename(path)) if args.file_title else str(i) + " " + s
+    def _set_tags(i, total, source, path):
+        _title = lambda s: sans_ext(os.path.basename(source)) if args.file_title else str(i) + " " + s
         audio = mutagen_file(path)
         if audio is None:
             return
@@ -284,7 +284,7 @@ def copy_album():
     def _cp(i, total, entry):
         src, dst = entry
         shutil.copy(src, dst)
-        _set_tags(i, total, dst)
+        _set_tags(i, total, src, dst)
         if args.verbose:
             print("{:>4}/{:<4} {}".format(i, total, dst))
         else:
