@@ -128,6 +128,15 @@ def decorate_dir_name(i, name):
     return str(i).zfill(3) + "-" + name
 
 
+def artist():
+    """
+    Generates Artist prefix for directory/file name
+    """
+    global args
+
+    return args.artist_tag + " - " if args.artist_tag else ""
+
+
 def decorate_file_name(cntw, i, dst_step, name):
     global args
 
@@ -135,7 +144,7 @@ def decorate_file_name(cntw, i, dst_step, name):
     prefix = str(i).zfill(cntw) + "-"
     if args.prepend_subdir_name and not args.tree_dst and len(dst_step):
         prefix += re.sub(os.sep, '-', dst_step) + "_"
-    return prefix + (args.unified_name + ext if args.unified_name else name)
+    return prefix + (artist() + args.unified_name + ext if args.unified_name else name)
 
 
 def traverse_tree_dst(src_dir, dst_root, dst_step, cntw):
@@ -212,8 +221,8 @@ def build_album():
 
     src_name = os.path.basename(args.src_dir)
     prefix = "" if args.album_num is None else (str(args.album_num).zfill(2) + "-")
-    base_dst = prefix + (src_name if args.unified_name is None else args.unified_name)
-    
+    base_dst = prefix + (artist() + args.unified_name if args.unified_name else src_name)
+
     executive_dst = os.path.join(args.dst_dir, "" if args.drop_dst else base_dst)
 
     def audiofiles_count(dir):
