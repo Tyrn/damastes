@@ -66,6 +66,7 @@ nosetests.xml
 .eric5project
 .eric6project
 .spyderproject
+.spyproject
 *.e4p
 *.geany
 *.iml
