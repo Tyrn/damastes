@@ -125,7 +125,7 @@ def list_dir_groom(abs_path, rev=False):
 
 
 def decorate_dir_name(i, name):
-    return str(i).zfill(3) + "-" + name
+    return ("" if args.strip_decorations else (str(i).zfill(3) + "-")) + name
 
 
 def artist():
@@ -140,6 +140,7 @@ def artist():
 def decorate_file_name(cntw, i, dst_step, name):
     global args
 
+    if args.strip_decorations: return name
     root, ext = os.path.splitext(name)
     prefix = str(i).zfill(cntw) + "-"
     if args.prepend_subdir_name and not args.tree_dst and len(dst_step):
@@ -285,7 +286,8 @@ def copy_album():
         if audio is None:
             return
 
-        audio["tracknumber"] = str(i) + "/" + str(total)
+        if not args.drop_tracknumber:
+            audio["tracknumber"] = str(i) + "/" + str(total)
         if args.artist_tag and args.album_tag:
             audio["title"] = _title(make_initials(args.artist_tag) + " - " + args.album_tag)
             audio["artist"] = args.artist_tag
@@ -326,6 +328,10 @@ def retrieve_args():
     parser = argparse.ArgumentParser(description=utility_description)
 
     parser.add_argument("-v", "--verbose", help="verbose output",
+                        action="store_true")
+    parser.add_argument("-d", "--drop-tracknumber", help="do not set track numbers",
+                        action="store_true")
+    parser.add_argument("-s", "--strip-decorations", help="strip file and directory name decorations",
                         action="store_true")
     parser.add_argument("-f", "--file-title", help="use file name for title tag",
                         action="store_true")
