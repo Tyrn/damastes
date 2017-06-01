@@ -29,6 +29,12 @@ short description and options
 ``-v, --verbose``
 unless verbose, just progress bar is shown
 
+``-d, --drop-tracknumber``
+do not set track numbers
+
+``-s, --strip-decorations``
+strip file and directory name decorations
+
 ``-f, --file-title``
 use file name for title tag
 
