@@ -46,6 +46,7 @@ nosetests.xml
 *.egg-info
 /dist/
 /build/
+*.spec
 
 # Vagrant
 .vagrant
