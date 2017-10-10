@@ -18,6 +18,7 @@ develop-eggs
 .installed.cfg
 lib/
 lib64/
+lib64
 __pycache__/
 share/
 
@@ -47,6 +48,7 @@ nosetests.xml
 /dist/
 /build/
 *.spec
+*.cfg
 
 # Vagrant
 .vagrant
