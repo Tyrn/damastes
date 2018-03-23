@@ -15,17 +15,6 @@ import warnings
 #import itertools as it
 import functools as ft
 
-utility_description = '''
-pcp "Procrustes" SmArT is a CLI utility for copying subtrees containing supported audio
-files in sequence, naturally sorted.
-The end result is a "flattened" copy of the source subtree. "Flattened" means
-that only a namesake of the root source directory is created, where all the files get
-copied to, names prefixed with a serial number. Tag "Track Number"
-is set, tags "Title", "Artist", and "Album" can be replaced optionally.
-The writing process is strictly sequential: either starting with the number one file,
-or in the reversed order. This can be important for some mobile devices.
-'''
-
 
 def sans_ext(path):
     """
@@ -226,13 +215,13 @@ def build_album():
 
     executive_dst = os.path.join(args.dst_dir, "" if args.drop_dst else base_dst)
 
-    def audiofiles_count(dir):
+    def audiofiles_count(directory):
         """
-        Returns full recursive count of audiofiles in dir
+        Returns full recursive count of audiofiles in directory
         """
         cnt = 0
 
-        for root, dirs, files in os.walk(dir):
+        for root, dirs, files in os.walk(directory):
             for name in files:
                 if isaudiofile(os.path.join(root, name)):
                     cnt += 1
@@ -258,13 +247,9 @@ def make_initials(name, sep=".", trail=".", hyph="-"):
     """
     Reduces a string of names to initials
     """
-    # Remove double quoted substring, if any.
-    quotes = re.compile('"').findall(name)
-    qcnt = len(quotes)
-    enm = name if qcnt == 0 or qcnt % 2 != 0 else re.sub('"(.*?)"', ' ', name)
-
+    sans_monikers = re.sub(r"\"(?:\\.|[^\"\\])*\"", " ", name)
     by_space = lambda nm: sep.join(x[0] if x else "" for x in re.split("\s+", nm)).upper()
-    return hyph.join(by_space(x.strip()) for x in re.split(hyph, enm)) + trail
+    return hyph.join(by_space(x.strip()) for x in re.split(hyph, sans_monikers)) + trail
 
 
 def copy_album():
@@ -325,7 +310,16 @@ def copy_album():
 
 
 def retrieve_args():
-    parser = argparse.ArgumentParser(description=utility_description)
+    parser = argparse.ArgumentParser(description='''
+    pcp "Procrustes" SmArT is a CLI utility for copying subtrees containing supported audio
+    files in sequence, naturally sorted.
+    The end result is a "flattened" copy of the source subtree. "Flattened" means
+    that only a namesake of the root source directory is created, where all the files get
+    copied to, names prefixed with a serial number. Tag "Track Number"
+    is set, tags "Title", "Artist", and "Album" can be replaced optionally.
+    The writing process is strictly sequential: either starting with the number one file,
+    or in the reversed order. This can be important for some mobile devices.
+    ''')
 
     parser.add_argument("-v", "--verbose", help="verbose output",
                         action="store_true")
