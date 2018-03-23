@@ -1,8 +1,7 @@
-Procrustes SmArT
-================
+## Procrustes SmArT
 
-Description
------------
+### Description
+
 **Procrustes SmArT** is a CLI utility for basic processing and copying
 of audio albums, mostly audiobooks of uncertain provenance to cheap mobile
 devices. Audiobooks in question can be poorly designed: track number tags
@@ -15,13 +14,12 @@ and directories are not modified in any way. Files are copied sequentially,
 by default file number one first, optionally in reverse order, as some
 mobile devices are copy-order sensitive.
 
-General syntax
---------------
+### General syntax
+
 
 ``$ pcp [<options>] <source directory> <destination directory>``
 
-Options
--------
+### Options
 
 ``-h, --help``
 short description and options
@@ -72,14 +70,13 @@ artist tag name
 ``-g --album-tag ALBUM_TAG``
 album tag name
 
-Examples
---------
+### Examples
+```
+Source Album $ pcp -a "Peter Crowcroft" -g "Mice All Over" . /run/media/user/F8950/Audiobooks/
+```
+- Destination directory `/run/media/user/F8950/Audiobooks/Source Album/` is created;
 
-``Source Album $ pcp -a "Peter Crowcroft" -g "Mice All Over" . /run/media/user/F8950/Audiobooks/``
-
-- Destination directory "/run/media/user/F8950/Audiobooks/Source Album/" is created;
-
-- Track numbers are set according to the natural sort order (file names ..., 5, 6, 7, 8, 9, 10...;
+- Track numbers are set according to the natural sort order (file names `..., 5, 6, 7, 8, 9, 10...`;
 regardless of the absence of the leading zeroes);
 
 - *Artist* is set to *Peter Crowcroft*;
@@ -87,3 +84,8 @@ regardless of the absence of the leading zeroes);
 - *Album* is set to *Mice All Over*;
 
 - *Title* is set to *1 P.C. - Mice All Over* for the first file, all titles enumerated;
+```
+Source Album $ pcp -st . /run/media/user/F8950/Audiobooks/
+```
+- *Source Album* directory is copied to `/run/media/user/F8950/Audiobooks/` in its entirety,
+without modification; sequential copy order, natural or lexicographical, is guaranteed.
