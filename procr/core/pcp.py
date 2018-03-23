@@ -2,8 +2,8 @@
 
 import sys
 
-if sys.version_info < (3, 4, 0):
-    sys.stderr.write("You need python 3.4 or later to run this script\n")
+if sys.version_info < (3, 6, 0):
+    sys.stderr.write("You need python 3.6 or later to run this script\n")
     sys.exit(1)
 
 import mutagen as mt
@@ -239,14 +239,14 @@ def build_album():
         return cnt
 
     tot = audiofiles_count(args.src_dir)
-    
+
     if tot < 1:
-        print('There are no supported audio files in the source directory "{}".'.format(args.src_dir))
+        print(f'There are no supported audio files in the source directory "{args.src_dir}".')
         sys.exit()
 
     if not args.drop_dst:
         if os.path.exists(executive_dst):
-            print('Destination directory "{}" already exists.'.format(executive_dst))
+            print(f'Destination directory "{executive_dst}" already exists.')
             sys.exit()
         else:
             os.mkdir(executive_dst)
@@ -305,7 +305,7 @@ def copy_album():
         shutil.copy(src, dst)
         _set_tags(i, total, src, dst)
         if args.verbose:
-            print("{:>4}/{:<4} {}".format(i, total, dst))
+            print(f"{i:>4}/{total:<4} {dst}")
         else:
             sys.stdout.write('.')
             sys.stdout.flush()
@@ -321,7 +321,7 @@ def copy_album():
         for i, x in enumerate(belt):
             _cp(i + 1, tot, x)
 
-    if not args.verbose: print(' Done ({}).'.format(tot))
+    if not args.verbose: print(f' Done ({tot}).')
 
 
 def retrieve_args():
@@ -364,10 +364,10 @@ def retrieve_args():
     rg.dst_dir = os.path.abspath(rg.dst_dir)
 
     if not os.path.isdir(rg.src_dir):
-        print('Source directory "{}" is not there.'.format(rg.src_dir))
+        print(f'Source directory "{rg.src_dir}" is not there.')
         sys.exit()
     if not os.path.isdir(rg.dst_dir):
-        print('Destination path "{}" is not there.'.format(rg.dst_dir))
+        print(f'Destination path "{rg.dst_dir}" is not there.')
         sys.exit()
 
     if rg.tree_dst and rg.reverse:
