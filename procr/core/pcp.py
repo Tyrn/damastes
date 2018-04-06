@@ -199,7 +199,7 @@ def build_album():
     """
     global args
 
-    src_name = args.src_dir.stem
+    src_name = args.src_dir.stem + args.src_dir.suffix
     prefix = "" if args.album_num is None else (str(args.album_num).zfill(2) + "-")
     base_dst = prefix + (artist() + " - " + args.unified_name if args.unified_name else src_name)
 
