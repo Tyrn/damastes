@@ -11,17 +11,10 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(str(3).zfill(5), "00003")
         self.assertEqual(str(15331).zfill(3), "15331")
 
-    def test_sans_ext(self):
-        self.assertEqual(sans_ext("/alfa/bravo/charlie.dat"), "/alfa/bravo/charlie")
-        self.assertEqual(sans_ext(""), "")
-        self.assertEqual(sans_ext("/alfa/bravo/charlie"), "/alfa/bravo/charlie")
-        self.assertEqual(sans_ext("/alfa/bravo/charlie/"), "/alfa/bravo/charlie/")
-        self.assertEqual(sans_ext("/alfa/bra.vo/charlie.dat"), "/alfa/bra.vo/charlie")
-
     def test_has_ext_of(self):
-        self.assertEqual(has_ext_of("/alfa/bra.vo/charlie.ogg", "OGG"), True)
-        self.assertEqual(has_ext_of("/alfa/bra.vo/charlie.ogg", ".ogg"), True)
-        self.assertEqual(has_ext_of("/alfa/bra.vo/charlie.ogg", "mp3"), False)
+        self.assertEqual(has_ext_of(Path("/alfa/bra.vo/charlie.ogg"), "OGG"), True)
+        self.assertEqual(has_ext_of(Path("/alfa/bra.vo/charlie.ogg"), ".ogg"), True)
+        self.assertEqual(has_ext_of(Path("/alfa/bra.vo/charlie.ogg"), "mp3"), False)
 
     def test_str_strip_numbers(self):
         self.assertEqual(str_strip_numbers("ab11cdd2k.144"), [11, 2, 144])

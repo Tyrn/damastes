@@ -12,24 +12,15 @@ import re
 import shutil
 import argparse
 import warnings
-#import itertools as it
 import functools as ft
-
-
-def sans_ext(path):
-    """
-    Discards file extension
-    """
-    root, ext = os.path.splitext(path)
-    return root
+from pathlib import Path
 
 
 def has_ext_of(path, ext):
     """
     Returns True, if path has extension ext, case and leading dot insensitive
     """
-    r, e = os.path.splitext(path)
-    return e.lstrip(".").upper() == ext.lstrip(".").upper()
+    return path.suffix.lstrip(".").upper() == ext.lstrip(".").upper()
 
 
 def str_strip_numbers(s):
@@ -59,22 +50,18 @@ def cmpstr_naturally(str_x, str_y):
     return cmpstr_c(num_x, num_y) if num_x != [] and num_y != [] else cmpstr_c(str_x, str_y)
 
 
-def compare_path(xp, yp):
+def compare_path(x, y):
     """
     Compares two paths, ignoring extensions
     """
-    x = sans_ext(xp)
-    y = sans_ext(yp)
-    return cmpstr_c(x, y) if args.sort_lex else cmpstr_naturally(x, y)
+    return cmpstr_c(str(x), str(y)) if args.sort_lex else cmpstr_naturally(str(x), str(y))
 
 
-def compare_file(xf, yf):
+def compare_file(x, y):
     """
     Compares two paths, filenames only, ignoring extensions
     """
-    x = sans_ext(os.path.basename(xf))
-    y = sans_ext(os.path.basename(yf))
-    return cmpstr_c(x, y) if args.sort_lex else cmpstr_naturally(x, y)
+    return cmpstr_c(x.stem, y.stem) if args.sort_lex else cmpstr_naturally(x.stem, y.stem)
 
 
 args = None
@@ -96,7 +83,7 @@ def isaudiofile(x):
     """
     Returns True, if x is an audio file, else returns False
     """
-    return not os.path.isdir(x) and mutagen_file(x) is not None
+    return not x.is_dir() and mutagen_file(x) is not None
 
 
 def list_dir_groom(abs_path, rev=False):
@@ -105,16 +92,16 @@ def list_dir_groom(abs_path, rev=False):
     offspring directory paths (1) naturally sorted list
     of offspring file paths.
     """
-    lst = [os.path.join(abs_path, x) for x in os.listdir(abs_path)]
-    dirs = sorted([x for x in lst if os.path.isdir(x)],
-                  key=ft.cmp_to_key((lambda xp, yp: -compare_path(xp, yp)) if rev else compare_path))
+    lst = [abs_path.joinpath(x) for x in os.listdir(abs_path)]
+    dirs = sorted([x for x in lst if x.is_dir()],
+                   key=ft.cmp_to_key((lambda xp, yp: -compare_path(xp, yp)) if rev else compare_path))
     files = sorted([x for x in lst if isaudiofile(x)],
                    key=ft.cmp_to_key((lambda xf, yf: -compare_file(xf, yf)) if rev else compare_file))
     return dirs, files
 
 
-def decorate_dir_name(i, name):
-    return ("" if args.strip_decorations else (str(i).zfill(3) + "-")) + name
+def decorate_dir_name(i, path):
+    return ("" if args.strip_decorations else (str(i).zfill(3) + "-")) + path.name
 
 
 def artist():
@@ -126,15 +113,13 @@ def artist():
     return args.artist_tag if args.artist_tag else ""
 
 
-def decorate_file_name(cntw, i, dst_step, name):
+def decorate_file_name(cntw, i, dst_step, path):
     global args
 
-    if args.strip_decorations: return name
-    root, ext = os.path.splitext(name)
-    prefix = str(i).zfill(cntw) + "-"
-    if args.prepend_subdir_name and not args.tree_dst and len(dst_step):
-        prefix += re.sub(os.sep, '-', dst_step) + "_"
-    return prefix + (args.unified_name + " - " + artist() + ext if args.unified_name else name)
+    if args.strip_decorations: return path.name
+    prefix = (str(i).zfill(cntw) +
+             ('<' + '-'.join(dst_step) + '>' if args.prepend_subdir_name and not args.tree_dst and len(dst_step) else '-'))
+    return prefix + (args.unified_name + " - " + artist() + path.suffix if args.unified_name else path.name)
 
 
 def traverse_tree_dst(src_dir, dst_root, dst_step, cntw):
@@ -145,12 +130,13 @@ def traverse_tree_dst(src_dir, dst_root, dst_step, cntw):
     dirs, files = list_dir_groom(src_dir)
 
     for i, d in enumerate(dirs):
-        step = os.path.join(dst_step, decorate_dir_name(i, os.path.basename(d)))
-        os.mkdir(os.path.join(dst_root, step))
+        step = list(dst_step)
+        step.append(decorate_dir_name(i, d))
+        os.mkdir(dst_root.joinpath(*step))
         yield from traverse_tree_dst(d, dst_root, step, cntw)
 
     for i, f in enumerate(files):
-        dst_path = os.path.join(dst_root, os.path.join(dst_step, decorate_file_name(cntw, i, dst_step, os.path.basename(f))))
+        dst_path = dst_root.joinpath(*dst_step).joinpath(decorate_file_name(cntw, i, dst_step, f))
         yield f, dst_path
 
 
@@ -162,10 +148,12 @@ def traverse_flat_dst(src_dir, dst_root, fcount, dst_step, cntw):
     dirs, files = list_dir_groom(src_dir)
 
     for i, d in enumerate(dirs):
-        yield from traverse_flat_dst(d, dst_root, fcount, os.path.join(dst_step, os.path.basename(d)), cntw)
+        step = list(dst_step)
+        step.append(d.name)
+        yield from traverse_flat_dst(d, dst_root, fcount, step, cntw)
 
     for i, f in enumerate(files):
-        dst_path = os.path.join(dst_root, decorate_file_name(cntw, fcount[0], dst_step, os.path.basename(f)))
+        dst_path = dst_root.joinpath(decorate_file_name(cntw, fcount[0], dst_step, f))
         fcount[0] += 1
         yield f, dst_path
 
@@ -178,12 +166,14 @@ def traverse_flat_dst_r(src_dir, dst_root, fcount, dst_step, cntw):
     dirs, files = list_dir_groom(src_dir, rev=True)
 
     for i, f in enumerate(files):
-        dst_path = os.path.join(dst_root, decorate_file_name(cntw, fcount[0], dst_step, os.path.basename(f)))
+        dst_path = dst_root.joinpath(decorate_file_name(cntw, fcount[0], dst_step, f))
         fcount[0] -= 1
         yield f, dst_path
 
     for i, d in enumerate(dirs):
-        yield from traverse_flat_dst_r(d, dst_root, fcount, os.path.join(dst_step, os.path.basename(d)), cntw)
+        step = list(dst_step)
+        step.append(d.name)
+        yield from traverse_flat_dst(d, dst_root, fcount, step, cntw)
 
 
 def groom(src, dst, cnt):
@@ -194,12 +184,12 @@ def groom(src, dst, cnt):
     cntw = len(str(cnt))      # File number substring need not be wider than this
 
     if args.tree_dst:
-        return traverse_tree_dst(src, dst, "", cntw)
+        return traverse_tree_dst(src, dst, [], cntw)
     else:
         if args.reverse:
-            return traverse_flat_dst_r(src, dst, [cnt], "", cntw)
+            return traverse_flat_dst_r(src, dst, [cnt], [], cntw)
         else:
-            return traverse_flat_dst(src, dst, [1], "", cntw)
+            return traverse_flat_dst(src, dst, [1], [], cntw)
 
 
 def build_album():
@@ -209,11 +199,11 @@ def build_album():
     """
     global args
 
-    src_name = os.path.basename(args.src_dir)
+    src_name = args.src_dir.stem
     prefix = "" if args.album_num is None else (str(args.album_num).zfill(2) + "-")
     base_dst = prefix + (artist() + " - " + args.unified_name if args.unified_name else src_name)
 
-    executive_dst = os.path.join(args.dst_dir, "" if args.drop_dst else base_dst)
+    executive_dst = args.dst_dir.joinpath("" if args.drop_dst else base_dst)
 
     def audiofiles_count(directory):
         """
@@ -223,7 +213,7 @@ def build_album():
 
         for root, dirs, files in os.walk(directory):
             for name in files:
-                if isaudiofile(os.path.join(root, name)):
+                if isaudiofile(Path(root).joinpath(name)):
                     cnt += 1
         return cnt
 
@@ -234,7 +224,7 @@ def build_album():
         sys.exit()
 
     if not args.drop_dst:
-        if os.path.exists(executive_dst):
+        if executive_dst.exists():
             print(f'Destination directory "{executive_dst}" already exists.')
             sys.exit()
         else:
@@ -262,9 +252,9 @@ def copy_album():
 
         def _title(s):
             if args.file_title_num:
-                return str(i) + '>' + sans_ext(os.path.basename(source))
+                return str(i) + '>' + source.stem
             if args.file_title:
-                return sans_ext(os.path.basename(source))
+                return source.stem
             return str(i) + " " + s
 
         audio = mutagen_file(path)
@@ -354,13 +344,13 @@ def retrieve_args():
     parser.add_argument('src_dir', help="source directory")
     parser.add_argument('dst_dir', help="general destination directory")
     rg = parser.parse_args()
-    rg.src_dir = os.path.abspath(rg.src_dir)    # Takes care of the trailing slash, too
-    rg.dst_dir = os.path.abspath(rg.dst_dir)
+    rg.src_dir = Path(rg.src_dir).absolute()    # Takes care of the trailing slash, too
+    rg.dst_dir = Path(rg.dst_dir).absolute()
 
-    if not os.path.isdir(rg.src_dir):
+    if not rg.src_dir.is_dir():
         print(f'Source directory "{rg.src_dir}" is not there.')
         sys.exit()
-    if not os.path.isdir(rg.dst_dir):
+    if not rg.dst_dir.is_dir():
         print(f'Destination path "{rg.dst_dir}" is not there.')
         sys.exit()
 
