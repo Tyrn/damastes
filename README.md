@@ -85,7 +85,7 @@ regardless of the absence of the leading zeroes);
 
 - *Title* is set to *1 P.C. - Mice All Over* for the first file, all titles enumerated;
 ```
-Source Album $ pcp -st . /run/media/user/F8950/Audiobooks/
+Source Album $ pcp -dst . /run/media/user/F8950/Audiobooks/
 ```
 - *Source Album* directory is copied to `/run/media/user/F8950/Audiobooks/` in its entirety,
 without modification; sequential copy order, natural or lexicographical, is guaranteed.
