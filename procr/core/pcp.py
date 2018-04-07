@@ -92,8 +92,8 @@ def list_dir_groom(abs_path, rev=False):
     offspring directory paths (1) naturally sorted list
     of offspring file paths.
     """
-    lst = [abs_path.joinpath(x) for x in os.listdir(abs_path)]
-    dirs = sorted([x for x in lst if x.is_dir()],
+    lst   = [abs_path.joinpath(x) for x in os.listdir(abs_path)]
+    dirs  = sorted([x for x in lst if x.is_dir()],
                    key=ft.cmp_to_key((lambda xp, yp: -compare_path(xp, yp)) if rev else compare_path))
     files = sorted([x for x in lst if isaudiofile(x)],
                    key=ft.cmp_to_key((lambda xf, yf: -compare_file(xf, yf)) if rev else compare_file))
@@ -173,7 +173,7 @@ def traverse_flat_dst_r(src_dir, dst_root, fcount, dst_step, cntw):
     for i, d in enumerate(dirs):
         step = list(dst_step)
         step.append(d.name)
-        yield from traverse_flat_dst(d, dst_root, fcount, step, cntw)
+        yield from traverse_flat_dst_r(d, dst_root, fcount, step, cntw)
 
 
 def groom(src, dst, cnt):
