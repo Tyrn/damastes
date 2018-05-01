@@ -20,13 +20,14 @@ lib/
 lib64/
 lib64
 __pycache__/
+.pytest_cache/
 share/
 
 # Installer logs
 pip-log.txt
 
 # Unit test / coverage reports
-.coverage
+*.coverage
 .tox
 nosetests.xml
 
@@ -66,10 +67,11 @@ nosetests.xml
 .pydevproject
 .settings
 .idea
+.spyproject
+eric_*
 .eric5project
 .eric6project
 .spyderproject
-.spyproject
 *.e4p
 *.geany
 *.iml

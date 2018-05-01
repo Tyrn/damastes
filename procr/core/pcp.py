@@ -232,13 +232,16 @@ def build_album():
     return tot, groom(args.src_dir, executive_dst, tot)
 
 
-def make_initials(name, sep=".", trail=".", hyph="-"):
+def make_initials(authors, sep=".", trail=".", hyph="-"):
     """
-    Reduces a string of names to initials.
+    Reduces authors to initials.
     """
-    sans_monikers = re.sub(r"\"(?:\\.|[^\"\\])*\"", " ", name)
-    by_space = lambda nm: sep.join(x[0] if x else "" for x in re.split("\s+", nm)).upper()
-    return hyph.join(by_space(x.strip()) for x in re.split(hyph, sans_monikers)) + trail
+    by_space = lambda s: sep.join(x[0] for x in re.split(f"[\s{sep}]+", s) if x).upper()
+    by_hyph  = lambda s: hyph.join(by_space(x) for x in re.split(f"\s*(?:{hyph}\s*)+", s)) + trail
+
+    sans_monikers = re.sub(r"\"(?:\\.|[^\"\\])*\"", " ", authors)
+
+    return ','.join(by_hyph(author) for author in sans_monikers.split(','))
 
 
 def copy_album():
