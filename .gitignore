@@ -74,6 +74,7 @@ eric_*
 .spyderproject
 *.e4p
 *.geany
+*.vim
 *.iml
 *.log
 
