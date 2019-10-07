@@ -28,7 +28,7 @@ def str_strip_numbers(s):
     Returns a vector of integer numbers
     embedded in a string argument.
     """
-    return [int(x) for x in re.compile('\d+').findall(s)]
+    return [int(x) for x in re.compile("\d+").findall(s)]
 
 
 def cmpstr_c(x, y):
@@ -47,24 +47,29 @@ def cmpstr_naturally(str_x, str_y):
     """
     num_x = str_strip_numbers(str_x)
     num_y = str_strip_numbers(str_y)
-    return cmpstr_c(num_x, num_y) if num_x != [] and num_y != [] else cmpstr_c(
-        str_x, str_y)
+    return (
+        cmpstr_c(num_x, num_y)
+        if num_x != [] and num_y != []
+        else cmpstr_c(str_x, str_y)
+    )
 
 
 def compare_path(x, y):
     """
     Compares two paths (directories).
     """
-    return cmpstr_c(str(x), str(y)) if args.sort_lex else cmpstr_naturally(
-        str(x), str(y))
+    return (
+        cmpstr_c(str(x), str(y)) if args.sort_lex else cmpstr_naturally(str(x), str(y))
+    )
 
 
 def compare_file(x, y):
     """
     Compares two paths, filenames only, ignoring extensions.
     """
-    return cmpstr_c(x.stem, y.stem) if args.sort_lex else cmpstr_naturally(
-        x.stem, y.stem)
+    return (
+        cmpstr_c(x.stem, y.stem) if args.sort_lex else cmpstr_naturally(x.stem, y.stem)
+    )
 
 
 args = None
@@ -98,18 +103,21 @@ def list_dir_groom(abs_path, rev=False):
     lst = [abs_path.joinpath(x) for x in os.listdir(abs_path)]
     dirs = sorted(
         [x for x in lst if x.is_dir()],
-        key=ft.cmp_to_key((
-            lambda xp, yp: -compare_path(xp, yp)) if rev else compare_path))
+        key=ft.cmp_to_key(
+            (lambda xp, yp: -compare_path(xp, yp)) if rev else compare_path
+        ),
+    )
     files = sorted(
         [x for x in lst if isaudiofile(x)],
-        key=ft.cmp_to_key((
-            lambda xf, yf: -compare_file(xf, yf)) if rev else compare_file))
+        key=ft.cmp_to_key(
+            (lambda xf, yf: -compare_file(xf, yf)) if rev else compare_file
+        ),
+    )
     return dirs, files
 
 
 def decorate_dir_name(i, path):
-    return ("" if args.strip_decorations else
-            (str(i).zfill(3) + "-")) + path.name
+    return ("" if args.strip_decorations else (str(i).zfill(3) + "-")) + path.name
 
 
 def artist():
@@ -124,12 +132,18 @@ def artist():
 def decorate_file_name(cntw, i, dst_step, path):
     global args
 
-    if args.strip_decorations: return path.name
-    prefix = (str(i).zfill(cntw) +
-              ('-' + '-'.join(dst_step) + '-' if args.prepend_subdir_name
-               and not args.tree_dst and len(dst_step) else '-'))
-    return prefix + (args.unified_name + " - " + artist() + path.suffix
-                     if args.unified_name else path.name)
+    if args.strip_decorations:
+        return path.name
+    prefix = str(i).zfill(cntw) + (
+        "-" + "-".join(dst_step) + "-"
+        if args.prepend_subdir_name and not args.tree_dst and len(dst_step)
+        else "-"
+    )
+    return prefix + (
+        args.unified_name + " - " + artist() + path.suffix
+        if args.unified_name
+        else path.name
+    )
 
 
 def traverse_tree_dst(src_dir, dst_root, dst_step, cntw):
@@ -147,7 +161,8 @@ def traverse_tree_dst(src_dir, dst_root, dst_step, cntw):
 
     for i, f in enumerate(files):
         dst_path = dst_root.joinpath(*dst_step).joinpath(
-            decorate_file_name(cntw, i, dst_step, f))
+            decorate_file_name(cntw, i, dst_step, f)
+        )
         yield f, dst_path
 
 
@@ -164,8 +179,7 @@ def traverse_flat_dst(src_dir, dst_root, fcount, dst_step, cntw):
         yield from traverse_flat_dst(d, dst_root, fcount, step, cntw)
 
     for f in files:
-        dst_path = dst_root.joinpath(
-            decorate_file_name(cntw, fcount[0], dst_step, f))
+        dst_path = dst_root.joinpath(decorate_file_name(cntw, fcount[0], dst_step, f))
         fcount[0] += 1
         yield f, dst_path
 
@@ -178,8 +192,7 @@ def traverse_flat_dst_r(src_dir, dst_root, fcount, dst_step, cntw):
     dirs, files = list_dir_groom(src_dir, rev=True)
 
     for f in files:
-        dst_path = dst_root.joinpath(
-            decorate_file_name(cntw, fcount[0], dst_step, f))
+        dst_path = dst_root.joinpath(decorate_file_name(cntw, fcount[0], dst_step, f))
         fcount[0] -= 1
         yield f, dst_path
 
@@ -213,8 +226,9 @@ def build_album():
     global args
 
     prefix = (str(args.album_num).zfill(2) + "-") if args.album_num else ""
-    base_dst = prefix + (artist() + " - " + args.unified_name
-                         if args.unified_name else args.src_dir.name)
+    base_dst = prefix + (
+        artist() + " - " + args.unified_name if args.unified_name else args.src_dir.name
+    )
 
     executive_dst = args.dst_dir.joinpath("" if args.drop_dst else base_dst)
 
@@ -252,14 +266,15 @@ def make_initials(authors, sep=".", trail=".", hyph="-"):
     """
     Reduces authors to initials.
     """
-    by_space = lambda s: sep.join(x[0] for x in re.split(f"[\s{sep}]+", s) if x
-                                  ).upper()
-    by_hyph = lambda s: hyph.join(
-        by_space(x) for x in re.split(f"\s*(?:{hyph}\s*)+", s)) + trail
+    by_space = lambda s: sep.join(x[0] for x in re.split(f"[\s{sep}]+", s) if x).upper()
+    by_hyph = (
+        lambda s: hyph.join(by_space(x) for x in re.split(f"\s*(?:{hyph}\s*)+", s))
+        + trail
+    )
 
     sans_monikers = re.sub(r"\"(?:\\.|[^\"\\])*\"", " ", authors)
 
-    return ','.join(by_hyph(author) for author in sans_monikers.split(','))
+    return ",".join(by_hyph(author) for author in sans_monikers.split(","))
 
 
 def copy_album():
@@ -271,7 +286,7 @@ def copy_album():
     def _set_tags(i, total, source, path):
         def _title(s):
             if args.file_title_num:
-                return str(i) + '>' + source.stem
+                return str(i) + ">" + source.stem
             if args.file_title:
                 return source.stem
             return str(i) + " " + s
@@ -284,7 +299,8 @@ def copy_album():
             audio["tracknumber"] = str(i) + "/" + str(total)
         if args.artist_tag and args.album_tag:
             audio["title"] = _title(
-                make_initials(args.artist_tag) + " - " + args.album_tag)
+                make_initials(args.artist_tag) + " - " + args.album_tag
+            )
             audio["artist"] = args.artist_tag
             audio["album"] = args.album_tag
         elif args.artist_tag:
@@ -302,12 +318,13 @@ def copy_album():
         if args.verbose:
             print(f"{i:>4}/{total:<4} {dst}")
         else:
-            sys.stdout.write('.')
+            sys.stdout.write(".")
             sys.stdout.flush()
 
     tot, belt = build_album()
 
-    if not args.verbose: sys.stdout.write('Starting ')
+    if not args.verbose:
+        sys.stdout.write("Starting ")
 
     if args.reverse:
         for i, x in enumerate(belt):
@@ -316,11 +333,13 @@ def copy_album():
         for i, x in enumerate(belt):
             _cp(i + 1, tot, x)
 
-    if not args.verbose: print(f' Done ({tot}).')
+    if not args.verbose:
+        print(f" Done ({tot}).")
 
 
 def retrieve_args():
-    parser = argparse.ArgumentParser(description='''
+    parser = argparse.ArgumentParser(
+        description="""
     pcp "Procrustes" SmArT is a CLI utility for copying subtrees containing supported audio
     files in sequence, naturally sorted.
     The end result is a "flattened" copy of the source subtree. "Flattened" means
@@ -329,79 +348,78 @@ def retrieve_args():
     is set, tags "Title", "Artist", and "Album" can be replaced optionally.
     The writing process is strictly sequential: either starting with the number one file,
     or in the reversed order. This can be important for some mobile devices.
-    ''')
+    """
+    )
 
+    parser.add_argument("-v", "--verbose", help="verbose output", action="store_true")
     parser.add_argument(
-        "-v", "--verbose", help="verbose output", action="store_true")
-    parser.add_argument(
-        "-d",
-        "--drop-tracknumber",
-        help="do not set track numbers",
-        action="store_true")
+        "-d", "--drop-tracknumber", help="do not set track numbers", action="store_true"
+    )
     parser.add_argument(
         "-s",
         "--strip-decorations",
         help="strip file and directory name decorations",
-        action="store_true")
+        action="store_true",
+    )
     parser.add_argument(
-        "-f",
-        "--file-title",
-        help="use file name for title tag",
-        action="store_true")
+        "-f", "--file-title", help="use file name for title tag", action="store_true"
+    )
     parser.add_argument(
         "-F",
         "--file-title-num",
         help="use numbered file name for title tag",
-        action="store_true")
+        action="store_true",
+    )
     parser.add_argument(
-        "-x",
-        "--sort-lex",
-        help="sort files lexicographically",
-        action="store_true")
+        "-x", "--sort-lex", help="sort files lexicographically", action="store_true"
+    )
     parser.add_argument(
         "-t",
         "--tree-dst",
         help="retain the tree structure of the source album at destination",
-        action="store_true")
+        action="store_true",
+    )
     parser.add_argument(
         "-p",
         "--drop-dst",
         help="do not create destination directory",
-        action="store_true")
+        action="store_true",
+    )
     parser.add_argument(
         "-r",
         "--reverse",
-        help=
-        "copy files in reverse order (number one file is the last to be copied)",
-        action="store_true")
+        help="copy files in reverse order (number one file is the last to be copied)",
+        action="store_true",
+    )
     parser.add_argument(
-        "-e",
-        "--file-type",
-        help="accept only audio files of the specified type")
+        "-e", "--file-type", help="accept only audio files of the specified type"
+    )
     parser.add_argument(
         "-i",
         "--prepend-subdir-name",
         help="prepend current subdirectory name to a file name",
-        action="store_true")
+        action="store_true",
+    )
     parser.add_argument(
         "-u",
         "--unified-name",
-        help='''
+        help="""
                         destination root directory name and file names are based on UNIFIED_NAME,
                         serial number prepended, file extensions retained; also album tag,
                         if the latter is not specified explicitly
-                        ''')
+                        """,
+    )
     parser.add_argument(
         "-b",
         "--album-num",
-        help="0..99; prepend ALBUM_NUM to the destination root directory name")
+        help="0..99; prepend ALBUM_NUM to the destination root directory name",
+    )
     parser.add_argument("-a", "--artist-tag", help="artist tag name")
     parser.add_argument("-g", "--album-tag", help="album tag name")
-    parser.add_argument('src_dir', help="source directory")
-    parser.add_argument('dst_dir', help="general destination directory")
+    parser.add_argument("src_dir", help="source directory")
+    parser.add_argument("dst_dir", help="general destination directory")
     rg = parser.parse_args()
-    rg.src_dir = Path(
-        rg.src_dir).absolute()  # Takes care of the trailing slash, too.
+    rg.src_dir = Path(rg.src_dir).absolute()  # Takes care of the trailing slash, too.
     rg.dst_dir = Path(rg.dst_dir).absolute()
 
     if not rg.src_dir.is_dir():
@@ -426,7 +444,7 @@ def main():
 
     try:
         warnings.resetwarnings()
-        warnings.simplefilter('ignore')
+        warnings.simplefilter("ignore")
 
         args = retrieve_args()
         copy_album()
@@ -434,5 +452,5 @@ def main():
         sys.exit(e)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

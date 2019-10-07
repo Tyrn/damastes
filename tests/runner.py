@@ -3,6 +3,6 @@ import os
 
 loader = unittest.TestLoader()
 print(f'Discovery in "{os.getcwd()}"')
-tests = loader.discover('.')
+tests = loader.discover(".")
 testRunner = unittest.runner.TextTestRunner()
 testRunner.run(tests)
