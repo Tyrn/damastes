@@ -1,5 +1,6 @@
 import unittest
-from procr.core.pcp import *
+from py_procr import __version__
+from py_procr.pcp import *
 
 
 class TestHelpers(unittest.TestCase):
@@ -8,6 +9,9 @@ class TestHelpers(unittest.TestCase):
 
     def tearDown(self):
         pass
+
+    def test_version(self):
+        assert __version__ == "0.1.0"
 
     def test_zero_pad(self):
         self.assertEqual(str(3).zfill(5), "00003")
