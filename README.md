@@ -1,5 +1,13 @@
 ## Procrustes SmArT
 
+### Build and install
+```
+$ poetry build
+$ pip install dist/<...>.whl --user [-I]
+...
+$ pcp --help
+```
+
 ### Description
 
 **Procrustes SmArT** is a CLI utility for basic processing and copying
