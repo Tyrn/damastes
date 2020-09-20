@@ -1,5 +1,6 @@
 # poetry
 /dist/
+/.venv/
 __pycache__/
 *.egg-info/
 poetry.lock
