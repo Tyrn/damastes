@@ -163,17 +163,17 @@ def traverse_tree_dst(
     """
     dirs, files = list_dir_groom(src_dir)
 
-    for i, d in enumerate(dirs):
+    for i, directory in enumerate(dirs):
         step = list(dst_step)
-        step.append(decorate_dir_name(i, d))
+        step.append(decorate_dir_name(i, directory))
         os.mkdir(dst_root.joinpath(*step))
-        yield from traverse_tree_dst(d, dst_root, step, cntw)
+        yield from traverse_tree_dst(directory, dst_root, step, cntw)
 
-    for i, f in enumerate(files):
+    for i, file in enumerate(files):
         dst_path = dst_root.joinpath(*dst_step).joinpath(
-            decorate_file_name(cntw, i, dst_step, f)
+            decorate_file_name(cntw, i, dst_step, file)
         )
-        yield f, dst_path
+        yield file, dst_path
 
 
 def traverse_flat_dst(
@@ -185,35 +185,40 @@ def traverse_flat_dst(
     """
     dirs, files = list_dir_groom(src_dir)
 
-    for d in dirs:
+    for directory in dirs:
         step = list(dst_step)
-        step.append(d.name)
-        yield from traverse_flat_dst(d, dst_root, fcount, step, cntw)
+        step.append(directory.name)
+        yield from traverse_flat_dst(directory, dst_root, fcount, step, cntw)
 
-    for f in files:
-        dst_path = dst_root.joinpath(decorate_file_name(cntw, fcount[0], dst_step, f))
+    for file in files:
+        dst_path = dst_root.joinpath(
+            decorate_file_name(cntw, fcount[0], dst_step, file)
+        )
         fcount[0] += 1
-        yield f, dst_path
+        yield file, dst_path
 
 
 def traverse_flat_dst_r(
     src_dir: Path, dst_root: Path, fcount: List[int], dst_step: List[str], cntw: int
 ) -> Iterator[Tuple[Path, Path]]:
     """
-    Recursively traverses the source directory backwards (-r) and yields a sequence of (src, flat dst) pairs;
+    Recursively traverses the source directory backwards (-r) and yields a sequence
+    of (src, flat dst) pairs;
     the destination directory and file names get decorated according to options.
     """
     dirs, files = list_dir_groom(src_dir, rev=True)
 
-    for f in files:
-        dst_path = dst_root.joinpath(decorate_file_name(cntw, fcount[0], dst_step, f))
+    for file in files:
+        dst_path = dst_root.joinpath(
+            decorate_file_name(cntw, fcount[0], dst_step, file)
+        )
         fcount[0] -= 1
-        yield f, dst_path
+        yield file, dst_path
 
-    for d in dirs:
+    for directory in dirs:
         step = list(dst_step)
-        step.append(d.name)
-        yield from traverse_flat_dst_r(d, dst_root, fcount, step, cntw)
+        step.append(directory.name)
+        yield from traverse_flat_dst_r(directory, dst_root, fcount, step, cntw)
 
 
 def groom(src: Path, dst: Path, cnt: int) -> Iterator[Tuple[Path, Path]]:
@@ -241,7 +246,7 @@ def build_album() -> Tuple[int, Iterator[Tuple[Path, Path]]]:
 
     executive_dst = ARGS.dst_dir.joinpath("" if ARGS.drop_dst else base_dst)
 
-    def audiofiles_count(directory):
+    def audiofiles_count(directory: Path) -> int:
         """
         Returns full recursive count of audiofiles in directory.
         """
