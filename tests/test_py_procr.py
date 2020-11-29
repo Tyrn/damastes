@@ -26,21 +26,22 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(str_strip_numbers("ab11cdd2k.144"), [11, 2, 144])
         self.assertEqual(str_strip_numbers("Ignacio Vazquez-Abrams"), [])
 
-    def test_cmpstr_c(self):
-        self.assertEqual(cmpstr_c([], []), 0)
-        self.assertEqual(cmpstr_c([1], []), 1)
-        self.assertEqual(cmpstr_c([3], []), 1)
-        self.assertEqual(cmpstr_c([1, 2, 3], [1, 2, 3, 4, 5]), -1)
-        self.assertEqual(cmpstr_c([1, 4], [1, 4, 16]), -1)
-        self.assertEqual(cmpstr_c([2, 8], [2, 2, 3]), 1)
-        self.assertEqual(cmpstr_c([0, 0, 2, 4], [0, 0, 15]), -1)
-        self.assertEqual(cmpstr_c([0, 13], [0, 2, 2]), 1)
-        self.assertEqual(cmpstr_c([11, 2], [11, 2]), 0)
+    def test_strcmp_c(self):
+        self.assertEqual(strcmp_c("aardwark", "bobo"), -1)
+        self.assertEqual(strcmp_c([], []), 0)
+        self.assertEqual(strcmp_c([1], []), 1)
+        self.assertEqual(strcmp_c([3], []), 1)
+        self.assertEqual(strcmp_c([1, 2, 3], [1, 2, 3, 4, 5]), -1)
+        self.assertEqual(strcmp_c([1, 4], [1, 4, 16]), -1)
+        self.assertEqual(strcmp_c([2, 8], [2, 2, 3]), 1)
+        self.assertEqual(strcmp_c([0, 0, 2, 4], [0, 0, 15]), -1)
+        self.assertEqual(strcmp_c([0, 13], [0, 2, 2]), 1)
+        self.assertEqual(strcmp_c([11, 2], [11, 2]), 0)
 
-    def test_cmpstr_naturally(self):
-        self.assertEqual(cmpstr_naturally("", ""), 0)
-        self.assertEqual(cmpstr_naturally("2a", "10a"), -1)
-        self.assertEqual(cmpstr_naturally("alfa", "bravo"), -1)
+    def test_strcmp_naturally(self):
+        self.assertEqual(strcmp_naturally("", ""), 0)
+        self.assertEqual(strcmp_naturally("2a", "10a"), -1)
+        self.assertEqual(strcmp_naturally("alfa", "bravo"), -1)
 
     def test_make_initials(self):
         self.assertEqual(make_initials(" "), ".")
@@ -59,3 +60,4 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(make_initials("a.s.,b.s."), "A.S.,B.S.")
         self.assertEqual(make_initials("A. Strugatsky, B...Strugatsky."), "A.S.,B.S.")
         self.assertEqual(make_initials("Иржи Кропачек, Йозеф Новотный"), "И.К.,Й.Н.")
+        self.assertEqual(make_initials("österreich"), "Ö.")
