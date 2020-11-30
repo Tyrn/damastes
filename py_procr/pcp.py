@@ -266,12 +266,18 @@ def build_album() -> Tuple[int, Iterator[Tuple[Path, Path]]]:
         )
         sys.exit()
 
-    if not ARGS.drop_dst:
+    if not ARGS.drop_dst and not ARGS.dry_run:
         if executive_dst.exists():
-            print(f'Destination directory "{executive_dst}" already exists.')
-            sys.exit()
-        else:
-            os.mkdir(executive_dst)
+            if ARGS.overwrite:
+                try:
+                    shutil.rmtree(executive_dst)
+                except FileNotFoundError:
+                    print(f'Failed to remove "{executive_dst}".')
+                    sys.exit()
+            else:
+                print(f'Destination directory "{executive_dst}" already exists.')
+                sys.exit()
+        os.mkdir(executive_dst)
 
     return tot, groom(ARGS.src_dir, executive_dst, tot)
 
@@ -328,8 +334,9 @@ def copy_album() -> None:
 
     def copy_file(i: int, total: int, entry: Tuple[Path, Path]) -> None:
         src, dst = entry
-        shutil.copy(src, dst)
-        set_tags(i, total, src, dst)
+        if not ARGS.dry_run:
+            shutil.copy(src, dst)
+            set_tags(i, total, src, dst)
         if ARGS.verbose:
             print(f"{i:>4}/{total:<4} {dst}")
         else:
@@ -407,6 +414,18 @@ def retrieve_args() -> Any:
         "-r",
         "--reverse",
         help="copy files in reverse order (number one file is the last to be copied)",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-w",
+        "--overwrite",
+        help="silently remove existing destination directory (not recommended)",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-y",
+        "--dry-run",
+        help="without actually copying the files",
         action="store_true",
     )
     parser.add_argument(

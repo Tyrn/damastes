@@ -27,7 +27,7 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(str_strip_numbers("Ignacio Vazquez-Abrams"), [])
 
     def test_strcmp_c(self):
-        self.assertEqual(strcmp_c("aardwark", "bobo"), -1)
+        self.assertEqual(strcmp_c("aardvark", "bobo"), -1)
         self.assertEqual(strcmp_c([], []), 0)
         self.assertEqual(strcmp_c([1], []), 1)
         self.assertEqual(strcmp_c([3], []), 1)
