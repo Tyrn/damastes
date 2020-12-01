@@ -136,13 +136,13 @@ def artist() -> str:
     return ARGS.artist_tag if ARGS.artist_tag else ""
 
 
-def decorate_file_name(cntw: int, i: int, dst_step: List[str], path: Path) -> str:
+def decorate_file_name(i: int, dst_step: List[str], path: Path) -> str:
     """
     Prepends zero padded decimal i to path name.
     """
     if ARGS.strip_decorations:
         return path.name
-    prefix = str(i).zfill(cntw) + (
+    prefix = str(i).zfill(len(str(FILES_TOTAL))) + (
         "-" + "-".join(dst_step) + "-"
         if ARGS.prepend_subdir_name and not ARGS.tree_dst and len(dst_step) > 0
         else "-"
@@ -155,8 +155,8 @@ def decorate_file_name(cntw: int, i: int, dst_step: List[str], path: Path) -> st
 
 
 def traverse_tree_dst(
-    src_dir: Path, dst_root: Path, dst_step: List[str], cntw: int
-) -> Iterator[Tuple[Path, Path]]:
+    src_dir: Path, dst_root: Path, fcount: List[int], dst_step: List[str]
+) -> Iterator[Tuple[int, Path, Path]]:
     """
     Recursively traverses the source directory and yields a sequence of (src, tree dst) pairs;
     the destination directory and file names get decorated according to options.
@@ -166,19 +166,22 @@ def traverse_tree_dst(
     for i, directory in enumerate(dirs):
         step = list(dst_step)
         step.append(decorate_dir_name(i, directory))
-        os.mkdir(dst_root.joinpath(*step))
-        yield from traverse_tree_dst(directory, dst_root, step, cntw)
+        if not ARGS.dry_run:
+            os.mkdir(dst_root.joinpath(*step))
+        yield from traverse_tree_dst(directory, dst_root, fcount, step)
 
     for i, file in enumerate(files):
         dst_path = dst_root.joinpath(*dst_step).joinpath(
-            decorate_file_name(cntw, i, dst_step, file)
+            decorate_file_name(i + 1, dst_step, file)
         )
-        yield file, dst_path
+        index = fcount[0]
+        fcount[0] += 1
+        yield index, file, dst_path
 
 
 def traverse_flat_dst(
-    src_dir: Path, dst_root: Path, fcount: List[int], dst_step: List[str], cntw: int
-) -> Iterator[Tuple[Path, Path]]:
+    src_dir: Path, dst_root: Path, fcount: List[int], dst_step: List[str]
+) -> Iterator[Tuple[int, Path, Path]]:
     """
     Recursively traverses the source directory and yields a sequence of (src, flat dst) pairs;
     the destination directory and file names get decorated according to options.
@@ -188,19 +191,18 @@ def traverse_flat_dst(
     for directory in dirs:
         step = list(dst_step)
         step.append(directory.name)
-        yield from traverse_flat_dst(directory, dst_root, fcount, step, cntw)
+        yield from traverse_flat_dst(directory, dst_root, fcount, step)
 
     for file in files:
-        dst_path = dst_root.joinpath(
-            decorate_file_name(cntw, fcount[0], dst_step, file)
-        )
+        i = fcount[0]
+        dst_path = dst_root.joinpath(decorate_file_name(i, dst_step, file))
         fcount[0] += 1
-        yield file, dst_path
+        yield i, file, dst_path
 
 
 def traverse_flat_dst_r(
-    src_dir: Path, dst_root: Path, fcount: List[int], dst_step: List[str], cntw: int
-) -> Iterator[Tuple[Path, Path]]:
+    src_dir: Path, dst_root: Path, fcount: List[int], dst_step: List[str]
+) -> Iterator[Tuple[int, Path, Path]]:
     """
     Recursively traverses the source directory backwards (-r) and yields a sequence
     of (src, flat dst) pairs;
@@ -209,36 +211,35 @@ def traverse_flat_dst_r(
     dirs, files = list_dir_groom(src_dir, rev=True)
 
     for file in files:
-        dst_path = dst_root.joinpath(
-            decorate_file_name(cntw, fcount[0], dst_step, file)
-        )
+        i = fcount[0]
+        dst_path = dst_root.joinpath(decorate_file_name(i, dst_step, file))
         fcount[0] -= 1
-        yield file, dst_path
+        yield i, file, dst_path
 
     for directory in dirs:
         step = list(dst_step)
         step.append(directory.name)
-        yield from traverse_flat_dst_r(directory, dst_root, fcount, step, cntw)
+        yield from traverse_flat_dst_r(directory, dst_root, fcount, step)
 
 
-def groom(src: Path, dst: Path, cnt: int) -> Iterator[Tuple[Path, Path]]:
+def groom(src: Path, dst: Path) -> Iterator[Tuple[int, Path, Path]]:
     """
     Makes an 'executive' run of traversing the source directory; returns the 'ammo belt' generator.
     """
-    cntw = len(str(cnt))  # File number substring need not be wider than this
-
     if ARGS.tree_dst:
-        return traverse_tree_dst(src, dst, [], cntw)
+        return traverse_tree_dst(src, dst, [1], [])
     if ARGS.reverse:
-        return traverse_flat_dst_r(src, dst, [cnt], [], cntw)
-    return traverse_flat_dst(src, dst, [1], [], cntw)
+        return traverse_flat_dst_r(src, dst, [FILES_TOTAL], [])
+    return traverse_flat_dst(src, dst, [1], [])
 
 
-def build_album() -> Tuple[int, Iterator[Tuple[Path, Path]]]:
+def album() -> Iterator[Tuple[int, Path, Path]]:
     """
     Sets up boilerplate required by the options and returns the ammo belt generator
     of (src, dst) pairs.
     """
+    global FILES_TOTAL
+
     prefix = (str(ARGS.album_num).zfill(2) + "-") if ARGS.album_num else ""
     base_dst = prefix + (
         artist() + " - " + ARGS.unified_name if ARGS.unified_name else ARGS.src_dir.name
@@ -258,9 +259,9 @@ def build_album() -> Tuple[int, Iterator[Tuple[Path, Path]]]:
                     cnt += 1
         return cnt
 
-    tot = audiofiles_count(ARGS.src_dir)
+    FILES_TOTAL = audiofiles_count(ARGS.src_dir)
 
-    if tot < 1:
+    if FILES_TOTAL < 1:
         print(
             f'There are no supported audio files in the source directory "{ARGS.src_dir}".'
         )
@@ -279,7 +280,7 @@ def build_album() -> Tuple[int, Iterator[Tuple[Path, Path]]]:
                 sys.exit()
         os.mkdir(executive_dst)
 
-    return tot, groom(ARGS.src_dir, executive_dst, tot)
+    return groom(ARGS.src_dir, executive_dst)
 
 
 def make_initials(authors: str, sep=".", trail=".", hyph="-") -> str:
@@ -304,7 +305,7 @@ def copy_album() -> None:
     Runs through the ammo belt and does copying, in the reverse order if necessary.
     """
 
-    def set_tags(i: int, total: int, source: Path, path: Path) -> None:
+    def set_tags(i: int, source: Path, path: Path) -> None:
         def make_title(tagging: str) -> str:
             if ARGS.file_title_num:
                 return str(i) + ">" + source.stem
@@ -317,7 +318,7 @@ def copy_album() -> None:
             return
 
         if not ARGS.drop_tracknumber:
-            audio["tracknumber"] = str(i) + "/" + str(total)
+            audio["tracknumber"] = str(i) + "/" + str(FILES_TOTAL)
         if ARGS.artist_tag and ARGS.album_tag:
             audio["title"] = make_title(
                 make_initials(ARGS.artist_tag) + " - " + ARGS.album_tag
@@ -332,31 +333,25 @@ def copy_album() -> None:
             audio["album"] = ARGS.album_tag
         audio.save()
 
-    def copy_file(i: int, total: int, entry: Tuple[Path, Path]) -> None:
-        src, dst = entry
+    def copy_file(entry: Tuple[int, Path, Path]) -> None:
+        i, src, dst = entry
         if not ARGS.dry_run:
             shutil.copy(src, dst)
-            set_tags(i, total, src, dst)
+            set_tags(i, src, dst)
         if ARGS.verbose:
-            print(f"{i:>4}/{total:<4} {dst}")
+            print(f"{i:>4}/{FILES_TOTAL:<4} {dst}")
         else:
             sys.stdout.write(".")
             sys.stdout.flush()
 
-    tot, belt = build_album()
-
     if not ARGS.verbose:
         sys.stdout.write("Starting ")
 
-    if ARGS.reverse:
-        for i, entry in enumerate(belt):
-            copy_file(tot - i, tot, entry)
-    else:
-        for i, entry in enumerate(belt):
-            copy_file(i + 1, tot, entry)
+    for entry in album():
+        copy_file(entry)
 
     if not ARGS.verbose:
-        print(f" Done ({tot}).")
+        print(f" Done ({FILES_TOTAL}).")
 
 
 def retrieve_args() -> Any:
@@ -479,6 +474,7 @@ def retrieve_args() -> Any:
 
 
 ARGS: Any = None
+FILES_TOTAL = -1
 
 
 def main() -> None:
