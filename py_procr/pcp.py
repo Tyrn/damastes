@@ -186,51 +186,27 @@ def traverse_flat_dst(
     Recursively traverses the source directory and yields a sequence of (src, flat dst) pairs;
     the destination directory and file names get decorated according to options.
     """
-    dirs, files = list_dir_groom(src_dir)
+    dirs, files = list_dir_groom(src_dir, ARGS.reverse)
 
-    for directory in dirs:
-        step = list(dst_step)
-        step.append(directory.name)
-        yield from traverse_flat_dst(directory, dst_root, fcount, step)
+    def dir_fund(dirs):
+        for directory in dirs:
+            step = list(dst_step)
+            step.append(directory.name)
+            yield from traverse_flat_dst(directory, dst_root, fcount, step)
 
-    for file in files:
-        i = fcount[0]
-        dst_path = dst_root.joinpath(decorate_file_name(i, dst_step, file))
-        fcount[0] += 1
-        yield i, file, dst_path
+    def file_fund(files):
+        for file in files:
+            i = fcount[0]
+            dst_path = dst_root.joinpath(decorate_file_name(i, dst_step, file))
+            fcount[0] += -1 if ARGS.reverse else 1
+            yield i, file, dst_path
 
-
-def traverse_flat_dst_r(
-    src_dir: Path, dst_root: Path, fcount: List[int], dst_step: List[str]
-) -> Iterator[Tuple[int, Path, Path]]:
-    """
-    Recursively traverses the source directory backwards (-r) and yields a sequence
-    of (src, flat dst) pairs;
-    the destination directory and file names get decorated according to options.
-    """
-    dirs, files = list_dir_groom(src_dir, rev=True)
-
-    for file in files:
-        i = fcount[0]
-        dst_path = dst_root.joinpath(decorate_file_name(i, dst_step, file))
-        fcount[0] -= 1
-        yield i, file, dst_path
-
-    for directory in dirs:
-        step = list(dst_step)
-        step.append(directory.name)
-        yield from traverse_flat_dst_r(directory, dst_root, fcount, step)
-
-
-def groom(src: Path, dst: Path) -> Iterator[Tuple[int, Path, Path]]:
-    """
-    Makes an 'executive' run of traversing the source directory; returns the 'ammo belt' generator.
-    """
-    if ARGS.tree_dst:
-        return traverse_tree_dst(src, dst, [1], [])
     if ARGS.reverse:
-        return traverse_flat_dst_r(src, dst, [FILES_TOTAL], [])
-    return traverse_flat_dst(src, dst, [1], [])
+        yield from file_fund(files)
+        yield from dir_fund(dirs)
+    else:
+        yield from dir_fund(dirs)
+        yield from file_fund(files)
 
 
 def album() -> Iterator[Tuple[int, Path, Path]]:
@@ -280,7 +256,11 @@ def album() -> Iterator[Tuple[int, Path, Path]]:
                 sys.exit()
         os.mkdir(executive_dst)
 
-    return groom(ARGS.src_dir, executive_dst)
+    seed = FILES_TOTAL if ARGS.reverse else 1
+
+    if ARGS.tree_dst:
+        return traverse_tree_dst(ARGS.src_dir, executive_dst, [1], [])
+    return traverse_flat_dst(ARGS.src_dir, executive_dst, [seed], [])
 
 
 def make_initials(authors: str, sep=".", trail=".", hyph="-") -> str:
