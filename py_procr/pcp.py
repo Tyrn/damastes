@@ -156,7 +156,7 @@ def decorate_file_name(i: int, dst_step: List[str], path: Path) -> str:
 
 def traverse_tree_dst(
     src_dir: Path, dst_root: Path, fcount: List[int], dst_step: List[str]
-) -> Iterator[Tuple[int, Path, Path]]:
+) -> Iterator[Tuple[int, Path, Path, str]]:
     """
     Recursively traverses the source directory and yields a sequence of (src, tree dst) pairs;
     the destination directory and file names get decorated according to options.
@@ -166,22 +166,19 @@ def traverse_tree_dst(
     for i, directory in enumerate(dirs):
         step = list(dst_step)
         step.append(decorate_dir_name(i, directory))
-        if not ARGS.dry_run:
-            os.mkdir(dst_root.joinpath(*step))
         yield from traverse_tree_dst(directory, dst_root, fcount, step)
 
     for i, file in enumerate(files):
-        dst_path = dst_root.joinpath(*dst_step).joinpath(
-            decorate_file_name(i + 1, dst_step, file)
-        )
         index = fcount[0]
         fcount[0] += 1
-        yield index, file, dst_path
+        yield index, file, dst_root.joinpath(*dst_step), decorate_file_name(
+            i + 1, dst_step, file
+        )
 
 
 def traverse_flat_dst(
     src_dir: Path, dst_root: Path, fcount: List[int], dst_step: List[str]
-) -> Iterator[Tuple[int, Path, Path]]:
+) -> Iterator[Tuple[int, Path, Path, str]]:
     """
     Recursively traverses the source directory and yields a sequence of (src, flat dst) pairs;
     the destination directory and file names get decorated according to options.
@@ -197,9 +194,8 @@ def traverse_flat_dst(
     def file_fund(files):
         for file in files:
             i = fcount[0]
-            dst_path = dst_root.joinpath(decorate_file_name(i, dst_step, file))
             fcount[0] += -1 if ARGS.reverse else 1
-            yield i, file, dst_path
+            yield i, file, dst_root, decorate_file_name(i, dst_step, file)
 
     if ARGS.reverse:
         yield from file_fund(files)
@@ -209,7 +205,7 @@ def traverse_flat_dst(
         yield from file_fund(files)
 
 
-def album() -> Iterator[Tuple[int, Path, Path]]:
+def album() -> Iterator[Tuple[int, Path, Path, str]]:
     """
     Sets up boilerplate required by the options and returns the ammo belt generator
     of (src, dst) pairs.
@@ -313,9 +309,11 @@ def copy_album() -> None:
             audio["album"] = ARGS.album_tag
         audio.save()
 
-    def copy_file(entry: Tuple[int, Path, Path]) -> None:
-        i, src, dst = entry
+    def copy_file(entry: Tuple[int, Path, Path, str]) -> None:
+        i, src, dst_path, target_file_name = entry
+        dst = dst_path.joinpath(target_file_name)
         if not ARGS.dry_run:
+            dst_path.mkdir(parents=True, exist_ok=True)
             shutil.copy(src, dst)
             set_tags(i, src, dst)
         if ARGS.verbose:
