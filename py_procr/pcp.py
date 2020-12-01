@@ -154,48 +154,44 @@ def decorate_file_name(i: int, dst_step: List[str], path: Path) -> str:
     )
 
 
-def traverse_tree_dst(
+def walk_file_tree(
     src_dir: Path, dst_root: Path, fcount: List[int], dst_step: List[str]
 ) -> Iterator[Tuple[int, Path, Path, str]]:
     """
-    Recursively traverses the source directory and yields a sequence of (src, tree dst) pairs;
-    the destination directory and file names get decorated according to options.
-    """
-    dirs, files = list_dir_groom(src_dir)
-
-    for i, directory in enumerate(dirs):
-        step = list(dst_step)
-        step.append(decorate_dir_name(i, directory))
-        yield from traverse_tree_dst(directory, dst_root, fcount, step)
-
-    for i, file in enumerate(files):
-        index = fcount[0]
-        fcount[0] += 1
-        yield index, file, dst_root.joinpath(*dst_step), decorate_file_name(
-            i + 1, dst_step, file
-        )
-
-
-def traverse_flat_dst(
-    src_dir: Path, dst_root: Path, fcount: List[int], dst_step: List[str]
-) -> Iterator[Tuple[int, Path, Path, str]]:
-    """
-    Recursively traverses the source directory and yields a sequence of (src, flat dst) pairs;
+    Recursively traverses the source directory and yields a tuple of copying attributes;
     the destination directory and file names get decorated according to options.
     """
     dirs, files = list_dir_groom(src_dir, ARGS.reverse)
 
-    def dir_fund(dirs):
+    def dir_flat(dirs):
         for directory in dirs:
             step = list(dst_step)
             step.append(directory.name)
-            yield from traverse_flat_dst(directory, dst_root, fcount, step)
+            yield from walk_file_tree(directory, dst_root, fcount, step)
 
-    def file_fund(files):
+    def file_flat(files):
         for file in files:
             i = fcount[0]
             fcount[0] += -1 if ARGS.reverse else 1
             yield i, file, dst_root, decorate_file_name(i, dst_step, file)
+
+    def dir_tree(dirs):
+        for i, directory in enumerate(dirs):
+            step = list(dst_step)
+            step.append(decorate_dir_name(i, directory))
+            yield from walk_file_tree(directory, dst_root, fcount, step)
+
+    def file_tree(files):
+        for i, file in enumerate(files):
+            index = fcount[0]
+            fcount[0] += -1 if ARGS.reverse else 1
+            yield index, file, dst_root.joinpath(*dst_step), decorate_file_name(
+                i + 1, dst_step, file
+            )
+
+    dir_fund, file_fund = (
+        (dir_tree, file_tree) if ARGS.tree_dst else (dir_flat, file_flat)
+    )
 
     if ARGS.reverse:
         yield from file_fund(files)
@@ -252,11 +248,9 @@ def album() -> Iterator[Tuple[int, Path, Path, str]]:
                 sys.exit()
         os.mkdir(executive_dst)
 
-    seed = FILES_TOTAL if ARGS.reverse else 1
-
-    if ARGS.tree_dst:
-        return traverse_tree_dst(ARGS.src_dir, executive_dst, [1], [])
-    return traverse_flat_dst(ARGS.src_dir, executive_dst, [seed], [])
+    return walk_file_tree(
+        ARGS.src_dir, executive_dst, [FILES_TOTAL if ARGS.reverse else 1], []
+    )
 
 
 def make_initials(authors: str, sep=".", trail=".", hyph="-") -> str:
@@ -440,10 +434,6 @@ def retrieve_args() -> Any:
     if not args.dst_dir.is_dir():
         print(f'Destination path "{args.dst_dir}" is not there.')
         sys.exit()
-
-    if args.tree_dst and args.reverse:
-        print("  *** -t option ignored (conflicts with -r) ***")
-        args.tree_dst = False
 
     if args.unified_name and args.album_tag is None:
         args.album_tag = args.unified_name
