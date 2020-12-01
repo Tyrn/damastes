@@ -249,7 +249,7 @@ def album() -> Iterator[Tuple[int, Path, Path, str]]:
             else:
                 print(f'Destination directory "{executive_dst}" already exists.')
                 sys.exit()
-        os.mkdir(executive_dst)
+        executive_dst.mkdir()
 
     return walk_file_tree(
         ARGS.src_dir, executive_dst, [FILES_TOTAL if ARGS.reverse else 1], []
