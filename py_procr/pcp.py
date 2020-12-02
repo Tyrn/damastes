@@ -103,18 +103,18 @@ def is_audiofile(name: Path) -> bool:
 def list_dir_groom(abs_path: Path, rev=False) -> Tuple[List[Path], List[Path]]:
     """
     Returns a tuple of: (0) naturally sorted list of
-    offspring directory paths (1) naturally sorted list
-    of offspring file paths.
+    offspring directory names (1) naturally sorted list
+    of offspring file names.
     """
-    lst = [abs_path.joinpath(x) for x in os.listdir(abs_path)]
+    lst = os.listdir(abs_path)
     dirs = sorted(
-        [x for x in lst if x.is_dir()],
+        [Path(x) for x in lst if abs_path.joinpath(x).is_dir()],
         key=ft.cmp_to_key(
             (lambda xp, yp: -path_compare(xp, yp)) if rev else path_compare
         ),
     )
     files = sorted(
-        [x for x in lst if is_audiofile(x)],
+        [Path(x) for x in lst if is_audiofile(abs_path.joinpath(x))],
         key=ft.cmp_to_key(
             (lambda xf, yf: -file_compare(xf, yf)) if rev else file_compare
         ),
@@ -167,13 +167,17 @@ def walk_file_tree(
         for directory in dirs:
             step = list(dst_step)
             step.append(directory.name)
-            yield from walk_file_tree(directory, dst_root, fcount, step)
+            yield from walk_file_tree(
+                src_dir.joinpath(directory), dst_root, fcount, step
+            )
 
     def file_flat(files):
         for file in files:
             i = fcount[0]
             fcount[0] += -1 if ARGS.reverse else 1
-            yield i, file, dst_root, decorate_file_name(i, dst_step, file)
+            yield i, src_dir.joinpath(file), dst_root, decorate_file_name(
+                i, dst_step, file
+            )
 
     def reverse(i, lst):
         return len(lst) - i if ARGS.reverse else i + 1
@@ -182,15 +186,17 @@ def walk_file_tree(
         for i, directory in enumerate(dirs):
             step = list(dst_step)
             step.append(decorate_dir_name(reverse(i, dirs), directory))
-            yield from walk_file_tree(directory, dst_root, fcount, step)
+            yield from walk_file_tree(
+                src_dir.joinpath(directory), dst_root, fcount, step
+            )
 
     def file_tree(files):
         for i, file in enumerate(files):
             index = fcount[0]
             fcount[0] += -1 if ARGS.reverse else 1
-            yield index, file, dst_root.joinpath(*dst_step), decorate_file_name(
-                reverse(i, files), dst_step, file
-            )
+            yield index, src_dir.joinpath(file), dst_root.joinpath(
+                *dst_step
+            ), decorate_file_name(reverse(i, files), dst_step, file)
 
     dir_fund, file_fund = (
         (dir_tree, file_tree) if ARGS.tree_dst else (dir_flat, file_flat)
