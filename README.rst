@@ -1,21 +1,27 @@
-## Procrustes SmArT
+Procrustes SmArT
+****************
 
-### Build and install
-```
-$ poetry build
-$ pip install dist/<...>.whl --user [-I]
-...
-$ pcp --help
-```
+Build and install
+=================
 
-### Use Git Hooks
-```
-$ pre-commit install
-...
-$ pre-commit run --all-files
-```
+::
 
-### Description
+    $ poetry build
+    $ pip install dist/<...>.whl --user [-I]
+    ...
+    $ pcp --help
+
+Use Git Hooks
+=============
+
+::
+
+    $ pre-commit install
+    ...
+    $ pre-commit run --all-files
+
+Description
+===========
 
 **Procrustes SmArT** is a CLI utility for basic processing and copying
 of audio albums, mostly audiobooks of uncertain provenance to cheap mobile
@@ -29,12 +35,15 @@ and directories are not modified in any way. Files are copied sequentially,
 by default file number one first, optionally in reverse order, as some
 mobile devices are copy-order sensitive.
 
-### General syntax
+General syntax
+==============
 
+::
 
-``$ pcp [<options>] <source directory> <destination directory>``
+    $ pcp [<options>] <source directory> <destination directory>
 
-### Options
+Options
+=======
 
 ``-h, --help``
 short description and options
@@ -66,6 +75,12 @@ do not create destination directory
 ``-r, --reverse``
 copy files in reverse order (number one file is the last to be copied)
 
+``-w, --overwrite``
+silently remove existing destination directory (not recommended)
+
+``-y, --dry-run``
+without actually copying the files
+
 ``-e, --file-type FILE_TYPE``
 accept only audio files of the specified type
 
@@ -85,10 +100,13 @@ artist tag name
 ``-g --album-tag ALBUM_TAG``
 album tag name
 
-### Examples
-```
-Source Album $ pcp -a "Peter Crowcroft" -g "Mice All Over" . /run/media/user/F8950/Audiobooks/
-```
+Examples
+========
+
+::
+
+    Source Album $ pcp -a "Peter Crowcroft" -g "Mice All Over" . /run/media/user/F8950/Audiobooks/
+
 - Destination directory `/run/media/user/F8950/Audiobooks/Source Album/` is created;
 
 - Track numbers are set according to the natural sort order (file names `..., 5, 6, 7, 8, 9, 10...`;
@@ -99,8 +117,10 @@ regardless of the absence of the leading zeroes);
 - *Album* is set to *Mice All Over*;
 
 - *Title* is set to *1 P.C. - Mice All Over* for the first file, all titles enumerated;
-```
-Source Album $ pcp -dst . /run/media/user/F8950/Audiobooks/
-```
+
+::
+
+    Source Album $ pcp -dst . /run/media/user/F8950/Audiobooks/
+
 - *Source Album* directory is copied to `/run/media/user/F8950/Audiobooks/` in its entirety,
 without modification; sequential copy order, natural or lexicographical, is guaranteed.
