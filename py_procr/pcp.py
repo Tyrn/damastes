@@ -173,11 +173,10 @@ def walk_file_tree(
 
     def file_flat(files):
         for file in files:
-            i = fcount[0]
-            fcount[0] += -1 if ARGS.reverse else 1
-            yield i, src_dir.joinpath(file), dst_root, decorate_file_name(
-                i, dst_step, file
+            yield fcount[0], src_dir.joinpath(file), dst_root, decorate_file_name(
+                fcount[0], dst_step, file
             )
+            fcount[0] += -1 if ARGS.reverse else 1
 
     def reverse(i, lst):
         return len(lst) - i if ARGS.reverse else i + 1
@@ -192,11 +191,10 @@ def walk_file_tree(
 
     def file_tree(files):
         for i, file in enumerate(files):
-            index = fcount[0]
-            fcount[0] += -1 if ARGS.reverse else 1
-            yield index, src_dir.joinpath(file), dst_root.joinpath(
+            yield fcount[0], src_dir.joinpath(file), dst_root.joinpath(
                 *dst_step
             ), decorate_file_name(reverse(i, files), dst_step, file)
+            fcount[0] += -1 if ARGS.reverse else 1
 
     dir_fund, file_fund = (
         (dir_tree, file_tree) if ARGS.tree_dst else (dir_flat, file_flat)
