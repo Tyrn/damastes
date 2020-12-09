@@ -318,7 +318,7 @@ def copy_album() -> None:
             shutil.copy(src, dst)
             set_tags(i, src, dst)
         if ARGS.verbose:
-            print(f"{i:>4}/{FILES_TOTAL:<4} {dst}")
+            print(f"{i:>4}/{FILES_TOTAL} \U0001f3a7 {dst}")
         else:
             sys.stdout.write(".")
             sys.stdout.flush()
@@ -350,7 +350,7 @@ def retrieve_args() -> Any:
     """
     )
 
-    parser.add_argument("-v", "--verbose", help="verbose output", action="store_true")
+    parser.add_argument("-V", "--verbose", help="verbose output", action="store_true")
     parser.add_argument(
         "-d", "--drop-tracknumber", help="do not set track numbers", action="store_true"
     )
@@ -403,13 +403,13 @@ def retrieve_args() -> Any:
         action="store_true",
     )
     parser.add_argument(
-        "-e", "--file-type", help="accept only audio files of the specified type"
-    )
-    parser.add_argument(
         "-i",
         "--prepend-subdir-name",
         help="prepend current subdirectory name to a file name",
         action="store_true",
+    )
+    parser.add_argument(
+        "-e", "--file-type", help="accept only audio files of the specified type"
     )
     parser.add_argument(
         "-u",
