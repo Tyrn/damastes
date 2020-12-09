@@ -352,13 +352,13 @@ def retrieve_args() -> Any:
     )
 
     parser.add_argument(
-        "-v",
+        "-V",
         "--version",
         help="package version",
         action="version",
         version=f"%(prog)s (version {__version__})",
     )
-    parser.add_argument("-V", "--verbose", help="verbose output", action="store_true")
+    parser.add_argument("-v", "--verbose", help="verbose output", action="store_true")
     parser.add_argument(
         "-d", "--drop-tracknumber", help="do not set track numbers", action="store_true"
     )

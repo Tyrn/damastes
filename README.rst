@@ -48,10 +48,10 @@ Options
 ``-h, --help``
 short description and options
 
-``-v, --version``
+``-V, --version``
 package version
 
-``-V, --verbose``
+``-v, --verbose``
 unless verbose, just progress bar is shown
 
 ``-d, --drop-tracknumber``
