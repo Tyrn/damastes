@@ -9,6 +9,7 @@ if sys.version_info < (3, 6, 0):
     sys.stderr.write("You need python 3.6 or later to run this script\n")
     sys.exit(1)
 
+from py_procr import __version__
 from typing import List, Tuple, Iterator, Any
 import mutagen as mt
 import os
@@ -350,6 +351,13 @@ def retrieve_args() -> Any:
     """
     )
 
+    parser.add_argument(
+        "-v",
+        "--version",
+        help="package version",
+        action="version",
+        version=f"%(prog)s (version {__version__})",
+    )
     parser.add_argument("-V", "--verbose", help="verbose output", action="store_true")
     parser.add_argument(
         "-d", "--drop-tracknumber", help="do not set track numbers", action="store_true"
