@@ -20,6 +20,15 @@ Use Git Hooks
     ...
     $ pre-commit run --all-files
 
+Test
+====
+
+::
+
+    $ python tests/runner.py
+    $ pytest
+    $ python -m doctest [-v] py_procr/pcp.py
+
 Description
 ===========
 

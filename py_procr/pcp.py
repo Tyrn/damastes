@@ -24,6 +24,11 @@ from pathlib import Path
 def has_ext_of(path: Path, ext: str) -> bool:
     """
     Returns True, if path has extension ext, case and leading dot insensitive.
+
+    >>> has_ext_of(Path("bra.vo/charlie.ogg"), "OGG")
+    True
+    >>> has_ext_of(Path("bra.vo/charlie.ogg"), "mp3")
+    False
     """
     return path.suffix.lstrip(".").upper() == ext.lstrip(".").upper()
 
@@ -32,6 +37,9 @@ def str_strip_numbers(str_alphanum: str) -> List[int]:
     """
     Returns a vector of integer numbers
     embedded in a string argument.
+
+    >>> str_strip_numbers("ab11cdd2k.144")
+    [11, 2, 144]
     """
     return [int(x) for x in re.compile(r"\d+").findall(str_alphanum)]
 
@@ -42,6 +50,15 @@ Ord = int  # LT (negative), EQ (zero) GT (positive).
 def strcmp_c(str_x, str_y) -> Ord:
     """
     Compares strings; also lists of integers using 'string semantics'.
+
+    >>> strcmp_c("aardvark", "bobo")
+    -1
+    >>> strcmp_c([1, 4], [1, 4, 16])
+    -1
+    >>> strcmp_c([2, 8], [2, 2, 3])
+    1
+    >>> strcmp_c([11, 2], [0xb, 2])
+    0
     """
     return 0 if str_x == str_y else -1 if str_x < str_y else 1
 
@@ -52,6 +69,11 @@ def strcmp_naturally(str_x: str, str_y: str) -> Ord:
     values embedded in the strings, otherwise returns the standard string comparison.
     The idea of the natural sort as opposed to the standard lexicographic sort is one of coping
     with the possible absence of the leading zeros in 'numbers' of files or directories.
+
+    >>> strcmp_naturally("2a", "10a")
+    -1
+    >>> strcmp_naturally("alfa", "bravo")
+    -1
     """
     num_x = str_strip_numbers(str_x)
     num_y = str_strip_numbers(str_y)
@@ -264,6 +286,9 @@ def album() -> Iterator[Tuple[int, Path, Path, str]]:
 def make_initials(authors: str, sep=".", trail=".", hyph="-") -> str:
     """
     Reduces authors to initials.
+
+    >>> make_initials('Ignacio "Castigador" Vazquez-Abrams')
+    'I.V-A.'
     """
     by_space = lambda s: sep.join(
         x[0] for x in re.split(rf"[\s{sep}]+", s) if x
