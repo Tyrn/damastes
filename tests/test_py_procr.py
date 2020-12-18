@@ -6,7 +6,7 @@ from py_procr.pcp import *
 
 
 def load_tests(_loader, tests, _ignore):
-    print(f"Doc Test in {pcp.__name__}")
+    print(f"✨ Doc Test in {pcp.__name__}")
     tests.addTests(doctest.DocTestSuite(pcp))
     return tests
 
