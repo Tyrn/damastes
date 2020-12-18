@@ -26,8 +26,8 @@ Test
 ::
 
     $ python tests/runner.py
-    $ pytest
     $ python -m doctest [-v] py_procr/pcp.py
+    $ mypy .
 
 Description
 ===========

@@ -1,6 +1,14 @@
 import unittest
+import doctest
 from py_procr import __version__
+import py_procr.pcp as pcp
 from py_procr.pcp import *
+
+
+def load_tests(_loader, tests, _ignore):
+    print(f"Doc Test in {pcp.__name__}")
+    tests.addTests(doctest.DocTestSuite(pcp))
+    return tests
 
 
 class TestHelpers(unittest.TestCase):
