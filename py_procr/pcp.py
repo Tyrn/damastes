@@ -70,9 +70,9 @@ def strcmp_naturally(str_x: str, str_y: str) -> Ord:
     The idea of the natural sort as opposed to the standard lexicographic sort is one of coping
     with the possible absence of the leading zeros in 'numbers' of files or directories.
 
-    >>> strcmp_naturally("2a", "10a")
+    >>> strcmp_naturally("2charlie", "10alfa")
     -1
-    >>> strcmp_naturally("alfa", "bravo")
+    >>> strcmp_naturally("charlie", "zulu")
     -1
     """
     num_x = str_strip_numbers(str_x)
@@ -287,8 +287,8 @@ def make_initials(authors: str, sep=".", trail=".", hyph="-") -> str:
     """
     Reduces authors to initials.
 
-    >>> make_initials('Ignacio "Castigador" Vazquez-Abrams')
-    'I.V-A.'
+    >>> make_initials('Ignacio "Castigador" Vazquez-Abrams, Nell Gwyn')
+    'I.V-A.,N.G.'
     """
     by_space = lambda s: sep.join(
         x[0] for x in re.split(rf"[\s{sep}]+", s) if x
