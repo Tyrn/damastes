@@ -287,8 +287,8 @@ def make_initials(authors: str, sep=".", trail=".", hyph="-") -> str:
     """
     Reduces authors to initials.
 
-    >>> make_initials('Ignacio "Castigador" Vazquez-Abrams, Nell Gwyn')
-    'I.V-A.,N.G.'
+    >>> make_initials('Ignacio "Castigador" Vazquez-Abrams, Estefania Cassingena Navone')
+    'I.V-A.,E.C.N.'
     """
     by_space = lambda s: sep.join(
         x[0] for x in re.split(rf"[\s{sep}]+", s) if x

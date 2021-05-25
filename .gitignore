@@ -2,6 +2,7 @@
 /dist/
 /.venv/
 __pycache__/
+__pypackages__/
 *.egg-info/
 poetry.lock
 
