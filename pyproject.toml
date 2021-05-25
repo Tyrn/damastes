@@ -5,7 +5,7 @@ description = ""
 authors = ["Tyrn <a@b.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 mutagen = "^1.44"
 
 [tool.poetry.dev-dependencies]
