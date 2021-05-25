@@ -7,6 +7,11 @@ Build and install
 ::
 
     $ poetry build
+
+Out of venv:
+
+::
+
     $ pip install dist/<...>.whl --user [-I]
     ...
     $ pcp --help
@@ -25,7 +30,7 @@ Test
 
 ::
 
-    $ python tests/runner.py
+    $ pytest [--doctest-modules] [-v]
     $ python -m doctest [-v] py_procr/pcp.py
     $ mypy .
 
