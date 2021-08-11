@@ -37,7 +37,7 @@ Configuration
 ::
 
     services:
-      tweaker:
+      procrustes:
         image: procrustes:latest
         volumes:
           - type: bind
