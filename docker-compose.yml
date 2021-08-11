@@ -1,0 +1,8 @@
+services:
+  procrustes:
+    image: procrustes:latest
+    volumes:
+      - type: bind
+        source: $HOME
+        target: /home/mnt
+    working_dir: /home/mnt
