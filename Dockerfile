@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.9-slim AS base
 
 ARG user=procrustes project=py-procr src=py_procr
 
@@ -18,6 +18,20 @@ COPY pyproject.toml ./
 # Build.
 RUN pip install poetry --user && \
     poetry config virtualenvs.create false && \
-    poetry install --no-dev
+    poetry install --no-dev && \
+    poetry build -f sdist
+
+FROM python:3.9-slim
+
+ARG user=procrustes project=py-procr
+
+# Non-root user.
+RUN useradd -ms /bin/bash "$user"
+USER $user
+WORKDIR /home/$user
+ENV PATH=/home/$user/.local/bin:$PATH
+
+COPY --from=base /home/$user/$project/dist/ ./dist/
+RUN pip install ./dist/* --user
 
 CMD ["bash"]
