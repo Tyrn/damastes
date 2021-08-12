@@ -16,9 +16,9 @@ COPY pyproject.toml ./
 #COPY poetry.lock ./
 
 # Build.
-RUN pip install poetry --user
-RUN poetry config virtualenvs.create false
-RUN poetry install --no-dev
-RUN poetry build
+RUN pip install poetry --user && \
+    poetry config virtualenvs.create false && \
+    poetry install --no-dev && \
+    poetry build
 
 CMD ["bash"]
