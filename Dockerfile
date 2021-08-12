@@ -18,7 +18,6 @@ COPY pyproject.toml ./
 # Build.
 RUN pip install poetry --user && \
     poetry config virtualenvs.create false && \
-    poetry install --no-dev && \
-    poetry build
+    poetry install --no-dev
 
 CMD ["bash"]
