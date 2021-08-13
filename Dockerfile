@@ -8,15 +8,15 @@ USER $user
 WORKDIR /home/$user
 ENV PATH=/home/$user/.local/bin:$PATH
 
-# Source and project files.
-RUN mkdir /home/$user/$project
+# Project.
+RUN pip install poetry --user && \
+    mkdir /home/$user/$project
 WORKDIR /home/$user/$project
 COPY $src ./$src/
 COPY pyproject.toml poetry.lock ./
 
 # Build.
-RUN pip install poetry --user && \
-    poetry config virtualenvs.create true && \
+RUN poetry config virtualenvs.create true && \
     poetry install --no-dev && \
     poetry build -f sdist
 
