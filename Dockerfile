@@ -1,4 +1,4 @@
-FROM python:3.9-slim AS base
+FROM python:3.9.6-slim AS base
 
 ARG user=procrustes project=py-procr src=py_procr
 
@@ -21,7 +21,7 @@ RUN pip install poetry --user && \
     poetry install --no-dev && \
     poetry build -f sdist
 
-FROM python:3.9-slim
+FROM python:3.9.6-slim
 
 ARG user=procrustes project=py-procr
 
