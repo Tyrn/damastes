@@ -12,12 +12,11 @@ ENV PATH=/home/$user/.local/bin:$PATH
 RUN mkdir /home/$user/$project
 WORKDIR /home/$user/$project
 COPY $src ./$src/
-COPY pyproject.toml ./
-#COPY poetry.lock ./
+COPY pyproject.toml poetry.lock ./
 
 # Build.
 RUN pip install poetry --user && \
-    poetry config virtualenvs.create false && \
+    poetry config virtualenvs.create true && \
     poetry install --no-dev && \
     poetry build -f sdist
 
