@@ -359,12 +359,15 @@ def copy_album() -> None:
         print(f" Done ({FILES_TOTAL}).")
 
 
+NB = "\U0001f53b"
+
+
 def retrieve_args() -> Any:
     """
     Parses the command line and returns a collection of arguments.
     """
     parser = argparse.ArgumentParser(
-        description="""
+        description=f"""
     pcp "Procrustes" SmArT is a CLI utility for copying subtrees containing supported audio
     files in sequence, naturally sorted.
     The end result is a "flattened" copy of the source subtree. "Flattened" means
@@ -373,6 +376,7 @@ def retrieve_args() -> Any:
     is set, tags "Title", "Artist", and "Album" can be replaced optionally.
     The writing process is strictly sequential: either starting with the number one file,
     or in the reversed order. This can be important for some mobile devices.
+    {NB} Really useful options.{NB}
     """
     )
 
@@ -383,7 +387,9 @@ def retrieve_args() -> Any:
         action="version",
         version=f"%(prog)s (version {__version__})",
     )
-    parser.add_argument("-v", "--verbose", help="verbose output", action="store_true")
+    parser.add_argument(
+        "-v", "--verbose", help=f"{NB} verbose output {NB}", action="store_true"
+    )
     parser.add_argument(
         "-d", "--drop-tracknumber", help="do not set track numbers", action="store_true"
     )
@@ -447,10 +453,10 @@ def retrieve_args() -> Any:
     parser.add_argument(
         "-u",
         "--unified-name",
-        help="""
-                        destination root directory name and file names are based on UNIFIED_NAME,
+        help=f"""
+                        {NB} destination root directory name and file names are based on UNIFIED_NAME,
                         serial number prepended, file extensions retained; also album tag,
-                        if the latter is not specified explicitly
+                        if the latter is not specified explicitly {NB}
                         """,
     )
     parser.add_argument(
@@ -458,8 +464,8 @@ def retrieve_args() -> Any:
         "--album-num",
         help="0..99; prepend ALBUM_NUM to the destination root directory name",
     )
-    parser.add_argument("-a", "--artist-tag", help="artist tag name")
-    parser.add_argument("-g", "--album-tag", help="album tag name")
+    parser.add_argument("-a", "--artist-tag", help=f"{NB} artist tag name {NB}")
+    parser.add_argument("-g", "--album-tag", help=f"{NB} album tag name {NB}")
     parser.add_argument("src_dir", help="source directory")
     parser.add_argument("dst_dir", help="general destination directory")
     args = parser.parse_args()
