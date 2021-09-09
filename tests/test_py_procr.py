@@ -10,6 +10,10 @@ class TestPureFunctions:
         assert str(3).zfill(5) == "00003"
         assert str(15331).zfill(3) == "15331"
 
+    def test_explicit_plus(self):
+        assert f"{1:+d}" == "+1"
+        assert f"{-1:+d}" == "-1"
+
     def test_has_ext_of(self):
         assert has_ext_of(Path("/alfa/bra.vo/charlie.ogg"), "OGG") is True
         assert has_ext_of(Path("/alfa/bra.vo/charlie.ogg"), ".ogg") is True

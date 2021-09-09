@@ -131,13 +131,13 @@ def list_dir_groom(abs_path: Path, rev=False) -> Tuple[List[Path], List[Path]]:
     """
     lst = os.listdir(abs_path)
     dirs = sorted(
-        [Path(x) for x in lst if (abs_path/x).is_dir()],
+        [Path(x) for x in lst if (abs_path / x).is_dir()],
         key=ft.cmp_to_key(
             (lambda xp, yp: -path_compare(xp, yp)) if rev else path_compare
         ),
     )
     files = sorted(
-        [Path(x) for x in lst if is_audiofile(abs_path/x)],
+        [Path(x) for x in lst if is_audiofile(abs_path / x)],
         key=ft.cmp_to_key(
             (lambda xf, yf: -file_compare(xf, yf)) if rev else file_compare
         ),
@@ -190,11 +190,11 @@ def walk_file_tree(
         for directory in dirs:
             step = list(dst_step)
             step.append(directory.name)
-            yield from walk_file_tree(src_dir/directory, dst_root, fcount, step)
+            yield from walk_file_tree(src_dir / directory, dst_root, fcount, step)
 
     def file_flat(files):
         for file in files:
-            yield fcount[0], src_dir/file, dst_root, decorate_file_name(
+            yield fcount[0], src_dir / file, dst_root, decorate_file_name(
                 fcount[0], dst_step, file
             )
             fcount[0] += -1 if ARGS.reverse else 1
@@ -206,11 +206,11 @@ def walk_file_tree(
         for i, directory in enumerate(dirs):
             step = list(dst_step)
             step.append(decorate_dir_name(reverse(i, dirs), directory))
-            yield from walk_file_tree(src_dir/directory, dst_root, fcount, step)
+            yield from walk_file_tree(src_dir / directory, dst_root, fcount, step)
 
     def file_tree(files):
         for i, file in enumerate(files):
-            yield fcount[0], src_dir/file, dst_root.joinpath(
+            yield fcount[0], src_dir / file, dst_root.joinpath(
                 *dst_step
             ), decorate_file_name(reverse(i, files), dst_step, file)
             fcount[0] += -1 if ARGS.reverse else 1
@@ -239,7 +239,7 @@ def album() -> Iterator[Tuple[int, Path, Path, str]]:
         artist() + " - " + ARGS.unified_name if ARGS.unified_name else ARGS.src_dir.name
     )
 
-    executive_dst = ARGS.dst_dir/("" if ARGS.drop_dst else base_dst)
+    executive_dst = ARGS.dst_dir / ("" if ARGS.drop_dst else base_dst)
 
     def audiofiles_count(directory: Path) -> int:
         """
@@ -249,7 +249,7 @@ def album() -> Iterator[Tuple[int, Path, Path, str]]:
 
         for root, _dirs, files in os.walk(directory):
             for name in files:
-                if is_audiofile(Path(root)/name):
+                if is_audiofile(Path(root) / name):
                     cnt += 1
         return cnt
 
@@ -299,6 +299,22 @@ def make_initials(authors: str, sep=".", trail=".", hyph="-") -> str:
     return ",".join(by_hyph(author) for author in sans_monikers.split(","))
 
 
+def human_rough(bytes: int, units=["", "KB", "MB", "GB", "TB", "PB", "EB"]) -> str:
+    """
+    Returns a human readable string representation of bytes.
+
+    >>> human_rough(42)
+    '42'
+    >>> human_rough(1800)
+    '1KB'
+    >>> human_rough(123456789)
+    '117MB'
+    """
+    return (
+        str(bytes) + units[0] if bytes < 1024 else human_rough(bytes >> 10, units[1:])
+    )
+
+
 def copy_album() -> None:
     """
     Runs through the ammo belt and does copying, in the reverse order if necessary.
@@ -332,18 +348,27 @@ def copy_album() -> None:
             audio["album"] = ARGS.album_tag
         audio.save()
 
-    def copy_file(entry: Tuple[int, Path, Path, str]) -> None:
+    def copy_file(entry: Tuple[int, Path, Path, str]) -> Tuple[int, int]:
         i, src, dst_path, target_file_name = entry
-        dst = dst_path/target_file_name
+        dst = dst_path / target_file_name
+        src_bytes, dst_bytes = src.stat().st_size, 0
         if not ARGS.dry_run:
             dst_path.mkdir(parents=True, exist_ok=True)
             shutil.copy(src, dst)
             set_tags(i, src, dst)
+            dst_bytes = dst.stat().st_size
         if ARGS.verbose:
-            print(f"{i:>4}/{FILES_TOTAL} \U0001f3a7 {dst}")
+            print(f"{i:>4}/{FILES_TOTAL} \U00002714 {dst}", end="")
+            if dst_bytes != src_bytes:
+                if dst_bytes == 0:
+                    print(f"  \U00002714 {src_bytes}", end="")
+                else:
+                    print(f"  \U00002714 {(dst_bytes - src_bytes):+d}", end="")
+            print("")
         else:
             sys.stdout.write(".")
             sys.stdout.flush()
+        return src_bytes, dst_bytes
 
     if not ARGS.verbose:
         sys.stdout.write("Starting ")
