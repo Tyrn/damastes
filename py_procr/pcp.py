@@ -344,6 +344,7 @@ def human_fine(bytes: int) -> str:
         return "0"
     if bytes == 1:
         return "1"
+    return f"human_fine error; bytes: {bytes}"
 
 
 def copy_album() -> None:
