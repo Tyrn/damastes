@@ -307,7 +307,7 @@ def human_rough(bytes: int, units=["", "kB", "MB", "GB", "TB", "PB", "EB"]) -> s
     >>> human_rough(42)
     '42'
     >>> human_rough(1800)
-    '1KB'
+    '1kB'
     >>> human_rough(123456789)
     '117MB'
     """
