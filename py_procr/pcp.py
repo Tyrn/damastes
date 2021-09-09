@@ -18,6 +18,7 @@ import shutil
 import argparse
 import warnings
 import functools as ft
+from math import log
 from pathlib import Path
 
 
@@ -299,9 +300,9 @@ def make_initials(authors: str, sep=".", trail=".", hyph="-") -> str:
     return ",".join(by_hyph(author) for author in sans_monikers.split(","))
 
 
-def human_rough(bytes: int, units=["", "KB", "MB", "GB", "TB", "PB", "EB"]) -> str:
+def human_rough(bytes: int, units=["", "kB", "MB", "GB", "TB", "PB", "EB"]) -> str:
     """
-    Returns a human readable string representation of bytes.
+    Returns a human readable string representation of bytes, roughly rounded.
 
     >>> human_rough(42)
     '42'
@@ -313,6 +314,36 @@ def human_rough(bytes: int, units=["", "KB", "MB", "GB", "TB", "PB", "EB"]) -> s
     return (
         str(bytes) + units[0] if bytes < 1024 else human_rough(bytes >> 10, units[1:])
     )
+
+
+def human_fine(bytes: int) -> str:
+    """
+    Returns a human readable string representation of bytes, nicely rounded.
+
+    >>> human_fine(0)
+    '0'
+    >>> human_fine(1)
+    '1'
+    >>> human_fine(42)
+    '42'
+    >>> human_fine(1800)
+    '2kB'
+    >>> human_fine(123456789)
+    '117.7MB'
+    >>> human_fine(123456789123)
+    '114.98GB'
+    """
+    unit_list = [("", 0), ("kB", 0), ("MB", 1), ("GB", 2), ("TB", 2), ("PB", 2)]
+
+    if bytes > 1:
+        exponent = min(int(log(bytes, 1024)), len(unit_list) - 1)
+        quotient = float(bytes) / 1024 ** exponent
+        unit, num_decimals = unit_list[exponent]
+        return f"{{:.{num_decimals}f}}{{}}".format(quotient, unit)
+    if bytes == 0:
+        return "0"
+    if bytes == 1:
+        return "1"
 
 
 def copy_album() -> None:
@@ -348,7 +379,7 @@ def copy_album() -> None:
             audio["album"] = ARGS.album_tag
         audio.save()
 
-    def copy_file(entry: Tuple[int, Path, Path, str]) -> Tuple[int, int]:
+    def copy_file(entry: Tuple[int, Path, Path, str]) -> int:
         i, src, dst_path, target_file_name = entry
         dst = dst_path / target_file_name
         src_bytes, dst_bytes = src.stat().st_size, 0
@@ -361,23 +392,24 @@ def copy_album() -> None:
             print(f"{i:>4}/{FILES_TOTAL} \U00002714 {dst}", end="")
             if dst_bytes != src_bytes:
                 if dst_bytes == 0:
-                    print(f"  \U00002714 {src_bytes}", end="")
+                    print(f"  \U00002714 {human_fine(src_bytes)}", end="")
                 else:
                     print(f"  \U00002714 {(dst_bytes - src_bytes):+d}", end="")
             print("")
         else:
             sys.stdout.write(".")
             sys.stdout.flush()
-        return src_bytes, dst_bytes
+        return dst_bytes
 
     if not ARGS.verbose:
         sys.stdout.write("Starting ")
 
-    for entry in album():
-        copy_file(entry)
+    bytes_total = 0
 
-    if not ARGS.verbose:
-        print(f" Done ({FILES_TOTAL}).")
+    for entry in album():
+        bytes_total += copy_file(entry)
+
+    print(f" Done ({FILES_TOTAL}, {human_fine(bytes_total)}).")
 
 
 NB = "\U0001f53b"
