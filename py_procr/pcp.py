@@ -585,7 +585,9 @@ def main() -> None:
         with yaspin() as sp:
             FILES_TOTAL, src_total = audiofiles_count(ARGS.src_dir, sp)
         if ARGS.count:
-            print(f"Files: {FILES_TOTAL}; Volume: {human_fine(src_total)}")
+            print(f"Files: {FILES_TOTAL}", end="")
+            print(f"; Volume: {human_fine(src_total)}", end="")
+            print(f"; Average: {human_fine(src_total / FILES_TOTAL)}")
         else:
             copy_album()
     except KeyboardInterrupt as ctrl_c:
