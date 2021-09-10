@@ -380,7 +380,7 @@ def copy_album() -> None:
             audio["album"] = ARGS.album_tag
         audio.save()
 
-    def copy_file(entry: Tuple[int, Path, Path, str]) -> int:
+    def copy_file(entry: Tuple[int, Path, Path, str]) -> Tuple[int, int]:
         i, src, dst_path, target_file_name = entry
         dst = dst_path / target_file_name
         src_bytes, dst_bytes = src.stat().st_size, 0
@@ -400,17 +400,22 @@ def copy_album() -> None:
         else:
             sys.stdout.write(".")
             sys.stdout.flush()
-        return dst_bytes
+        return src_bytes, dst_bytes
 
     if not ARGS.verbose:
         sys.stdout.write("Starting ")
 
-    bytes_total = 0
+    src_total, dst_total = 0, 0
 
     for entry in album():
-        bytes_total += copy_file(entry)
+        src_bytes, dst_bytes = copy_file(entry)
+        src_total += src_bytes
+        dst_total += dst_bytes
 
-    print(f" Done ({FILES_TOTAL}, {human_fine(bytes_total)}).")
+    print(f" Done ({FILES_TOTAL}, {human_fine(dst_total)}", end="")
+    if ARGS.dry_run:
+        print(f"; src total: {human_fine(src_total)}", end="")
+    print(").")
 
 
 NB = "\U0001f53b"
