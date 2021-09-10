@@ -119,20 +119,24 @@ def mutagen_file(name: Path):
     """
     Returns Mutagen thing, if name looks like an audio file path, else returns None.
     """
+    if ARGS.file_type and not has_ext_of(name, ARGS.file_type):
+        return None
     try:
         file = mt.File(name, easy=True)
     except mt.MutagenError:
         return None
-    if ARGS.file_type is None:
-        return file
-    return file if has_ext_of(name, ARGS.file_type) else None
+    return file
 
 
 def is_audiofile(name: Path) -> bool:
     """
     Returns True, if name is an audio file, else returns False.
     """
-    return name.is_file() and mutagen_file(name)
+    if name.is_file():
+        file = mutagen_file(name)
+        if file:
+            return True
+    return False
 
 
 def list_dir_groom(abs_path: Path, rev=False) -> Tuple[List[Path], List[Path]]:
