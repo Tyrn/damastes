@@ -591,7 +591,7 @@ def main() -> None:
         if ARGS.count:
             print(f"Files: {FILES_TOTAL}", end="")
             print(f"; Volume: {human_fine(src_total)}", end="")
-            print(f"; Average: {human_fine(src_total / FILES_TOTAL)}")
+            print(f"; Average: {human_fine(src_total // FILES_TOTAL)}")
         else:
             copy_album()
     except KeyboardInterrupt as ctrl_c:
