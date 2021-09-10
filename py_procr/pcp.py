@@ -18,6 +18,7 @@ import shutil
 import argparse
 import warnings
 import functools as ft
+from yaspin import yaspin
 from math import log
 from pathlib import Path
 
@@ -228,33 +229,30 @@ def walk_file_tree(
         yield from file_fund(files)
 
 
+def audiofiles_count(directory: Path) -> int:
+    """
+    Returns full recursive count of audiofiles in directory.
+    """
+    cnt = 0
+
+    for root, _dirs, files in os.walk(directory):
+        for name in files:
+            if is_audiofile(Path(root) / name):
+                cnt += 1
+    return cnt
+
+
 def album() -> Iterator[Tuple[int, Path, Path, str]]:
     """
     Sets up boilerplate required by the options and returns the ammo belt generator
     of (src, dst) pairs.
     """
-    global FILES_TOTAL
-
     prefix = (str(ARGS.album_num).zfill(2) + "-") if ARGS.album_num else ""
     base_dst = prefix + (
         artist() + " - " + ARGS.unified_name if ARGS.unified_name else ARGS.src_dir.name
     )
 
     executive_dst = ARGS.dst_dir / ("" if ARGS.drop_dst else base_dst)
-
-    def audiofiles_count(directory: Path) -> int:
-        """
-        Returns full recursive count of audiofiles in directory.
-        """
-        cnt = 0
-
-        for root, _dirs, files in os.walk(directory):
-            for name in files:
-                if is_audiofile(Path(root) / name):
-                    cnt += 1
-        return cnt
-
-    FILES_TOTAL = audiofiles_count(ARGS.src_dir)
 
     if FILES_TOTAL < 1:
         print(
@@ -405,17 +403,20 @@ def copy_album() -> None:
     if not ARGS.verbose:
         sys.stdout.write("Starting ")
 
-    src_total, dst_total = 0, 0
+    src_total, dst_total, files_total = 0, 0, 0
 
     for entry in album():
         src_bytes, dst_bytes = copy_file(entry)
         src_total += src_bytes
         dst_total += dst_bytes
+        files_total += 1
 
     print(f" Done ({FILES_TOTAL}, {human_fine(dst_total)}", end="")
     if ARGS.dry_run:
         print(f"; src total: {human_fine(src_total)}", end="")
     print(").")
+    if files_total != FILES_TOTAL:
+        print(f"Fatal error. files_total: {files_total}, FILES_TOTAL: {FILES_TOTAL}")
 
 
 NB = "\U0001f53b"
@@ -554,13 +555,15 @@ def main() -> None:
     """
     Entry point.
     """
-    global ARGS
+    global ARGS, FILES_TOTAL
 
     try:
         warnings.resetwarnings()
         warnings.simplefilter("ignore")
 
         ARGS = retrieve_args()
+        with yaspin():
+            FILES_TOTAL = audiofiles_count(ARGS.src_dir)
         copy_album()
     except KeyboardInterrupt as ctrl_c:
         sys.exit(ctrl_c)
