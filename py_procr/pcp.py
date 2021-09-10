@@ -23,16 +23,23 @@ from math import log
 from pathlib import Path
 
 
-def has_ext_of(path: Path, ext: str) -> bool:
+def has_ext_of(path: Path, *extensions: str) -> bool:
     """
-    Returns True, if path has extension ext, case and leading dot insensitive.
+    Returns True, if path has an extension from extensions,
+    case and leading dot insensitive.
 
     >>> has_ext_of(Path("bra.vo/charlie.ogg"), "OGG")
     True
     >>> has_ext_of(Path("bra.vo/charlie.ogg"), "mp3")
     False
+    >>> has_ext_of(Path("bra.vo/charlie.ogg"), "mp3", "mp4", "flac")
+    False
     """
-    return path.suffix.lstrip(".").upper() == ext.lstrip(".").upper()
+    path_ext = path.suffix.lstrip(".").upper()
+    for ext in extensions:
+        if path_ext == ext.lstrip(".").upper():
+            return True
+    return False
 
 
 def str_strip_numbers(str_alphanum: str) -> List[int]:
@@ -112,7 +119,10 @@ def mutagen_file(name: Path):
     """
     Returns Mutagen thing, if name looks like an audio file path, else returns None.
     """
-    file = mt.File(name, easy=True)
+    try:
+        file = mt.File(name, easy=True)
+    except mt.MutagenError:
+        return None
     if ARGS.file_type is None:
         return file
     return file if has_ext_of(name, ARGS.file_type) else None
@@ -229,17 +239,21 @@ def walk_file_tree(
         yield from file_fund(files)
 
 
-def audiofiles_count(directory: Path) -> int:
+def audiofiles_count(directory: Path, spinner) -> Tuple[int, int]:
     """
     Returns full recursive count of audiofiles in directory.
     """
-    cnt = 0
+    cnt, size = 0, 0
 
     for root, _dirs, files in os.walk(directory):
         for name in files:
-            if is_audiofile(Path(root) / name):
+            abs_path = Path(root) / name
+            if is_audiofile(abs_path):
+                if cnt % 10 == 0:
+                    spinner.text = name
                 cnt += 1
-    return cnt
+                size += abs_path.stat().st_size
+    return cnt, size
 
 
 def album() -> Iterator[Tuple[int, Path, Path, str]]:
@@ -413,7 +427,7 @@ def copy_album() -> None:
 
     print(f" Done ({FILES_TOTAL}, {human_fine(dst_total)}", end="")
     if ARGS.dry_run:
-        print(f"; src total: {human_fine(src_total)}", end="")
+        print(f"; Volume: {human_fine(src_total)}", end="")
     print(").")
     if files_total != FILES_TOTAL:
         print(f"Fatal error. files_total: {files_total}, FILES_TOTAL: {FILES_TOTAL}")
@@ -502,6 +516,12 @@ def retrieve_args() -> Any:
         action="store_true",
     )
     parser.add_argument(
+        "-c",
+        "--count",
+        help="just count the files",
+        action="store_true",
+    )
+    parser.add_argument(
         "-i",
         "--prepend-subdir-name",
         help="prepend current subdirectory name to a file name",
@@ -562,9 +582,12 @@ def main() -> None:
         warnings.simplefilter("ignore")
 
         ARGS = retrieve_args()
-        with yaspin():
-            FILES_TOTAL = audiofiles_count(ARGS.src_dir)
-        copy_album()
+        with yaspin() as sp:
+            FILES_TOTAL, src_total = audiofiles_count(ARGS.src_dir, sp)
+        if ARGS.count:
+            print(f"Files: {FILES_TOTAL}; Volume: {human_fine(src_total)}")
+        else:
+            copy_album()
     except KeyboardInterrupt as ctrl_c:
         sys.exit(ctrl_c)
 
