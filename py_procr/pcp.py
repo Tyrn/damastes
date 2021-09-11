@@ -21,6 +21,7 @@ import functools as ft
 from yaspin import yaspin
 from math import log
 from pathlib import Path
+from tempfile import mkstemp
 
 
 def has_ext_of(path: Path, *extensions: str) -> bool:
@@ -410,14 +411,26 @@ def copy_album() -> None:
             audio["album"] = ARGS.album_tag
         audio.save()
 
+    def copy_and_set(index: int, src: Path, dst: Path) -> None:
+        shutil.copy(src, dst)
+        set_tags(index, src, dst)
+
+    def copy_and_set_via_tmp(index: int, src: Path, dst: Path) -> None:
+        fd, path = mkstemp(suffix=src.suffix)
+        tmp = Path(path)
+        os.close(fd)
+        shutil.copy(src, tmp)
+        set_tags(index, src, tmp)
+        shutil.copy(tmp, dst)
+        os.remove(tmp)
+
     def copy_file(entry: Tuple[int, Path, Path, str]) -> Tuple[int, int]:
         i, src, dst_path, target_file_name = entry
         dst = dst_path / target_file_name
         src_bytes, dst_bytes = src.stat().st_size, 0
         if not ARGS.dry_run:
             dst_path.mkdir(parents=True, exist_ok=True)
-            shutil.copy(src, dst)
-            set_tags(i, src, dst)
+            copy_and_set_via_tmp(i, src, dst)
             dst_bytes = dst.stat().st_size
         if ARGS.verbose:
             print(f"{i:>4}/{FILES_TOTAL} {COLUMN_ICON} {dst}", end="")
@@ -589,7 +602,7 @@ INVALID_ICON = "\U0000274c"
 SUSPICIOUS_ICON = "\U00002754"
 DONE_ICON = "\U0001f7e2"
 COLUMN_ICON = "\U00002714"
-KNOWN_EXTENSIONS = ["MP3", "OGG", "M4A", "FLAC", "APE"]
+KNOWN_EXTENSIONS = ["MP3", "OGG", "M4A", "M4B", "FLAC", "APE"]
 
 ARGS: Any = None
 FILES_TOTAL = -1
