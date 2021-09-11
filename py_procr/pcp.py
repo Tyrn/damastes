@@ -115,7 +115,7 @@ def file_compare(path_x: Path, path_y: Path) -> Ord:
     )
 
 
-def mutagen_file(name: Path):
+def mutagen_file(name: Path, spinner=None):
     """
     Returns Mutagen thing, if name looks like an audio file path, else returns None.
     """
@@ -124,16 +124,18 @@ def mutagen_file(name: Path):
     try:
         file = mt.File(name, easy=True)
     except mt.MutagenError:
+        if spinner:
+            spinner.write(f"\U0000274c Invalid Media: {str(name)}")
         return None
     return file
 
 
-def is_audiofile(name: Path) -> bool:
+def is_audiofile(name: Path, spinner=None) -> bool:
     """
     Returns True, if name is an audio file, else returns False.
     """
     if name.is_file():
-        file = mutagen_file(name)
+        file = mutagen_file(name, spinner)
         if file:
             return True
     return False
@@ -252,7 +254,7 @@ def audiofiles_count(directory: Path, spinner) -> Tuple[int, int]:
     for root, _dirs, files in os.walk(directory):
         for name in files:
             abs_path = Path(root) / name
-            if is_audiofile(abs_path):
+            if is_audiofile(abs_path, spinner):
                 if cnt % 10 == 0:
                     spinner.text = name
                 cnt += 1
