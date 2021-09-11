@@ -125,15 +125,19 @@ def mutagen_file(name: Path, spinner=None):
 
     if ARGS.file_type and not has_ext_of(name, ARGS.file_type):
         return None
+
+    name_to_print: str = str(name) if ARGS.verbose else name.name
+
     try:
         file = mt.File(name, easy=True)
-    except mt.MutagenError:
+    except mt.MutagenError as mt_error:
         if spinner:
-            spinner.write(f"\U0000274c Invalid Media: {str(name)}")
+            spinner.write(f" {INVALID_ICON} >>{mt_error}>> {name_to_print}")
             INVALID_TOTAL += 1
         return None
+
     if spinner and file is None and has_ext_of(name, *KNOWN_EXTENSIONS):
-        spinner.write(f"\U00002754 Suspicious Media: {str(name)}")
+        spinner.write(f" {SUSPICIOUS_ICON} {name_to_print}")
         SUSPICIOUS_TOTAL += 1
     return file
 
@@ -144,7 +148,7 @@ def is_audiofile(name: Path, spinner=None) -> bool:
     """
     if name.is_file():
         file = mutagen_file(name, spinner)
-        if file:
+        if file is not None:
             return True
     return False
 
@@ -416,12 +420,12 @@ def copy_album() -> None:
             set_tags(i, src, dst)
             dst_bytes = dst.stat().st_size
         if ARGS.verbose:
-            print(f"{i:>4}/{FILES_TOTAL} \U00002714 {dst}", end="")
+            print(f"{i:>4}/{FILES_TOTAL} {COLUMN_ICON} {dst}", end="")
             if dst_bytes != src_bytes:
                 if dst_bytes == 0:
-                    print(f"  \U00002714 {human_fine(src_bytes)}", end="")
+                    print(f"  {COLUMN_ICON} {human_fine(src_bytes)}", end="")
                 else:
-                    print(f"  \U00002714 {(dst_bytes - src_bytes):+d}", end="")
+                    print(f"  {COLUMN_ICON} {(dst_bytes - src_bytes):+d}", end="")
             print("")
         else:
             sys.stdout.write(".")
@@ -439,15 +443,12 @@ def copy_album() -> None:
         dst_total += dst_bytes
         files_total += 1
 
-    print(f" \U0001f7e2 Done ({FILES_TOTAL}, {human_fine(dst_total)}", end="")
+    print(f" {DONE_ICON} Done ({FILES_TOTAL}, {human_fine(dst_total)}", end="")
     if ARGS.dry_run:
         print(f"; Volume: {human_fine(src_total)}", end="")
     print(").")
     if files_total != FILES_TOTAL:
         print(f"Fatal error. files_total: {files_total}, FILES_TOTAL: {FILES_TOTAL}")
-
-
-NB = "\U0001f53b"
 
 
 def retrieve_args() -> Any:
@@ -464,6 +465,8 @@ def retrieve_args() -> Any:
     is set, tags "Title", "Artist", and "Album" can be replaced optionally.
     The writing process is strictly sequential: either starting with the number one file,
     or in the reversed order. This can be important for some mobile devices.
+    {INVALID_ICON} Broken media;
+    {SUSPICIOUS_ICON} Suspicious media;
     {NB} Really useful options.{NB}
     """
     )
@@ -581,7 +584,13 @@ def retrieve_args() -> Any:
     return args
 
 
+NB = "\U0001f53b"
+INVALID_ICON = "\U0000274c"
+SUSPICIOUS_ICON = "\U00002754"
+DONE_ICON = "\U0001f7e2"
+COLUMN_ICON = "\U00002714"
 KNOWN_EXTENSIONS = ["MP3", "OGG", "M4A", "FLAC", "APE"]
+
 ARGS: Any = None
 FILES_TOTAL = -1
 INVALID_TOTAL = 0
@@ -603,7 +612,7 @@ def main() -> None:
         with yaspin() as sp:
             FILES_TOTAL, src_total = audiofiles_count(ARGS.src_dir, sp)
         if ARGS.count:
-            print(f" \U0001f7e2 Files: {FILES_TOTAL}", end="")
+            print(f" {DONE_ICON} Valid: {FILES_TOTAL} file(s)", end="")
             print(f"; Volume: {human_fine(src_total)}", end="")
             if FILES_TOTAL > 0:
                 print(f"; Average: {human_fine(src_total // FILES_TOTAL)}", end="")
@@ -612,9 +621,9 @@ def main() -> None:
             copy_album()
 
         if INVALID_TOTAL > 0:
-            print(f"\U0000274c Invalid Media: {INVALID_TOTAL} file(s)")
+            print(f" {INVALID_ICON} Broken: {INVALID_TOTAL} file(s)")
         if SUSPICIOUS_TOTAL > 0:
-            print(f"\U00002754 Suspicious Media: {SUSPICIOUS_TOTAL} file(s)")
+            print(f" {SUSPICIOUS_ICON} Suspicious: {SUSPICIOUS_TOTAL} file(s)")
 
     except KeyboardInterrupt as ctrl_c:
         sys.exit(ctrl_c)
