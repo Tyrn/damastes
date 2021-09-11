@@ -34,6 +34,8 @@ def has_ext_of(path: Path, *extensions: str) -> bool:
     False
     >>> has_ext_of(Path("bra.vo/charlie.ogg"), "mp3", "mp4", "flac")
     False
+    >>> has_ext_of(Path("bra.vo/charlie.ogg"), *["mp3", "mp4", "flac"])
+    False
     """
     path_ext = path.suffix.lstrip(".").upper()
     for ext in extensions:
@@ -119,7 +121,7 @@ def mutagen_file(name: Path, spinner=None):
     """
     Returns Mutagen thing, if name looks like an audio file path, else returns None.
     """
-    global INVALID_TOTAL
+    global INVALID_TOTAL, SUSPICIOUS_TOTAL
 
     if ARGS.file_type and not has_ext_of(name, ARGS.file_type):
         return None
@@ -130,6 +132,9 @@ def mutagen_file(name: Path, spinner=None):
             spinner.write(f"\U0000274c Invalid Media: {str(name)}")
             INVALID_TOTAL += 1
         return None
+    if spinner and file is None and has_ext_of(name, *KNOWN_EXTENSIONS):
+        spinner.write(f"\U00002754 Suspicious Media: {str(name)}")
+        SUSPICIOUS_TOTAL += 1
     return file
 
 
@@ -434,7 +439,7 @@ def copy_album() -> None:
         dst_total += dst_bytes
         files_total += 1
 
-    print(f" Done ({FILES_TOTAL}, {human_fine(dst_total)}", end="")
+    print(f" \U0001f7e2 Done ({FILES_TOTAL}, {human_fine(dst_total)}", end="")
     if ARGS.dry_run:
         print(f"; Volume: {human_fine(src_total)}", end="")
     print(").")
@@ -576,9 +581,11 @@ def retrieve_args() -> Any:
     return args
 
 
+KNOWN_EXTENSIONS = ["MP3", "OGG", "M4A", "FLAC", "APE"]
 ARGS: Any = None
 FILES_TOTAL = -1
 INVALID_TOTAL = 0
+SUSPICIOUS_TOTAL = 0
 
 
 def main() -> None:
@@ -596,7 +603,7 @@ def main() -> None:
         with yaspin() as sp:
             FILES_TOTAL, src_total = audiofiles_count(ARGS.src_dir, sp)
         if ARGS.count:
-            print(f"Files: {FILES_TOTAL}", end="")
+            print(f" \U0001f7e2 Files: {FILES_TOTAL}", end="")
             print(f"; Volume: {human_fine(src_total)}", end="")
             if FILES_TOTAL > 0:
                 print(f"; Average: {human_fine(src_total // FILES_TOTAL)}", end="")
@@ -605,7 +612,9 @@ def main() -> None:
             copy_album()
 
         if INVALID_TOTAL > 0:
-            print(f"\U0000274c Invalid Media: {INVALID_TOTAL} file(s)", end="")
+            print(f"\U0000274c Invalid Media: {INVALID_TOTAL} file(s)")
+        if SUSPICIOUS_TOTAL > 0:
+            print(f"\U00002754 Suspicious Media: {SUSPICIOUS_TOTAL} file(s)")
 
     except KeyboardInterrupt as ctrl_c:
         sys.exit(ctrl_c)
