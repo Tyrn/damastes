@@ -119,6 +119,8 @@ def mutagen_file(name: Path, spinner=None):
     """
     Returns Mutagen thing, if name looks like an audio file path, else returns None.
     """
+    global INVALID_TOTAL
+
     if ARGS.file_type and not has_ext_of(name, ARGS.file_type):
         return None
     try:
@@ -126,6 +128,7 @@ def mutagen_file(name: Path, spinner=None):
     except mt.MutagenError:
         if spinner:
             spinner.write(f"\U0000274c Invalid Media: {str(name)}")
+            INVALID_TOTAL += 1
         return None
     return file
 
@@ -575,6 +578,7 @@ def retrieve_args() -> Any:
 
 ARGS: Any = None
 FILES_TOTAL = -1
+INVALID_TOTAL = 0
 
 
 def main() -> None:
@@ -588,14 +592,21 @@ def main() -> None:
         warnings.simplefilter("ignore")
 
         ARGS = retrieve_args()
+
         with yaspin() as sp:
             FILES_TOTAL, src_total = audiofiles_count(ARGS.src_dir, sp)
         if ARGS.count:
             print(f"Files: {FILES_TOTAL}", end="")
             print(f"; Volume: {human_fine(src_total)}", end="")
-            print(f"; Average: {human_fine(src_total // FILES_TOTAL)}")
+            if FILES_TOTAL > 0:
+                print(f"; Average: {human_fine(src_total // FILES_TOTAL)}", end="")
+            print("")
         else:
             copy_album()
+
+        if INVALID_TOTAL > 0:
+            print(f"\U0000274c Invalid Media: {INVALID_TOTAL} file(s)", end="")
+
     except KeyboardInterrupt as ctrl_c:
         sys.exit(ctrl_c)
 
