@@ -8,7 +8,7 @@ Build and install
 
     $ poetry build
 
-Out of venv:
+Out of venv or poetry shell:
 
 ::
 
@@ -59,75 +59,68 @@ General syntax
 Options
 =======
 
-``-h, --help``
-short description and options
+-h, --help  short description and options
 
-``-V, --version``
-package version
+-V, --version  package version
 
-``-v, --verbose``
-unless verbose, just progress bar is shown
+-v, --verbose  unless verbose, just progress bar is shown
 
-``-d, --drop-tracknumber``
-do not set track numbers
+-d, --drop-tracknumber  do not set track numbers
 
-``-s, --strip-decorations``
-strip file and directory name decorations
+-s, --strip-decorations  strip file and directory name decorations
 
-``-f, --file-title``
-use file name for title tag
+-f, --file-title  use file name for title tag
 
-``-F, --file-title-num``
-use numbered file name for title tag
+-F, --file-title-num  use numbered file name for title tag
 
-``-x, --sort-lex``
-sort files lexicographically
+-x, --sort-lex  sort files lexicographically
 
-``-t, --tree-dst``
-retain the tree structure of the source album at destination
+-t, --tree-dst  retain the tree structure of the source album at destination
 
-``-p, --drop-dst``
-do not create destination directory
+-p, --drop-dst  do not create destination directory
 
-``-r, --reverse``
-copy files in reverse order (number one file is the last to be copied)
+-r, --reverse  copy files in reverse order (number one file is the last to be copied)
 
-``-w, --overwrite``
-silently remove existing destination directory (not recommended)
+-w, --overwrite  silently remove existing destination directory (not recommended)
 
-``-y, --dry-run``
-without actually copying the files
+-y, --dry-run  without actually copying the files
 
-``-i, --prepend-subdir-name``
-prepend current subdirectory name to a file name
+-c, --count  just count the files
 
-``-e, --file-type FILE_TYPE``
-accept only audio files of the specified type
+-i, --prepend-subdir-name  prepend current subdirectory name to a file name
 
-``-u, --unified-name UNIFIED_NAME``
-destination root directory name and file names are based on UNIFIED_NAME,
-serial nuber prepended, file extentions retained
+-e, --file-type FILE_TYPE  accept only audio files of the specified type
 
-``-b, --album-num ALBUM_NUM``
-0..99; prepend ALBUM_NUM to the destination root directory name
+-u, --unified-name UNIFIED_NAME  destination root directory name and file names are based on UNIFIED_NAME, serial nuber prepended, file extentions retained
 
-``-a --artist-tag ARTIST_TAG``
-artist tag name
+-b, --album-num ALBUM_NUM  0..99; prepend ALBUM_NUM to the destination root directory name
 
-``-g --album-tag ALBUM_TAG``
-album tag name
+-a, --artist-tag ARTIST_TAG  artist tag name
+
+-g, --album-tag ALBUM_TAG  album tag name
 
 Examples
 ========
 
 ::
 
+    Source Album $ pcp -c . .
+
+- All the files in *Source Album* get checked. Destination directory is required (and ignored).
+
+::
+
+    Source Album $ pcp -y . .
+
+- Dry run: everything is done according to any options; no new files or directories created, destination is left undisturbed.
+
+::
+
     Source Album $ pcp -a "Peter Crowcroft" -g "Mice All Over" . /run/media/user/F8950/Audiobooks/
 
-- Destination directory `/run/media/user/F8950/Audiobooks/Source Album/` is created;
+- Destination directory */run/media/user/F8950/Audiobooks/Source Album/* is created;
 
-- Track numbers are set according to the natural sort order (file names `..., 5, 6, 7, 8, 9, 10...`;
-regardless of the absence of the leading zeroes);
+- Track numbers are set according to the natural sort order (file names *..., 5, 6, 7, 8, 9, 10...*; regardless of the absence of the leading zeroes);
 
 - *Artist* is set to *Peter Crowcroft*;
 
@@ -139,5 +132,4 @@ regardless of the absence of the leading zeroes);
 
     Source Album $ pcp -dst . /run/media/user/F8950/Audiobooks/
 
-- *Source Album* directory is copied to `/run/media/user/F8950/Audiobooks/` in its entirety,
-without modification; sequential copy order, natural or lexicographical, is guaranteed.
+- *Source Album* directory is copied to */run/media/user/F8950/Audiobooks/* in its entirety, without modification; sequential copy order, natural or lexicographical, is guaranteed.
