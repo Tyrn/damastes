@@ -60,43 +60,24 @@ Options
 =======
 
 -h, --help                          short description and options
-
 -V, --version                       package version
-
 -v, --verbose                       unless verbose, just progress bar is shown
-
 -d, --drop-tracknumber              do not set track numbers
-
 -s, --strip-decorations             strip file and directory name decorations
-
 -f, --file-title                    use file name for title tag
-
 -F, --file-title-num                use numbered file name for title tag
-
 -x, --sort-lex                      sort files lexicographically
-
 -t, --tree-dst                      retain the tree structure of the source album at destination
-
 -p, --drop-dst                      do not create destination directory
-
 -r, --reverse                       copy files in reverse order (number one file is the last to be copied)
-
 -w, --overwrite                     silently remove existing destination directory (not recommended)
-
 -y, --dry-run                       without actually copying the files
-
 -c, --count                         just count the files
-
 -i, --prepend-subdir-name           prepend current subdirectory name to a file name
-
 -e, --file-type FILE_TYPE           accept only audio files of the specified type
-
 -u, --unified-name UNIFIED_NAME     destination root directory name and file names are based on UNIFIED_NAME, serial nuber prepended, file extentions retained
-
 -b, --album-num ALBUM_NUM           0..99; prepend ALBUM_NUM to the destination root directory name
-
 -a, --artist-tag ARTIST_TAG         artist tag name
-
 -g, --album-tag ALBUM_TAG           album tag name
 
 Examples
