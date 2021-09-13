@@ -3,11 +3,11 @@
 Audio album builder. See description.
 """
 
+PY_VERSION = (3, 6, 0)
+
 import sys
 
-if sys.version_info < (3, 6, 0):
-    sys.stderr.write("You need python 3.6 or later to run this script\n")
-    sys.exit(1)
+assert sys.version_info >= PY_VERSION, f"Python {PY_VERSION} or later required."
 
 from py_procr import __version__
 from typing import List, Tuple, Iterator, Any
@@ -627,7 +627,7 @@ def main() -> None:
         if ARGS.count:
             print(f" {DONE_ICON} Valid: {FILES_TOTAL} file(s)", end="")
             print(f"; Volume: {human_fine(src_total)}", end="")
-            if FILES_TOTAL > 0:
+            if FILES_TOTAL > 1:
                 print(f"; Average: {human_fine(src_total // FILES_TOTAL)}", end="")
             print("")
         else:
