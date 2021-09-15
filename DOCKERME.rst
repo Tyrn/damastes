@@ -9,16 +9,16 @@ Build
 
 ::
 
-    $ docker build -t procrustes --rm .
+    $ docker build -t damastes --rm .
 
 Run
 ---
 
 ::
 
-    $ docker run -it --name procrustes --rm --mount type=bind,source="$HOME"/,target=/home/mnt procrustes
+    $ docker run -it --name damastes --rm --mount type=bind,source="$HOME"/,target=/home/mnt damastes
 
-- `--name procrustes` is the container name; tailing/`target` `procrustes` is the image name.
+- `--name damastes` is the container name; tailing/`target` `damastes` is the image name.
 
 Docker Compose
 ==============
@@ -26,19 +26,13 @@ Docker Compose
 Configuration
 -------------
 
-`.env`:
-
-::
-
-    HOST=$HOME
-
 `docker-compose.yml`:
 
 ::
 
     services:
-      procrustes:
-        image: procrustes:latest
+      damastes:
+        image: damastes:latest
         volumes:
           - type: bind
             source: $HOME
@@ -50,4 +44,4 @@ Run
 
 ::
 
-    $ docker-compose run --rm procrustes
+    $ docker-compose run --rm damastes

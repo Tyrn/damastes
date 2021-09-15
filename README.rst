@@ -1,5 +1,5 @@
-Procrustes SmArT
-****************
+Damastes a.k.a. Procrustes
+**************************
 
 Build and install
 =================
@@ -13,8 +13,12 @@ Out of venv or poetry shell:
 ::
 
     $ pip install dist/<...>.whl --user [-I]
-    ...
-    $ pcp --help
+
+or
+
+::
+
+    $ pipx install dist/<...>.whl
 
 Use Git Hooks
 =============
@@ -31,19 +35,18 @@ Test
 ::
 
     $ pytest [--doctest-modules] [-v]
-    $ python -m doctest [-v] py_procr/pcp.py
     $ mypy .
 
 Description
 ===========
 
-**Procrustes SmArT** is a CLI utility for basic processing and copying
+**Damastes** is a CLI utility for basic processing and copying
 of audio albums, mostly audiobooks of uncertain provenance to cheap mobile
 devices. Audiobooks in question can be poorly designed: track number tags
 may be missing or incorrect, directory and/or file names enumerated
 without leading zeroes, etc.
 
-**Procrustes SmArT** renames directories and audio files, replacing tags,
+**Damastes** renames directories and audio files, replacing tags,
 if necessary, while copying the album to destination. Source files
 and directories are not modified in any way. Files are copied sequentially,
 by default file number one first, optionally in reverse order, as some
@@ -54,7 +57,7 @@ General syntax
 
 ::
 
-    $ pcp [<options>] <source directory> <destination directory>
+    $ damastes [<options>] <source directory> <destination directory>
 
 Options
 =======
@@ -104,19 +107,19 @@ Examples
 
 ::
 
-    Source Album $ pcp -c . .
+    Source Album $ damastes -c . .
 
 - All the files in *Source Album* get checked. Destination directory is required (and ignored).
 
 ::
 
-    Source Album $ pcp -y . .
+    Source Album $ damastes -y . .
 
 - Dry run: everything is done according to any options; no new files or directories created, destination is left undisturbed.
 
 ::
 
-    Source Album $ pcp -a "Peter Crowcroft" -g "Mice All Over" . /run/media/user/F8950/Audiobooks/
+    Source Album $ damastes -a "Peter Crowcroft" -g "Mice All Over" . /run/media/user/F8950/Audiobooks/
 
 - Destination directory */run/media/user/F8950/Audiobooks/Source Album/* is created;
 
@@ -130,6 +133,6 @@ Examples
 
 ::
 
-    Source Album $ pcp -dst . /run/media/user/F8950/Audiobooks/
+    Source Album $ damastes -dst . /run/media/user/F8950/Audiobooks/
 
 - *Source Album* directory is copied to */run/media/user/F8950/Audiobooks/* in its entirety, without modification; sequential copy order, natural or lexicographical, is guaranteed.

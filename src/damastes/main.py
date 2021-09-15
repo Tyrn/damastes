@@ -9,7 +9,7 @@ import sys
 
 assert sys.version_info >= PY_VERSION, f"Python {PY_VERSION} or later required."
 
-from py_procr import __version__
+from . import __version__
 from typing import List, Tuple, Iterator, Any
 import mutagen as mt
 import os
@@ -470,8 +470,8 @@ def retrieve_args() -> Any:
     """
     parser = argparse.ArgumentParser(
         description=f"""
-    pcp "Procrustes" SmArT is a CLI utility for copying subtrees containing supported audio
-    files in sequence, naturally sorted.
+    Damastes a.k.a. Procrustes is a CLI utility for copying directories and subdirectories
+    containing supported audio files in sequence, naturally sorted.
     The end result is a "flattened" copy of the source subtree. "Flattened" means
     that only a namesake of the root source directory is created, where all the files get
     copied to, names prefixed with a serial number. Tag "Track Number"
@@ -489,7 +489,7 @@ def retrieve_args() -> Any:
         "--version",
         help="package version",
         action="version",
-        version=f"%(prog)s (version {__version__})",
+        version=f"%(prog)s {__version__}",
     )
     parser.add_argument(
         "-v", "--verbose", help=f"{NB} verbose output {NB}", action="store_true"

@@ -1,5 +1,5 @@
-from py_procr import __version__
-from py_procr.pcp import *
+from src.damastes import __version__
+from src.damastes.main import *
 
 
 class TestPureFunctions:

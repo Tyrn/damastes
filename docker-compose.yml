@@ -1,6 +1,6 @@
 services:
-  procrustes:
-    image: procrustes:latest
+  damastes:
+    image: damastes:latest
     volumes:
       - type: bind
         source: $HOME

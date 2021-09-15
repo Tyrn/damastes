@@ -1,6 +1,6 @@
 FROM python:3.9.6-slim AS base
 
-ARG user=procrustes project=py-procr src=py_procr
+ARG user=damastes project=py-procr src=src
 
 # Non-root user.
 RUN useradd -ms /bin/bash "$user"
@@ -22,7 +22,7 @@ RUN poetry config virtualenvs.create true && \
 
 FROM python:3.9.6-slim
 
-ARG user=procrustes project=py-procr
+ARG user=damastes project=py-procr
 
 # Non-root user.
 RUN useradd -ms /bin/bash "$user"
