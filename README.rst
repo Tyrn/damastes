@@ -14,12 +14,6 @@ Out of venv or poetry shell:
 
     $ pip install dist/<...>.whl --user [-I]
 
-or
-
-::
-
-    $ pipx install dist/<...>.whl
-
 Use Git Hooks
 =============
 
