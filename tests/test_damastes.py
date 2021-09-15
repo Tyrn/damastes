@@ -4,7 +4,7 @@ from src.damastes.main import *
 
 class TestPureFunctions:
     def test_version(self):
-        assert __version__ == "0.1.0"
+        assert __version__ == "0.9.1"
 
     def test_zero_pad(self):
         assert str(3).zfill(5) == "00003"
