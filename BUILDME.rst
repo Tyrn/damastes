@@ -1,8 +1,49 @@
-Using this application with Docker
-**********************************
+Damastes a.k.a. Procrustes
+**************************
 
-Raw
-===
+Build and install
+=================
+
+::
+
+    $ poetry build
+
+Exit venv or poetry shell, then:
+
+::
+
+    $ pip install dist/<...>.whl --user [-I]
+
+Use Git Hooks
+=============
+
+::
+
+    $ pre-commit install
+    ...
+    $ pre-commit run --all-files
+
+Format
+======
+
+::
+
+    $ black .
+
+Test
+====
+
+::
+
+    $ pytest [--doctest-modules] [-v]
+    $ mypy .
+    $ twine check dist/<...>.whl
+
+Containerize
+************
+
+Docker
+======
 
 Build
 -----

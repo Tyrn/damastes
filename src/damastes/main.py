@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Audio album builder. See description.
 """

@@ -1,8 +1,10 @@
 [tool.poetry]
 name = "damastes"
 version = "0.9.1"
-description = ""
+description = "Damastes a.k.a. Procrustes, audiobook builder: copy and edit on the fly"
 authors = ["Tyrn <a@b.com>"]
+license = "MIT"
+readme = "README.rst"
 
 [tool.poetry.dependencies]
 python = "^3.9"

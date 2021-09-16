@@ -1,36 +1,6 @@
 Damastes a.k.a. Procrustes
 **************************
 
-Build and install
-=================
-
-::
-
-    $ poetry build
-
-Out of venv or poetry shell:
-
-::
-
-    $ pip install dist/<...>.whl --user [-I]
-
-Use Git Hooks
-=============
-
-::
-
-    $ pre-commit install
-    ...
-    $ pre-commit run --all-files
-
-Test
-====
-
-::
-
-    $ pytest [--doctest-modules] [-v]
-    $ mypy .
-
 Description
 ===========
 
