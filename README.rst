@@ -1,14 +1,66 @@
 Damastes a.k.a. Procrustes
 **************************
 
+Ever got frustrated with an audiobook like this?
+
+::
+
+    Robinson Crusoe $ ls
+    'Disc 1'   'Disc 14'  'Disc 3'  'Disc 8'
+    'Disc 10'  'Disc 15'  'Disc 4'  'Disc 9'
+    'Disc 11'  'Disc 16'  'Disc 5'
+    'Disc 12'  'Disc 17'  'Disc 6'
+    'Disc 13'  'Disc 2'   'Disc 7'
+
+::
+
+    Robinson Crusoe $ tree
+    ...
+    ├── Disc 17
+    │   ├── 01 Track 1.mp3
+    │   ├── 02 Track 2.mp3
+    ...
+    │   ├── 13 Track 13.mp3
+    ├── Disc 2
+    │   ├── 01 Track 1.mp3
+    │   ├── 02 Track 2.mp3
+    │   ├── 03 Track 3.mp3
+    ...
+    │   ├── 15 Track 15.mp3
+    │   └── desktop.ini
+    ├── Disc 3
+    │   ├── 01 Track 1.mp3
+    │   ├── 02 Track 2.mp3
+    ...
+
+Try **Damastes**, this way:
+
+::
+
+    Robinson Crusoe $ damastes -via 'Daniel Defoe' -g 'Robinson Crusoe' . ~/MyAudioLibrary
+
+- ``MyAudioLibrary`` must exist
+
+or just this:
+
+::
+
+    Robinson Crusoe $ damastes -a 'Daniel Defoe' -u 'Robinson Crusoe' . ~/MyAudioLibrary
+
+Notice the tags set by **Damastes**.
+
 Description
 ===========
 
 **Damastes** is a CLI utility for basic processing and copying
-of audio albums, mostly audiobooks of uncertain provenance to cheap mobile
-devices. Audiobooks in question can be poorly designed: track number tags
-may be missing or incorrect, directory and/or file names enumerated
+of audio albums, mostly slovenly built audiobooks, possibly to cheap mobile
+devices. Common poor design problems: track number tags
+missing or incorrect, directory and/or file names enumerated
 without leading zeroes, etc.
+
+Meanwhile, one cannot listen to an audiobook with the tracks in the wrong
+order. **Damastes** tries hard to sort the tracks properly.
+To check the track order visually use ``-v`` and avoid ``-u``.
 
 **Damastes** renames directories and audio files, replacing tags,
 if necessary, while copying the album to destination. Source files
