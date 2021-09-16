@@ -5,7 +5,7 @@ description = "Damastes a.k.a. Procrustes, audiobook builder: copy and edit on t
 authors = ["Tyrn <a@b.com>"]
 license = "MIT"
 readme = "README.rst"
-repository = "https://github.com/Tyrn/damastes"
+homepage = "https://github.com/Tyrn/damastes"
 
 [tool.poetry.dependencies]
 python = "^3.9"

@@ -37,7 +37,17 @@ Test
 
     $ pytest [--doctest-modules] [-v]
     $ mypy .
+
+Publish
+=======
+
+::
+
+    $ poetry build
     $ twine check dist/<...>.whl
+    $ poetry run twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
+- Poetry issue `#742 <https://github.com/python-poetry/poetry/issues/742>`__
 
 Containerize
 ************
