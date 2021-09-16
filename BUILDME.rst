@@ -59,7 +59,7 @@ Run
 
     $ docker run -it --name damastes --rm --mount type=bind,source="$HOME"/,target=/home/mnt damastes
 
-- `--name damastes` is the container name; tailing/`target` `damastes` is the image name.
+- ``--name damastes`` is the container name; tailing ``target=/home/mnt damastes`` is the image name.
 
 Docker Compose
 ==============
@@ -67,7 +67,7 @@ Docker Compose
 Configuration
 -------------
 
-`docker-compose.yml`:
+*docker-compose.yml*:
 
 ::
 
