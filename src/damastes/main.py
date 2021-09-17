@@ -557,7 +557,7 @@ def retrieve_args() -> Any:
         action="store_true",
     )
     parser.add_argument(
-        "-e", "--file-type", help="accept only audio files of the specified type"
+        "-e", "--file-type", help="accept only audio files of the specified type (e.g. -e mp3)"
     )
     parser.add_argument(
         "-u",
