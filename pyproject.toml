@@ -7,6 +7,10 @@ license = "MIT"
 readme = "README.rst"
 homepage = "https://github.com/Tyrn/damastes"
 
+#packages = [
+#    { include = "procrustes", from = "src" },
+#]
+
 [tool.poetry.dependencies]
 python = "^3.9"
 mutagen = "^1.44"
