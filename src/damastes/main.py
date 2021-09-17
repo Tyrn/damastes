@@ -290,7 +290,7 @@ def album() -> Iterator[Tuple[int, Path, Path, str]]:
         print(
             f'There are no supported audio files in the source directory "{ARGS.src_dir}".'
         )
-        sys.exit()
+        sys.exit(1)
 
     if not ARGS.drop_dst and not ARGS.dry_run:
         if executive_dst.exists():
@@ -299,10 +299,10 @@ def album() -> Iterator[Tuple[int, Path, Path, str]]:
                     shutil.rmtree(executive_dst)
                 except FileNotFoundError:
                     print(f'Failed to remove "{executive_dst}".')
-                    sys.exit()
+                    sys.exit(1)
             else:
                 print(f'Destination directory "{executive_dst}" already exists.')
-                sys.exit()
+                sys.exit(1)
         executive_dst.mkdir()
 
     return walk_file_tree(
@@ -440,12 +440,11 @@ def copy_album() -> None:
                     print(f"  {COLUMN_ICON} {(dst_bytes - src_bytes):+d}", end="")
             print("")
         else:
-            sys.stdout.write(".")
-            sys.stdout.flush()
+            print(".", end="", flush=True)
         return src_bytes, dst_bytes
 
     if not ARGS.verbose:
-        sys.stdout.write("Starting ")
+        print("Starting ", end="", flush=True)
 
     src_total, dst_total, files_total = 0, 0, 0
 
@@ -587,10 +586,10 @@ def retrieve_args(argv: List[str]) -> Any:
 
     if not args.src_dir.is_dir():
         print(f'Source directory "{args.src_dir}" is not there.')
-        sys.exit()
+        sys.exit(1)
     if not args.dst_dir.is_dir():
         print(f'Destination path "{args.dst_dir}" is not there.')
-        sys.exit()
+        sys.exit(1)
 
     if args.unified_name and args.album_tag is None:
         args.album_tag = args.unified_name
