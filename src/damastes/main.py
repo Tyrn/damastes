@@ -463,7 +463,7 @@ def copy_album() -> None:
         print(f"Fatal error. files_total: {files_total}, FILES_TOTAL: {FILES_TOTAL}")
 
 
-def retrieve_args(main_argv: List[str]) -> Any:
+def retrieve_args(argv: List[str]) -> Any:
     """
     Parses the command line and returns a collection of arguments.
     """
@@ -579,7 +579,7 @@ def retrieve_args(main_argv: List[str]) -> Any:
     parser.add_argument("-g", "--album-tag", help=f"{NB} album tag name {NB}")
     parser.add_argument("src_dir", help="source directory")
     parser.add_argument("dst_dir", help="general destination directory")
-    args = parser.parse_args(main_argv)
+    args = parser.parse_args(argv)
     args.src_dir = Path(
         args.src_dir
     ).absolute()  # Takes care of the trailing slash, too.
@@ -611,7 +611,7 @@ INVALID_TOTAL = 0
 SUSPICIOUS_TOTAL = 0
 
 
-def main(main_argv: List[str] = None) -> int:
+def main(argv: List[str] = sys.argv[1:]) -> int:
     """
     Entry point.
     """
@@ -621,7 +621,7 @@ def main(main_argv: List[str] = None) -> int:
         warnings.resetwarnings()
         warnings.simplefilter("ignore")
 
-        ARGS = retrieve_args(sys.argv[1:] if main_argv is None else main_argv)
+        ARGS = retrieve_args(argv)
 
         with yaspin() as sp:
             FILES_TOTAL, src_total = audiofiles_count(ARGS.src_dir, sp)
