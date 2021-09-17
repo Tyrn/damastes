@@ -256,7 +256,7 @@ def walk_file_tree(
         yield from file_fund(files)
 
 
-def audiofiles_count(directory: Path, spinner) -> Tuple[int, int]:
+def audiofiles_count(directory: Path, spinner=None) -> Tuple[int, int]:
     """
     Returns full recursive count of audiofiles in directory.
     """
@@ -266,7 +266,7 @@ def audiofiles_count(directory: Path, spinner) -> Tuple[int, int]:
         for name in files:
             abs_path = Path(root) / name
             if is_audiofile(abs_path, spinner):
-                if cnt % 10 == 0:
+                if spinner and cnt % 10 == 0:
                     spinner.text = name
                 cnt += 1
                 size += abs_path.stat().st_size
@@ -286,7 +286,7 @@ def album() -> Iterator[Tuple[int, Path, Path, str]]:
     executive_dst = ARGS.dst_dir / ("" if ARGS.drop_dst else base_dst)
 
     if FILES_TOTAL < 1:
-        print(
+        _show(
             f'There are no supported audio files in the source directory "{ARGS.src_dir}".'
         )
         sys.exit(1)
@@ -297,10 +297,10 @@ def album() -> Iterator[Tuple[int, Path, Path, str]]:
                 try:
                     shutil.rmtree(executive_dst)
                 except FileNotFoundError:
-                    print(f'Failed to remove "{executive_dst}".')
+                    _show(f'Failed to remove "{executive_dst}".')
                     sys.exit(1)
             else:
-                print(f'Destination directory "{executive_dst}" already exists.')
+                _show(f'Destination directory "{executive_dst}" already exists.')
                 sys.exit(1)
         executive_dst.mkdir()
 
@@ -431,19 +431,19 @@ def copy_album() -> None:
             copy_and_set_via_tmp(i, src, dst)
             dst_bytes = dst.stat().st_size
         if ARGS.verbose:
-            print(f"{i:>4}/{FILES_TOTAL} {COLUMN_ICON} {dst}", end="")
+            _show(f"{i:>4}/{FILES_TOTAL} {COLUMN_ICON} {dst}", end="")
             if dst_bytes != src_bytes:
                 if dst_bytes == 0:
-                    print(f"  {COLUMN_ICON} {human_fine(src_bytes)}", end="")
+                    _show(f"  {COLUMN_ICON} {human_fine(src_bytes)}", end="")
                 else:
-                    print(f"  {COLUMN_ICON} {(dst_bytes - src_bytes):+d}", end="")
-            print("")
+                    _show(f"  {COLUMN_ICON} {(dst_bytes - src_bytes):+d}", end="")
+            _show("")
         else:
-            print(".", end="", flush=True)
+            _show(".", end="", flush=True)
         return src_bytes, dst_bytes
 
     if not ARGS.verbose:
-        print("Starting ", end="", flush=True)
+        _show("Starting ", end="", flush=True)
 
     src_total, dst_total, files_total = 0, 0, 0
 
@@ -453,15 +453,15 @@ def copy_album() -> None:
         dst_total += dst_bytes
         files_total += 1
 
-    print(f" {DONE_ICON} Done ({FILES_TOTAL}, {human_fine(dst_total)}", end="")
+    _show(f" {DONE_ICON} Done ({FILES_TOTAL}, {human_fine(dst_total)}", end="")
     if ARGS.dry_run:
-        print(f"; Volume: {human_fine(src_total)}", end="")
-    print(").")
+        _show(f"; Volume: {human_fine(src_total)}", end="")
+    _show(").")
     if files_total != FILES_TOTAL:
-        print(f"Fatal error. files_total: {files_total}, FILES_TOTAL: {FILES_TOTAL}")
+        _show(f"Fatal error. files_total: {files_total}, FILES_TOTAL: {FILES_TOTAL}")
 
 
-def retrieve_args(argv: List[str], stub: str) -> Any:
+def retrieve_args(argv: List[str]) -> Any:
     """
     Parses the command line and returns a collection of arguments.
     """
@@ -486,7 +486,7 @@ def retrieve_args(argv: List[str], stub: str) -> Any:
         "--version",
         help="package version",
         action="version",
-        version=stub,
+        version=APP_VERSION,
     )
     parser.add_argument(
         "-v", "--verbose", help=f"{NB} verbose output {NB}", action="store_true"
@@ -584,16 +584,21 @@ def retrieve_args(argv: List[str], stub: str) -> Any:
     args.dst_dir = Path(args.dst_dir).absolute()
 
     if not args.src_dir.is_dir():
-        print(f'Source directory "{args.src_dir}" is not there.')
+        _show(f'Source directory "{args.src_dir}" is not there.')
         sys.exit(1)
     if not args.dst_dir.is_dir():
-        print(f'Destination path "{args.dst_dir}" is not there.')
+        _show(f'Destination path "{args.dst_dir}" is not there.')
         sys.exit(1)
 
     if args.unified_name and args.album_tag is None:
         args.album_tag = args.unified_name
 
     return args
+
+
+def _show(string: str, end="\n", file=sys.stdout, flush=False) -> None:
+    if APP_VERSION:
+        return print(string, end=end, file=file, flush=flush)
 
 
 NB = "\U0001f53b"
@@ -621,26 +626,30 @@ def main(*, argv: List[str] = sys.argv[1:], stub="") -> int:
         warnings.simplefilter("ignore")
 
         APP_VERSION = stub
-        ARGS = retrieve_args(argv, stub)
+        ARGS = retrieve_args(argv)
 
-        with yaspin() as sp:
-            FILES_TOTAL, src_total = audiofiles_count(ARGS.src_dir, sp)
+        if APP_VERSION:
+            with yaspin() as sp:
+                FILES_TOTAL, src_total = audiofiles_count(ARGS.src_dir, sp)
+        else:
+            FILES_TOTAL, src_total = audiofiles_count(ARGS.src_dir)
+
         if ARGS.count:
-            print(f" {DONE_ICON} Valid: {FILES_TOTAL} file(s)", end="")
-            print(f"; Volume: {human_fine(src_total)}", end="")
+            _show(f" {DONE_ICON} Valid: {FILES_TOTAL} file(s)", end="")
+            _show(f"; Volume: {human_fine(src_total)}", end="")
             if FILES_TOTAL > 1:
-                print(f"; Average: {human_fine(src_total // FILES_TOTAL)}", end="")
-            print("")
+                _show(f"; Average: {human_fine(src_total // FILES_TOTAL)}", end="")
+            _show("")
         else:
             copy_album()
 
         if INVALID_TOTAL > 0:
-            print(f" {INVALID_ICON} Broken: {INVALID_TOTAL} file(s)")
+            _show(f" {INVALID_ICON} Broken: {INVALID_TOTAL} file(s)")
         if SUSPICIOUS_TOTAL > 0:
-            print(f" {SUSPICIOUS_ICON} Suspicious: {SUSPICIOUS_TOTAL} file(s)")
+            _show(f" {SUSPICIOUS_ICON} Suspicious: {SUSPICIOUS_TOTAL} file(s)")
 
     except KeyboardInterrupt:
-        print("Aborted manually.", file=sys.stderr)
+        _show("Aborted manually.", file=sys.stderr)
         return 1
 
     return 0
