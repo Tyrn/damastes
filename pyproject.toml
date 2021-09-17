@@ -6,6 +6,10 @@ authors = ["Tyrn <a@b.com>"]
 license = "MIT"
 readme = "README.rst"
 homepage = "https://github.com/Tyrn/damastes"
+packages = [
+    { include = "damastes", from = "src" },
+    { include = "procrustes", from = "src" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.9"

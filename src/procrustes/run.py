@@ -615,9 +615,11 @@ SUSPICIOUS_TOTAL = 0
 APP_VERSION = ""
 
 
-def main(*, argv: List[str] = sys.argv[1:], stub="") -> int:
+def run(*, argv: List[str] = sys.argv[1:], version="") -> int:
     """
-    Entry point.
+    Runs the whole Procrustes business according to argv options.
+    Non-empty version means full console output required by
+    a command line utility.
     """
     global ARGS, FILES_TOTAL, APP_VERSION
 
@@ -625,7 +627,7 @@ def main(*, argv: List[str] = sys.argv[1:], stub="") -> int:
         warnings.resetwarnings()
         warnings.simplefilter("ignore")
 
-        APP_VERSION = stub
+        APP_VERSION = version
         ARGS = retrieve_args(argv)
 
         if APP_VERSION:
@@ -656,4 +658,4 @@ def main(*, argv: List[str] = sys.argv[1:], stub="") -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run(version="Procrustes running..."))

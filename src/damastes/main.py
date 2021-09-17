@@ -4,11 +4,14 @@ Audio album builder.
 
 from . import __version__
 import sys
-from procrustes import procrustes  # type: ignore
+from procrustes.run import run  # type: ignore
 
 
 def main() -> int:
-    return procrustes.main(stub=f"Damastes {__version__}")
+    """
+    Entry point.
+    """
+    return run(version=f"Damastes {__version__}")
 
 
 if __name__ == "__main__":
