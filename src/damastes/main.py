@@ -463,7 +463,7 @@ def copy_album() -> None:
         print(f"Fatal error. files_total: {files_total}, FILES_TOTAL: {FILES_TOTAL}")
 
 
-def retrieve_args() -> Any:
+def retrieve_args(main_argv: List[str]) -> Any:
     """
     Parses the command line and returns a collection of arguments.
     """
@@ -579,7 +579,7 @@ def retrieve_args() -> Any:
     parser.add_argument("-g", "--album-tag", help=f"{NB} album tag name {NB}")
     parser.add_argument("src_dir", help="source directory")
     parser.add_argument("dst_dir", help="general destination directory")
-    args = parser.parse_args()
+    args = parser.parse_args(main_argv)
     args.src_dir = Path(
         args.src_dir
     ).absolute()  # Takes care of the trailing slash, too.
@@ -611,7 +611,7 @@ INVALID_TOTAL = 0
 SUSPICIOUS_TOTAL = 0
 
 
-def main() -> None:
+def main(main_argv: List[str] = None) -> int:
     """
     Entry point.
     """
@@ -621,7 +621,7 @@ def main() -> None:
         warnings.resetwarnings()
         warnings.simplefilter("ignore")
 
-        ARGS = retrieve_args()
+        ARGS = retrieve_args(sys.argv[1:] if main_argv is None else main_argv)
 
         with yaspin() as sp:
             FILES_TOTAL, src_total = audiofiles_count(ARGS.src_dir, sp)
@@ -639,9 +639,12 @@ def main() -> None:
         if SUSPICIOUS_TOTAL > 0:
             print(f" {SUSPICIOUS_ICON} Suspicious: {SUSPICIOUS_TOTAL} file(s)")
 
-    except KeyboardInterrupt as ctrl_c:
-        sys.exit(ctrl_c)
+    except KeyboardInterrupt:
+        print("Aborted manually.", file=sys.stderr)
+        return 1
+
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
