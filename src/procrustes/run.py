@@ -100,7 +100,7 @@ def path_compare(path_x: Path, path_y: Path) -> Ord:
     """
     return (
         strcmp_c(str(path_x), str(path_y))
-        if ARGS.sort_lex
+        if _ARGS.sort_lex
         else strcmp_naturally(str(path_x), str(path_y))
     )
 
@@ -111,7 +111,7 @@ def file_compare(path_x: Path, path_y: Path) -> Ord:
     """
     return (
         strcmp_c(path_x.stem, path_y.stem)
-        if ARGS.sort_lex
+        if _ARGS.sort_lex
         else strcmp_naturally(path_x.stem, path_y.stem)
     )
 
@@ -120,24 +120,24 @@ def mutagen_file(name: Path, spinner=None):
     """
     Returns Mutagen thing, if name looks like an audio file path, else returns None.
     """
-    global INVALID_TOTAL, SUSPICIOUS_TOTAL
+    global _INVALID_TOTAL, _SUSPICIOUS_TOTAL
 
-    if ARGS.file_type and not has_ext_of(name, ARGS.file_type):
+    if _ARGS.file_type and not has_ext_of(name, _ARGS.file_type):
         return None
 
-    name_to_print: str = str(name) if ARGS.verbose else name.name
+    name_to_print: str = str(name) if _ARGS.verbose else name.name
 
     try:
         file = mt.File(name, easy=True)
     except mt.MutagenError as mt_error:
         if spinner:
             spinner.write(f" {INVALID_ICON} >>{mt_error}>> {name_to_print}")
-            INVALID_TOTAL += 1
+            _INVALID_TOTAL += 1
         return None
 
     if spinner and file is None and has_ext_of(name, *KNOWN_EXTENSIONS):
         spinner.write(f" {SUSPICIOUS_ICON} {name_to_print}")
-        SUSPICIOUS_TOTAL += 1
+        _SUSPICIOUS_TOTAL += 1
     return file
 
 
@@ -178,30 +178,30 @@ def decorate_dir_name(i: int, path: Path) -> str:
     """
     Prepends decimal i to path name.
     """
-    return ("" if ARGS.strip_decorations else (str(i).zfill(3) + "-")) + path.name
+    return ("" if _ARGS.strip_decorations else (str(i).zfill(3) + "-")) + path.name
 
 
 def artist() -> str:
     """
     Generates Artist prefix for a directory/file name.
     """
-    return ARGS.artist_tag if ARGS.artist_tag else ""
+    return _ARGS.artist_tag if _ARGS.artist_tag else ""
 
 
 def decorate_file_name(i: int, dst_step: List[str], path: Path) -> str:
     """
     Prepends zero padded decimal i to path name.
     """
-    if ARGS.strip_decorations:
+    if _ARGS.strip_decorations:
         return path.name
-    prefix = str(i).zfill(len(str(FILES_TOTAL))) + (
+    prefix = str(i).zfill(len(str(_FILES_TOTAL))) + (
         "-" + "-".join(dst_step) + "-"
-        if ARGS.prepend_subdir_name and not ARGS.tree_dst and len(dst_step) > 0
+        if _ARGS.prepend_subdir_name and not _ARGS.tree_dst and len(dst_step) > 0
         else "-"
     )
     return prefix + (
-        ARGS.unified_name + " - " + artist() + path.suffix
-        if ARGS.unified_name
+        _ARGS.unified_name + " - " + artist() + path.suffix
+        if _ARGS.unified_name
         else path.name
     )
 
@@ -213,7 +213,7 @@ def walk_file_tree(
     Recursively traverses the source directory and yields a tuple of copying attributes;
     the destination directory and file names get decorated according to options.
     """
-    dirs, files = list_dir_groom(src_dir, ARGS.reverse)
+    dirs, files = list_dir_groom(src_dir, _ARGS.reverse)
 
     def dir_flat(dirs):
         for directory in dirs:
@@ -226,10 +226,10 @@ def walk_file_tree(
             yield fcount[0], src_dir / file, dst_root, decorate_file_name(
                 fcount[0], dst_step, file
             )
-            fcount[0] += -1 if ARGS.reverse else 1
+            fcount[0] += -1 if _ARGS.reverse else 1
 
     def reverse(i, lst):
-        return len(lst) - i if ARGS.reverse else i + 1
+        return len(lst) - i if _ARGS.reverse else i + 1
 
     def dir_tree(dirs):
         for i, directory in enumerate(dirs):
@@ -242,13 +242,13 @@ def walk_file_tree(
             yield fcount[0], src_dir / file, dst_root.joinpath(
                 *dst_step
             ), decorate_file_name(reverse(i, files), dst_step, file)
-            fcount[0] += -1 if ARGS.reverse else 1
+            fcount[0] += -1 if _ARGS.reverse else 1
 
     dir_fund, file_fund = (
-        (dir_tree, file_tree) if ARGS.tree_dst else (dir_flat, file_flat)
+        (dir_tree, file_tree) if _ARGS.tree_dst else (dir_flat, file_flat)
     )
 
-    if ARGS.reverse:
+    if _ARGS.reverse:
         yield from file_fund(files)
         yield from dir_fund(dirs)
     else:
@@ -278,22 +278,24 @@ def album() -> Iterator[Tuple[int, Path, Path, str]]:
     Sets up boilerplate required by the options and returns the ammo belt generator
     of (src, dst) pairs.
     """
-    prefix = (str(ARGS.album_num).zfill(2) + "-") if ARGS.album_num else ""
+    prefix = (str(_ARGS.album_num).zfill(2) + "-") if _ARGS.album_num else ""
     base_dst = prefix + (
-        artist() + " - " + ARGS.unified_name if ARGS.unified_name else ARGS.src_dir.name
+        artist() + " - " + _ARGS.unified_name
+        if _ARGS.unified_name
+        else _ARGS.src_dir.name
     )
 
-    executive_dst = ARGS.dst_dir / ("" if ARGS.drop_dst else base_dst)
+    executive_dst = _ARGS.dst_dir / ("" if _ARGS.drop_dst else base_dst)
 
-    if FILES_TOTAL < 1:
+    if _FILES_TOTAL < 1:
         _show(
-            f'There are no supported audio files in the source directory "{ARGS.src_dir}".'
+            f'There are no supported audio files in the source directory "{_ARGS.src_dir}".'
         )
         sys.exit(1)
 
-    if not ARGS.drop_dst and not ARGS.dry_run:
+    if not _ARGS.drop_dst and not _ARGS.dry_run:
         if executive_dst.exists():
-            if ARGS.overwrite:
+            if _ARGS.overwrite:
                 try:
                     shutil.rmtree(executive_dst)
                 except FileNotFoundError:
@@ -305,7 +307,7 @@ def album() -> Iterator[Tuple[int, Path, Path, str]]:
         executive_dst.mkdir()
 
     return walk_file_tree(
-        ARGS.src_dir, executive_dst, [FILES_TOTAL if ARGS.reverse else 1], []
+        _ARGS.src_dir, executive_dst, [_FILES_TOTAL if _ARGS.reverse else 1], []
     )
 
 
@@ -383,9 +385,9 @@ def copy_album() -> None:
 
     def set_tags(i: int, source: Path, path: Path) -> None:
         def make_title(tagging: str) -> str:
-            if ARGS.file_title_num:
+            if _ARGS.file_title_num:
                 return str(i) + ">" + source.stem
-            if ARGS.file_title:
+            if _ARGS.file_title:
                 return source.stem
             return str(i) + " " + tagging
 
@@ -393,20 +395,20 @@ def copy_album() -> None:
         if audio is None:
             return
 
-        if not ARGS.drop_tracknumber:
-            audio["tracknumber"] = str(i) + "/" + str(FILES_TOTAL)
-        if ARGS.artist_tag and ARGS.album_tag:
+        if not _ARGS.drop_tracknumber:
+            audio["tracknumber"] = str(i) + "/" + str(_FILES_TOTAL)
+        if _ARGS.artist_tag and _ARGS.album_tag:
             audio["title"] = make_title(
-                make_initials(ARGS.artist_tag) + " - " + ARGS.album_tag
+                make_initials(_ARGS.artist_tag) + " - " + _ARGS.album_tag
             )
-            audio["artist"] = ARGS.artist_tag
-            audio["album"] = ARGS.album_tag
-        elif ARGS.artist_tag:
-            audio["title"] = make_title(ARGS.artist_tag)
-            audio["artist"] = ARGS.artist_tag
-        elif ARGS.album_tag:
-            audio["title"] = make_title(ARGS.album_tag)
-            audio["album"] = ARGS.album_tag
+            audio["artist"] = _ARGS.artist_tag
+            audio["album"] = _ARGS.album_tag
+        elif _ARGS.artist_tag:
+            audio["title"] = make_title(_ARGS.artist_tag)
+            audio["artist"] = _ARGS.artist_tag
+        elif _ARGS.album_tag:
+            audio["title"] = make_title(_ARGS.album_tag)
+            audio["album"] = _ARGS.album_tag
         audio.save()
 
     def copy_and_set(index: int, src: Path, dst: Path) -> None:
@@ -426,12 +428,12 @@ def copy_album() -> None:
         i, src, dst_path, target_file_name = entry
         dst = dst_path / target_file_name
         src_bytes, dst_bytes = src.stat().st_size, 0
-        if not ARGS.dry_run:
+        if not _ARGS.dry_run:
             dst_path.mkdir(parents=True, exist_ok=True)
             copy_and_set_via_tmp(i, src, dst)
             dst_bytes = dst.stat().st_size
-        if ARGS.verbose:
-            _show(f"{i:>4}/{FILES_TOTAL} {COLUMN_ICON} {dst}", end="")
+        if _ARGS.verbose:
+            _show(f"{i:>4}/{_FILES_TOTAL} {COLUMN_ICON} {dst}", end="")
             if dst_bytes != src_bytes:
                 if dst_bytes == 0:
                     _show(f"  {COLUMN_ICON} {human_fine(src_bytes)}", end="")
@@ -442,23 +444,25 @@ def copy_album() -> None:
             _show(".", end="", flush=True)
         return src_bytes, dst_bytes
 
-    if not ARGS.verbose:
+    if not _ARGS.verbose:
         _show("Starting ", end="", flush=True)
 
-    src_total, dst_total, files_total = 0, 0, 0
+    src_total, dst_total, _FILES_TOTAL = 0, 0, 0
 
     for entry in album():
         src_bytes, dst_bytes = copy_file(entry)
         src_total += src_bytes
         dst_total += dst_bytes
-        files_total += 1
+        _FILES_TOTAL += 1
 
-    _show(f" {DONE_ICON} Done ({FILES_TOTAL}, {human_fine(dst_total)}", end="")
-    if ARGS.dry_run:
+    _show(f" {DONE_ICON} Done ({_FILES_TOTAL}, {human_fine(dst_total)}", end="")
+    if _ARGS.dry_run:
         _show(f"; Volume: {human_fine(src_total)}", end="")
     _show(").")
-    if files_total != FILES_TOTAL:
-        _show(f"Fatal error. files_total: {files_total}, FILES_TOTAL: {FILES_TOTAL}")
+    if _FILES_TOTAL != _FILES_TOTAL:
+        _show(
+            f"Fatal error. _FILES_TOTAL: {_FILES_TOTAL}, _FILES_TOTAL: {_FILES_TOTAL}"
+        )
 
 
 def retrieve_args(argv: List[str]) -> Any:
@@ -486,7 +490,7 @@ def retrieve_args(argv: List[str]) -> Any:
         "--version",
         help="package version",
         action="version",
-        version=APP_VERSION,
+        version=_APP_VERSION,
     )
     parser.add_argument(
         "-v", "--verbose", help=f"{NB} verbose output {NB}", action="store_true"
@@ -597,7 +601,7 @@ def retrieve_args(argv: List[str]) -> Any:
 
 
 def _show(string: str, end="\n", file=sys.stdout, flush=False) -> None:
-    if APP_VERSION:
+    if _APP_VERSION:
         return print(string, end=end, file=file, flush=flush)
 
 
@@ -608,11 +612,25 @@ DONE_ICON = "\U0001f7e2"
 COLUMN_ICON = "\U00002714"
 KNOWN_EXTENSIONS = ["MP3", "OGG", "M4A", "M4B", "FLAC", "APE"]
 
-ARGS: Any = None
-FILES_TOTAL = -1
-INVALID_TOTAL = 0
-SUSPICIOUS_TOTAL = 0
-APP_VERSION = ""
+_ARGS: Any = None
+_FILES_TOTAL = -1
+_INVALID_TOTAL = 0
+_SUSPICIOUS_TOTAL = 0
+_APP_VERSION = ""
+
+
+def _reset_all() -> None:
+    global _ARGS
+    global _FILES_TOTAL
+    global _INVALID_TOTAL
+    global _SUSPICIOUS_TOTAL
+    global _APP_VERSION
+
+    _ARGS = None
+    _FILES_TOTAL = -1
+    _INVALID_TOTAL = 0
+    _SUSPICIOUS_TOTAL = 0
+    _APP_VERSION = ""
 
 
 def run(*, argv: List[str] = sys.argv[1:], version="") -> int:
@@ -621,34 +639,35 @@ def run(*, argv: List[str] = sys.argv[1:], version="") -> int:
     Non-empty version means full console output required by
     a command line utility.
     """
-    global ARGS, FILES_TOTAL, APP_VERSION
+    global _ARGS, _FILES_TOTAL, _APP_VERSION
 
     try:
         warnings.resetwarnings()
         warnings.simplefilter("ignore")
 
-        APP_VERSION = version
-        ARGS = retrieve_args(argv)
+        _reset_all()
+        _APP_VERSION = version
+        _ARGS = retrieve_args(argv)
 
-        if APP_VERSION:
+        if _APP_VERSION:
             with yaspin() as sp:
-                FILES_TOTAL, src_total = audiofiles_count(ARGS.src_dir, sp)
+                _FILES_TOTAL, src_total = audiofiles_count(_ARGS.src_dir, sp)
         else:
-            FILES_TOTAL, src_total = audiofiles_count(ARGS.src_dir)
+            _FILES_TOTAL, src_total = audiofiles_count(_ARGS.src_dir)
 
-        if ARGS.count:
-            _show(f" {DONE_ICON} Valid: {FILES_TOTAL} file(s)", end="")
+        if _ARGS.count:
+            _show(f" {DONE_ICON} Valid: {_FILES_TOTAL} file(s)", end="")
             _show(f"; Volume: {human_fine(src_total)}", end="")
-            if FILES_TOTAL > 1:
-                _show(f"; Average: {human_fine(src_total // FILES_TOTAL)}", end="")
+            if _FILES_TOTAL > 1:
+                _show(f"; Average: {human_fine(src_total // _FILES_TOTAL)}", end="")
             _show("")
         else:
             copy_album()
 
-        if INVALID_TOTAL > 0:
-            _show(f" {INVALID_ICON} Broken: {INVALID_TOTAL} file(s)")
-        if SUSPICIOUS_TOTAL > 0:
-            _show(f" {SUSPICIOUS_ICON} Suspicious: {SUSPICIOUS_TOTAL} file(s)")
+        if _INVALID_TOTAL > 0:
+            _show(f" {INVALID_ICON} Broken: {_INVALID_TOTAL} file(s)")
+        if _SUSPICIOUS_TOTAL > 0:
+            _show(f" {SUSPICIOUS_ICON} Suspicious: {_SUSPICIOUS_TOTAL} file(s)")
 
     except KeyboardInterrupt:
         _show("Aborted manually.", file=sys.stderr)
