@@ -15,6 +15,7 @@ import re
 import shutil
 import argparse
 import warnings
+import inspect
 import functools as ft
 from yaspin import yaspin
 from math import log
@@ -595,6 +596,22 @@ def _retrieve_args(argv: List[str]) -> Any:
 def _show(string: str, end="\n", file=sys.stdout, flush=False) -> None:
     if _APP_VERSION:
         return print(string, end=end, file=file, flush=flush)
+
+
+def list_safe_imports(*, unsafe: List[str] = ["run"]) -> List[str]:
+    """
+    Returns a list of general purpose functions without side effects,
+    presumably safe to import and run anywhere. The presence of a
+    doctest is usually a good sign of safety :)
+
+    >>> 'list_safe_imports' in list_safe_imports()
+    True
+    """
+    return [
+        m[0]
+        for m in inspect.getmembers(sys.modules[__name__], inspect.isfunction)
+        if __name__ == m[1].__module__ and m[0] not in unsafe and m[0][0] != "_"
+    ]
 
 
 NB = "\U0001f53b"

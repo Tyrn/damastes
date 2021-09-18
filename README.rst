@@ -60,7 +60,7 @@ without leading zeroes, etc.
 
 Meanwhile, one cannot listen to an audiobook with the tracks in the wrong
 order. **Damastes** tries hard to sort the tracks properly.
-To check the track order visually use ``-v`` and avoid ``-u``.
+To check the track order visually use ``-v``, and avoid ``-u``.
 
 **Damastes** renames directories and audio files, replacing tags,
 if necessary, while copying the album to destination. Source files
@@ -152,3 +152,47 @@ Examples
     Source Album $ damastes -dst . /run/media/user/F8950/Audiobooks/
 
 - *Source Album* directory is copied to */run/media/user/F8950/Audiobooks/* in its entirety, without modification; sequential copy order, natural or lexicographical, is guaranteed.
+
+Procrustes library
+==================
+
+**Damastes** command line utility is based entirely on the **Procrustes** library, currently integrated into this package.
+It is available system-, project-, or user-wide as soon as the *damastes* package is installed.
+
+One can play with it:
+
+::
+
+    >>> import procrustes as p
+
+    >>> p.list_safe_imports()
+    ['has_ext_of', 'human_fine', 'human_rough', 'list_safe_imports', 'make_initials', 'str_strip_numbers', 'strcmp_c', 'strcmp_naturally']
+
+    >>> help(p.list_safe_imports)
+
+    >>> help(p.make_initials)
+
+    >>> p.make_initials('William J. "Wild Bill" Donovan, Joseph Gordon-Levitt')
+    'W.J.D.,J.G-L.'
+    >>>
+
+The ``run()`` function is not on the list, because it is by no means safe and incredibly rich on side effects.
+One can still use it, with care.
+
+::
+
+    >>> import os
+    >>> os.getcwd()
+    '/home/user/dir-src'
+    >>> from procrustes import run
+    >>> run(argv=['-va', 'Vladimir Nabokov', '-u', 'Ada', '.', '/home/user/dir-dst'], version='42')
+       1/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/1-Ada - Vladimir Nabokov.mp3  ✔ +20277
+       2/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/2-Ada - Vladimir Nabokov.mp3  ✔ +20257
+       3/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/3-Ada - Vladimir Nabokov.mp3  ✔ +20081
+       4/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/4-Ada - Vladimir Nabokov.mp3  ✔ +20493
+       5/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/5-Ada - Vladimir Nabokov.mp3  ✔ +20383
+     🟢 Done (5, 91.6MB).
+    0
+    >>>
+
+The tailing number like ``+20277`` means that the file grew fatter by 20277 bytes because of the set tags.
