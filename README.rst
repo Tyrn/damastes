@@ -102,7 +102,7 @@ Options
 
 ``-w, --overwrite``                  *silently remove existing destination directory (not recommended)*
 
-``-y, --dry-run``                    *without actually copying the files*
+``-y, --dry-run``                    *without actually modifying anything*
 
 ``-c, --count``                      *just count the files*
 

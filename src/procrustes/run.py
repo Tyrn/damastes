@@ -536,7 +536,7 @@ def _retrieve_args(argv: List[str]) -> Any:
     parser.add_argument(
         "-y",
         "--dry-run",
-        help="without actually copying the files",
+        help="without actually modifying anything",
         action="store_true",
     )
     parser.add_argument(
