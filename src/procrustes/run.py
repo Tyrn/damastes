@@ -536,7 +536,7 @@ def _retrieve_args(argv: List[str]) -> Any:
     parser.add_argument(
         "-y",
         "--dry-run",
-        help="without actually modifying anything",
+        help="without actually modifying anything (trumps -w, too)",
         action="store_true",
     )
     parser.add_argument(

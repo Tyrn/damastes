@@ -1,7 +1,7 @@
 Damastes a.k.a. Procrustes
 **************************
 
-Ever got frustrated with an audiobook like this?
+Ever got frustrated with an audiobook like this one?
 
 ::
 
@@ -41,7 +41,7 @@ Try **Damastes**, this way:
 
 - ``MyAudioLibrary`` must exist
 
-or just this:
+or just like this:
 
 ::
 
@@ -102,7 +102,7 @@ Options
 
 ``-w, --overwrite``                  *silently remove existing destination directory (not recommended)*
 
-``-y, --dry-run``                    *without actually modifying anything*
+``-y, --dry-run``                    *without actually modifying anything (trumps -w, too)*
 
 ``-c, --count``                      *just count the files*
 
