@@ -441,22 +441,20 @@ def _copy_album() -> None:
     if not _ARGS.verbose:
         _show("Starting ", end="", flush=True)
 
-    src_total, dst_total, _FILES_TOTAL = 0, 0, 0
+    src_total, dst_total, files_total = 0, 0, 0
 
     for entry in _album():
         src_bytes, dst_bytes = copy_file(entry)
         src_total += src_bytes
         dst_total += dst_bytes
-        _FILES_TOTAL += 1
+        files_total += 1
 
-    _show(f" {DONE_ICON} Done ({_FILES_TOTAL}, {human_fine(dst_total)}", end="")
+    _show(f" {DONE_ICON} Done ({files_total}, {human_fine(dst_total)}", end="")
     if _ARGS.dry_run:
         _show(f"; Volume: {human_fine(src_total)}", end="")
     _show(").")
-    if _FILES_TOTAL != _FILES_TOTAL:
-        _show(
-            f"Fatal error. _FILES_TOTAL: {_FILES_TOTAL}, _FILES_TOTAL: {_FILES_TOTAL}"
-        )
+    if files_total != _FILES_TOTAL:
+        _show(f"Fatal error. files_total: {files_total}, _FILES_TOTAL: {_FILES_TOTAL}")
 
 
 def _retrieve_args(argv: List[str]) -> Any:

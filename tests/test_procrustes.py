@@ -1,5 +1,5 @@
 from src.damastes import __version__
-from src.procrustes.run import *
+from src.procrustes import *
 
 
 class TestPureFunctions:

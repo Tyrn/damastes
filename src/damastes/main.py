@@ -4,7 +4,7 @@ Audio album builder.
 
 from . import __version__
 import sys
-from procrustes.run import run  # type: ignore
+from procrustes import run  # type: ignore
 
 
 def main() -> int:
