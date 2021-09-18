@@ -351,18 +351,12 @@ def human_fine(bytes: int) -> str:
     """
     Returns a human readable string representation of bytes, nicely rounded.
 
-    >>> human_fine(0)
-    '0'
-    >>> human_fine(1)
-    '1'
     >>> human_fine(42)
     '42'
     >>> human_fine(1800)
     '2kB'
     >>> human_fine(123456789)
     '117.7MB'
-    >>> human_fine(123456789123)
-    '114.98GB'
     """
     unit_list = [("", 0), ("kB", 0), ("MB", 1), ("GB", 2), ("TB", 2), ("PB", 2)]
 

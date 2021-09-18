@@ -58,3 +58,11 @@ class TestPureFunctions:
         assert make_initials("A. Strugatsky, B...Strugatsky.") == "A.S.,B.S."
         assert make_initials("Иржи Кропачек, Йозеф Новотный") == "И.К.,Й.Н."
         assert make_initials("österreich") == "Ö."
+
+    def test_human_fine(self):
+        assert human_fine(0) == "0"
+        assert human_fine(1) == "1"
+        assert human_fine(42) == "42"
+        assert human_fine(1800) == "2kB"
+        assert human_fine(123456789) == "117.7MB"
+        assert human_fine(123456789123) == "114.98GB"
