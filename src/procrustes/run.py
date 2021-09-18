@@ -94,7 +94,7 @@ def strcmp_naturally(str_x: str, str_y: str) -> Ord:
     )
 
 
-def path_compare(path_x: Path, path_y: Path) -> Ord:
+def _path_compare(path_x: Path, path_y: Path) -> Ord:
     """
     Compares two paths (directories).
     """
@@ -105,7 +105,7 @@ def path_compare(path_x: Path, path_y: Path) -> Ord:
     )
 
 
-def file_compare(path_x: Path, path_y: Path) -> Ord:
+def _file_compare(path_x: Path, path_y: Path) -> Ord:
     """
     Compares two paths, filenames only, ignoring extensions.
     """
@@ -116,7 +116,7 @@ def file_compare(path_x: Path, path_y: Path) -> Ord:
     )
 
 
-def mutagen_file(name: Path, spinner=None):
+def _mutagen_file(name: Path, spinner=None):
     """
     Returns Mutagen thing, if name looks like an audio file path, else returns None.
     """
@@ -141,18 +141,18 @@ def mutagen_file(name: Path, spinner=None):
     return file
 
 
-def is_audiofile(name: Path, spinner=None) -> bool:
+def _is_audiofile(name: Path, spinner=None) -> bool:
     """
     Returns True, if name is an audio file, else returns False.
     """
     if name.is_file():
-        file = mutagen_file(name, spinner)
+        file = _mutagen_file(name, spinner)
         if file is not None:
             return True
     return False
 
 
-def list_dir_groom(abs_path: Path, rev=False) -> Tuple[List[Path], List[Path]]:
+def _list_dir_groom(abs_path: Path, rev=False) -> Tuple[List[Path], List[Path]]:
     """
     Returns a tuple of: (0) naturally sorted list of
     offspring directory names (1) naturally sorted list
@@ -162,33 +162,33 @@ def list_dir_groom(abs_path: Path, rev=False) -> Tuple[List[Path], List[Path]]:
     dirs = sorted(
         [Path(x) for x in lst if (abs_path / x).is_dir()],
         key=ft.cmp_to_key(
-            (lambda xp, yp: -path_compare(xp, yp)) if rev else path_compare
+            (lambda xp, yp: -_path_compare(xp, yp)) if rev else _path_compare
         ),
     )
     files = sorted(
-        [Path(x) for x in lst if is_audiofile(abs_path / x)],
+        [Path(x) for x in lst if _is_audiofile(abs_path / x)],
         key=ft.cmp_to_key(
-            (lambda xf, yf: -file_compare(xf, yf)) if rev else file_compare
+            (lambda xf, yf: -_file_compare(xf, yf)) if rev else _file_compare
         ),
     )
     return dirs, files
 
 
-def decorate_dir_name(i: int, path: Path) -> str:
+def _decorate_dir_name(i: int, path: Path) -> str:
     """
     Prepends decimal i to path name.
     """
     return ("" if _ARGS.strip_decorations else (str(i).zfill(3) + "-")) + path.name
 
 
-def artist() -> str:
+def _artist() -> str:
     """
     Generates Artist prefix for a directory/file name.
     """
     return _ARGS.artist_tag if _ARGS.artist_tag else ""
 
 
-def decorate_file_name(i: int, dst_step: List[str], path: Path) -> str:
+def _decorate_file_name(i: int, dst_step: List[str], path: Path) -> str:
     """
     Prepends zero padded decimal i to path name.
     """
@@ -200,30 +200,30 @@ def decorate_file_name(i: int, dst_step: List[str], path: Path) -> str:
         else "-"
     )
     return prefix + (
-        _ARGS.unified_name + " - " + artist() + path.suffix
+        _ARGS.unified_name + " - " + _artist() + path.suffix
         if _ARGS.unified_name
         else path.name
     )
 
 
-def walk_file_tree(
+def _walk_file_tree(
     src_dir: Path, dst_root: Path, fcount: List[int], dst_step: List[str]
 ) -> Iterator[Tuple[int, Path, Path, str]]:
     """
     Recursively traverses the source directory and yields a tuple of copying attributes;
     the destination directory and file names get decorated according to options.
     """
-    dirs, files = list_dir_groom(src_dir, _ARGS.reverse)
+    dirs, files = _list_dir_groom(src_dir, _ARGS.reverse)
 
     def dir_flat(dirs):
         for directory in dirs:
             step = list(dst_step)
             step.append(directory.name)
-            yield from walk_file_tree(src_dir / directory, dst_root, fcount, step)
+            yield from _walk_file_tree(src_dir / directory, dst_root, fcount, step)
 
     def file_flat(files):
         for file in files:
-            yield fcount[0], src_dir / file, dst_root, decorate_file_name(
+            yield fcount[0], src_dir / file, dst_root, _decorate_file_name(
                 fcount[0], dst_step, file
             )
             fcount[0] += -1 if _ARGS.reverse else 1
@@ -234,14 +234,14 @@ def walk_file_tree(
     def dir_tree(dirs):
         for i, directory in enumerate(dirs):
             step = list(dst_step)
-            step.append(decorate_dir_name(reverse(i, dirs), directory))
-            yield from walk_file_tree(src_dir / directory, dst_root, fcount, step)
+            step.append(_decorate_dir_name(reverse(i, dirs), directory))
+            yield from _walk_file_tree(src_dir / directory, dst_root, fcount, step)
 
     def file_tree(files):
         for i, file in enumerate(files):
             yield fcount[0], src_dir / file, dst_root.joinpath(
                 *dst_step
-            ), decorate_file_name(reverse(i, files), dst_step, file)
+            ), _decorate_file_name(reverse(i, files), dst_step, file)
             fcount[0] += -1 if _ARGS.reverse else 1
 
     dir_fund, file_fund = (
@@ -256,7 +256,7 @@ def walk_file_tree(
         yield from file_fund(files)
 
 
-def audiofiles_count(directory: Path, spinner=None) -> Tuple[int, int]:
+def _audiofiles_count(directory: Path, spinner=None) -> Tuple[int, int]:
     """
     Returns full recursive count of audiofiles in directory.
     """
@@ -265,7 +265,7 @@ def audiofiles_count(directory: Path, spinner=None) -> Tuple[int, int]:
     for root, _dirs, files in os.walk(directory):
         for name in files:
             abs_path = Path(root) / name
-            if is_audiofile(abs_path, spinner):
+            if _is_audiofile(abs_path, spinner):
                 if spinner and cnt % 10 == 0:
                     spinner.text = name
                 cnt += 1
@@ -273,14 +273,14 @@ def audiofiles_count(directory: Path, spinner=None) -> Tuple[int, int]:
     return cnt, size
 
 
-def album() -> Iterator[Tuple[int, Path, Path, str]]:
+def _album() -> Iterator[Tuple[int, Path, Path, str]]:
     """
     Sets up boilerplate required by the options and returns the ammo belt generator
     of (src, dst) pairs.
     """
     prefix = (str(_ARGS.album_num).zfill(2) + "-") if _ARGS.album_num else ""
     base_dst = prefix + (
-        artist() + " - " + _ARGS.unified_name
+        _artist() + " - " + _ARGS.unified_name
         if _ARGS.unified_name
         else _ARGS.src_dir.name
     )
@@ -306,7 +306,7 @@ def album() -> Iterator[Tuple[int, Path, Path, str]]:
                 sys.exit(1)
         executive_dst.mkdir()
 
-    return walk_file_tree(
+    return _walk_file_tree(
         _ARGS.src_dir, executive_dst, [_FILES_TOTAL if _ARGS.reverse else 1], []
     )
 
@@ -372,7 +372,7 @@ def human_fine(bytes: int) -> str:
     return f"human_fine error; bytes: {bytes}"
 
 
-def copy_album() -> None:
+def _copy_album() -> None:
     """
     Runs through the ammo belt and does copying, in the reverse order if necessary.
     """
@@ -385,7 +385,7 @@ def copy_album() -> None:
                 return source.stem
             return str(i) + " " + tagging
 
-        audio = mutagen_file(path)
+        audio = _mutagen_file(path)
         if audio is None:
             return
 
@@ -443,7 +443,7 @@ def copy_album() -> None:
 
     src_total, dst_total, _FILES_TOTAL = 0, 0, 0
 
-    for entry in album():
+    for entry in _album():
         src_bytes, dst_bytes = copy_file(entry)
         src_total += src_bytes
         dst_total += dst_bytes
@@ -459,7 +459,7 @@ def copy_album() -> None:
         )
 
 
-def retrieve_args(argv: List[str]) -> Any:
+def _retrieve_args(argv: List[str]) -> Any:
     """
     Parses the command line and returns a collection of arguments.
     """
@@ -641,13 +641,13 @@ def run(*, argv: List[str] = sys.argv[1:], version="") -> int:
 
         _reset_all()
         _APP_VERSION = version
-        _ARGS = retrieve_args(argv)
+        _ARGS = _retrieve_args(argv)
 
         if _APP_VERSION:
             with yaspin() as sp:
-                _FILES_TOTAL, src_total = audiofiles_count(_ARGS.src_dir, sp)
+                _FILES_TOTAL, src_total = _audiofiles_count(_ARGS.src_dir, sp)
         else:
-            _FILES_TOTAL, src_total = audiofiles_count(_ARGS.src_dir)
+            _FILES_TOTAL, src_total = _audiofiles_count(_ARGS.src_dir)
 
         if _ARGS.count:
             _show(f" {DONE_ICON} Valid: {_FILES_TOTAL} file(s)", end="")
@@ -656,7 +656,7 @@ def run(*, argv: List[str] = sys.argv[1:], version="") -> int:
                 _show(f"; Average: {human_fine(src_total // _FILES_TOTAL)}", end="")
             _show("")
         else:
-            copy_album()
+            _copy_album()
 
         if _INVALID_TOTAL > 0:
             _show(f" {INVALID_ICON} Broken: {_INVALID_TOTAL} file(s)")
