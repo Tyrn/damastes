@@ -45,7 +45,20 @@ Publish
 
     $ poetry build
     $ twine check dist/<...>.whl
+
+then
+
+::
+
     $ poetry run twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
+or
+
+::
+
+    $ poetry config --list
+    $ poetry config repositories.testpypi https://test.pypi.org/legacy/
+    $ poetry publish -r testpypi
 
 - Poetry issue `#742 <https://github.com/python-poetry/poetry/issues/742>`__
 

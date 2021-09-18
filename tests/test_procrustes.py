@@ -4,7 +4,7 @@ from src.procrustes import *
 
 class TestPureFunctions:
     def test_version(self):
-        assert __version__ == "0.9.1"
+        assert __version__ == "0.9.2"
 
     def test_zero_pad(self):
         assert str(3).zfill(5) == "00003"
