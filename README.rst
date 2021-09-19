@@ -157,7 +157,7 @@ Procrustes library
 ==================
 
 **Damastes** command line utility is based entirely on the **Procrustes** library, currently integrated into this package.
-It is available system-, project-, or user-wide as soon as the *damastes* package is installed.
+It is available system-, project-, or user-wide as soon as the ``damastes`` package is installed.
 
 One can play with it:
 

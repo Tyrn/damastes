@@ -342,6 +342,8 @@ def human_rough(bytes: int, units=["", "kB", "MB", "GB", "TB", "PB", "EB"]) -> s
     '1kB'
     >>> human_rough(123456789)
     '117MB'
+    >>> human_rough(1024 ** 4)
+    '1TB'
     """
     return (
         str(bytes) + units[0] if bytes < 1024 else human_rough(bytes >> 10, units[1:])
