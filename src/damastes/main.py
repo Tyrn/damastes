@@ -2,9 +2,9 @@
 Audio album builder.
 """
 
-from . import __version__
 import sys
-from procrustes import run  # type: ignore
+from . import __version__
+from . import run  # type: ignore
 
 
 def main() -> int:

@@ -153,26 +153,26 @@ Examples
 
 - *Source Album* directory is copied to */run/media/user/F8950/Audiobooks/* in its entirety, without modification; sequential copy order, natural or lexicographical, is guaranteed.
 
-Procrustes library
-==================
+Damastes library
+================
 
-**Damastes** command line utility is based entirely on the **Procrustes** library, currently integrated into this package.
+**Damastes** package exposes an API of sorts.
 It is available system-, project-, or user-wide as soon as the ``damastes`` package is installed.
 
 One can play with it:
 
 ::
 
-    >>> import procrustes as p
+    >>> import damastes as d
 
-    >>> p.list_safe_imports()
+    >>> d.list_safe_imports()
     ['has_ext_of', 'human_fine', 'human_rough', 'list_safe_imports', 'make_initials', 'str_strip_numbers', 'strcmp_c', 'strcmp_naturally']
 
-    >>> help(p.list_safe_imports)
+    >>> help(d.list_safe_imports)
 
-    >>> help(p.make_initials)
+    >>> help(d.make_initials)
 
-    >>> p.make_initials('William J. "Wild Bill" Donovan, Joseph Gordon-Levitt')
+    >>> d.make_initials('William J. "Wild Bill" Donovan, Joseph Gordon-Levitt')
     'W.J.D.,J.G-L.'
     >>>
 
@@ -184,7 +184,7 @@ One can still use it, with care.
     >>> import os
     >>> os.getcwd()
     '/home/user/dir-src'
-    >>> from procrustes import run
+    >>> from damastes import run
     >>> run(argv=['-va', 'Vladimir Nabokov', '-u', 'Ada', '.', '/home/user/dir-dst'], version='42')
        1/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/1-Ada - Vladimir Nabokov.mp3  ✔ +20277
        2/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/2-Ada - Vladimir Nabokov.mp3  ✔ +20257
