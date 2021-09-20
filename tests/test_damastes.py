@@ -4,7 +4,7 @@ from src.damastes import *
 
 class TestPureFunctions:
     def test_version(self):
-        assert __version__ == "0.9.2"
+        assert __version__ == "0.9.3"
 
     def test_zero_pad(self):
         assert str(3).zfill(5) == "00003"
@@ -57,7 +57,7 @@ class TestPureFunctions:
         assert make_initials("a.s.,b.s.") == "A.S.,B.S."
         assert make_initials("A. Strugatsky, B...Strugatsky.") == "A.S.,B.S."
         assert make_initials("Иржи Кропачек, Йозеф Новотный") == "И.К.,Й.Н."
-        assert make_initials("österreich") == "Ö."
+        assert make_initials("Österreich über alles") == "Ö.Ü.A."
 
     def test_human_fine(self):
         assert human_fine(0) == "0"
