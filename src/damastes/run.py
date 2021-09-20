@@ -183,11 +183,13 @@ def _decorate_dir_name(i: int, path: Path) -> str:
     return ("" if _ARGS.strip_decorations else (str(i).zfill(3) + "-")) + path.name
 
 
-def _artist() -> str:
+def _artist(*, prefix="", suffix="") -> str:
     """
     Generates Artist prefix for a directory/file name.
     """
-    return _ARGS.artist_tag if _ARGS.artist_tag else ""
+    if _ARGS.artist_tag:
+        return prefix + _ARGS.artist_tag + suffix
+    return ""
 
 
 def _decorate_file_name(i: int, dst_step: List[str], path: Path) -> str:
@@ -202,7 +204,7 @@ def _decorate_file_name(i: int, dst_step: List[str], path: Path) -> str:
         else "-"
     )
     return prefix + (
-        _ARGS.unified_name + " - " + _artist() + path.suffix
+        _ARGS.unified_name + _artist(prefix=" - ") + path.suffix
         if _ARGS.unified_name
         else path.name
     )
@@ -282,7 +284,7 @@ def _album() -> Iterator[Tuple[int, Path, Path, str]]:
     """
     prefix = (str(_ARGS.album_num).zfill(2) + "-") if _ARGS.album_num else ""
     base_dst = prefix + (
-        _artist() + " - " + _ARGS.unified_name
+        _artist(suffix=" - ") + _ARGS.unified_name
         if _ARGS.unified_name
         else _ARGS.src_dir.name
     )
