@@ -17,6 +17,7 @@ import argparse
 import warnings
 import inspect
 import functools as ft
+from time import perf_counter
 from yaspin import yaspin
 from math import log
 from pathlib import Path
@@ -455,7 +456,7 @@ def _copy_album() -> None:
     _show(f" {DONE_ICON} Done ({files_total}, {human_fine(dst_total)}", end="")
     if _ARGS.dry_run:
         _show(f"; Volume: {human_fine(src_total)}", end="")
-    _show(").")
+    _show(f"; {(perf_counter() - _START_TIME):.1f}s).")
     if files_total != _FILES_TOTAL:
         _show(f"Fatal error. files_total: {files_total}, _FILES_TOTAL: {_FILES_TOTAL}")
 
@@ -628,6 +629,7 @@ _FILES_TOTAL = -1
 _INVALID_TOTAL = 0
 _SUSPICIOUS_TOTAL = 0
 _APP_VERSION = ""
+_START_TIME = 0.0
 
 
 def _reset_all() -> None:
@@ -636,12 +638,14 @@ def _reset_all() -> None:
     global _INVALID_TOTAL
     global _SUSPICIOUS_TOTAL
     global _APP_VERSION
+    global _START_TIME
 
     _ARGS = None
     _FILES_TOTAL = -1
     _INVALID_TOTAL = 0
     _SUSPICIOUS_TOTAL = 0
     _APP_VERSION = ""
+    _START_TIME = perf_counter()
 
 
 def run(*, argv: List[str] = sys.argv[1:], version="") -> int:
@@ -671,7 +675,7 @@ def run(*, argv: List[str] = sys.argv[1:], version="") -> int:
             _show(f"; Volume: {human_fine(src_total)}", end="")
             if _FILES_TOTAL > 1:
                 _show(f"; Average: {human_fine(src_total // _FILES_TOTAL)}", end="")
-            _show("")
+            _show(f"; Time: {(perf_counter() - _START_TIME):.1f}s")
         else:
             _copy_album()
 

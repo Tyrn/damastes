@@ -191,7 +191,7 @@ One can still use it, with care.
        3/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/3-Ada - Vladimir Nabokov.mp3  ✔ +20081
        4/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/4-Ada - Vladimir Nabokov.mp3  ✔ +20493
        5/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/5-Ada - Vladimir Nabokov.mp3  ✔ +20383
-     🟢 Done (5, 91.6MB).
+     🟢 Done (5, 91.6MB; 3.8s).
     0
     >>>
 
