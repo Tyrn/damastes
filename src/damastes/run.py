@@ -185,7 +185,7 @@ def _decorate_dir_name(i: int, path: Path) -> str:
 
 def _artist(*, prefix="", suffix="") -> str:
     """
-    Generates Artist prefix for a directory/file name.
+    Returns Artist,  nicely shaped to be a directory/file name.
     """
     if _ARGS.artist_tag:
         return prefix + _ARGS.artist_tag + suffix

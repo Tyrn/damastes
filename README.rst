@@ -102,13 +102,13 @@ Options
 
 ``-w, --overwrite``                  *silently remove existing destination directory (not recommended)*
 
-``-y, --dry-run``                    *without actually modifying anything (trumps -w, too)*
+``-y, --dry-run``                    *without actually modifying anything (trumps* ``-w``, *too)*
 
 ``-c, --count``                      *just count the files*
 
 ``-i, --prepend-subdir-name``        *prepend current subdirectory name to a file name*
 
-``-e, --file-type FILE_TYPE``        *accept only audio files of the specified type (e.g. -e mp3)*
+``-e, --file-type FILE_TYPE``        *accept only audio files of the specified type (e.g.* ``-e mp3``*)*
 
 ``-u, --unified-name UNIFIED_NAME``  *destination root directory name and file names are based on UNIFIED_NAME, serial number prepended, file extensions retained*
 
