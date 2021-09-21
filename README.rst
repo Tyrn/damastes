@@ -108,11 +108,11 @@ Options
 
 ``-i, --prepend-subdir-name``        *prepend current subdirectory name to a file name*
 
-``-e, --file-type FILE_TYPE``        *accept only audio files of the specified type (e.g.* ``-e mp3``*)*
+``-e, --file-type FILE_TYPE``        *accept only audio files of the specified type, e.g.* ``-e mp3``
 
-``-u, --unified-name UNIFIED_NAME``  *destination root directory name and file names are based on UNIFIED_NAME, serial number prepended, file extensions retained*
+``-u, --unified-name UNIFIED_NAME``  *destination root directory name and file names are based on* ``UNIFIED_NAME``, *serial number prepended, file extensions retained*
 
-``-b, --album-num ALBUM_NUM``        *0..99; prepend ALBUM_NUM to the destination root directory name*
+``-b, --album-num ALBUM_NUM``        *0..99; prepend* ``ALBUM_NUM`` *to the destination root directory name*
 
 ``-a, --artist-tag ARTIST_TAG``      *artist tag name*
 
