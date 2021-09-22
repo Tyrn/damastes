@@ -12,6 +12,7 @@ from typing import List, Tuple, Iterator, Any
 import mutagen as mt
 import os
 import re
+import fnmatch
 import shutil
 import argparse
 import warnings
@@ -102,10 +103,16 @@ def _mutagen_file(name: Path, spinner=None):
     Returns Mutagen thing, if name looks like an audio file path, else returns None.
     """
     global _INVALID_TOTAL, _SUSPICIOUS_TOTAL
-    ext: str = name.suffix.lstrip(".").upper()
+    ext = name.suffix.lstrip(".").upper()
+    atp = _ARGS.file_type
 
-    if _ARGS.file_type and ext != _ARGS.file_type.lstrip(".").upper():
-        return None
+    if atp:
+        if "*" in atp or "?" in atp or "[" in atp:
+            if not fnmatch.fnmatch(name.name, atp):
+                return None
+        else:
+            if ext != atp.lstrip(".").upper():
+                return None
 
     name_to_print: str = str(name) if _ARGS.verbose else name.name
 
@@ -539,7 +546,7 @@ def _retrieve_args(argv: List[str]) -> Any:
     parser.add_argument(
         "-e",
         "--file-type",
-        help="accept only audio files of the specified type (e.g. -e mp3)",
+        help="accept only specified audio files (e.g. -e flac, or even -e '*64k.mp3')",
     )
     parser.add_argument(
         "-u",
