@@ -14,15 +14,6 @@ class TestPureFunctions:
         assert f"{1:+d}" == "+1"
         assert f"{-1:+d}" == "-1"
 
-    def test_has_ext_of(self):
-        assert has_ext_of(Path("/alfa/bra.vo/charlie.ogg"), "OGG") is True
-        assert has_ext_of(Path("/alfa/bra.vo/charlie.ogg"), ".ogg") is True
-        assert has_ext_of(Path("/alfa/bra.vo/charlie.ogg"), "mp3") is False
-        assert has_ext_of(Path("/alfa/bra.vo/charlie.jpg"), *KNOWN_EXTENSIONS) is False
-        assert has_ext_of(Path("/alfa/bra.vo/charlie.m4a"), *KNOWN_EXTENSIONS) is True
-        assert has_ext_of(Path("/alfa/bra.vo/charlie.m4b"), *KNOWN_EXTENSIONS) is True
-        assert has_ext_of(Path("/alfa/bra.vo/charlie.flac"), *KNOWN_EXTENSIONS) is True
-
     def test_str_strip_numbers(self):
         assert str_strip_numbers("ab11cdd2k.144") == [11, 2, 144]
         assert str_strip_numbers("Ignacio Vazquez-Abrams") == []

@@ -24,25 +24,6 @@ from pathlib import Path
 from tempfile import mkstemp
 
 
-def has_ext_of(path: Path, *extensions: str) -> bool:
-    """
-    Returns True, if path has an extension from extensions,
-    case and leading dot insensitive.
-
-    >>> has_ext_of(Path("bra.vo/charlie.ogg"), "OGG")
-    True
-    >>> has_ext_of(Path("bra.vo/charlie.ogg"), ".ogg")
-    True
-    >>> has_ext_of(Path("bra.vo/charlie.ogg"), ".mp3", "mp4", "flac")
-    False
-    >>> has_ext_of(Path("bra.vo/charlie.FLAC"), *["mp3", "mp4", ".flac"])
-    True
-    """
-    return path.suffix.lstrip(".").upper() in [
-        x.lstrip(".").upper() for x in extensions
-    ]
-
-
 def str_strip_numbers(str_alphanum: str) -> List[int]:
     """
     Returns a vector of integer numbers
@@ -121,8 +102,9 @@ def _mutagen_file(name: Path, spinner=None):
     Returns Mutagen thing, if name looks like an audio file path, else returns None.
     """
     global _INVALID_TOTAL, _SUSPICIOUS_TOTAL
+    ext: str = name.suffix.lstrip(".").upper()
 
-    if _ARGS.file_type and not has_ext_of(name, _ARGS.file_type):
+    if _ARGS.file_type and ext != _ARGS.file_type.lstrip(".").upper():
         return None
 
     name_to_print: str = str(name) if _ARGS.verbose else name.name
@@ -135,7 +117,7 @@ def _mutagen_file(name: Path, spinner=None):
             _INVALID_TOTAL += 1
         return None
 
-    if spinner and file is None and has_ext_of(name, *KNOWN_EXTENSIONS):
+    if spinner and file is None and ext in KNOWN_EXTENSIONS:
         spinner.write(f" {SUSPICIOUS_ICON} {name_to_print}")
         _SUSPICIOUS_TOTAL += 1
     return file
