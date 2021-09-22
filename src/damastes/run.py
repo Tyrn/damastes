@@ -578,7 +578,7 @@ def _retrieve_args(argv: List[str]) -> Any:
     return args
 
 
-def _show(string: str, end="\n", file=sys.stdout, flush=False) -> None:
+def _show(string: str, *, end="\n", file=sys.stdout, flush=False) -> None:
     if _APP_VERSION:
         return print(string, end=end, file=file, flush=flush)
 
