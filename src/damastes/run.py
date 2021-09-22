@@ -185,7 +185,7 @@ def _decorate_dir_name(i: int, path: Path) -> str:
 
 def _artist(*, prefix="", suffix="") -> str:
     """
-    Returns Artist, nicely shaped to be a directory/file name.
+    Returns Artist, nicely shaped to be a part of a directory/file name.
     """
     if _ARGS.artist_tag:
         return prefix + _ARGS.artist_tag + suffix
@@ -624,7 +624,7 @@ INVALID_ICON = "\U0000274c"
 SUSPICIOUS_ICON = "\U00002754"
 DONE_ICON = "\U0001f7e2"
 COLUMN_ICON = "\U00002714"
-KNOWN_EXTENSIONS = ["MP3", "OGG", "M4A", "M4B", "FLAC", "APE"]
+KNOWN_EXTENSIONS = ["MP3", "OGG", "M4A", "M4B", "OPUS", "FLAC", "APE"]
 
 _ARGS: Any = None
 _FILES_TOTAL = -1
