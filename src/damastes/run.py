@@ -31,18 +31,16 @@ def has_ext_of(path: Path, *extensions: str) -> bool:
 
     >>> has_ext_of(Path("bra.vo/charlie.ogg"), "OGG")
     True
-    >>> has_ext_of(Path("bra.vo/charlie.ogg"), "mp3")
+    >>> has_ext_of(Path("bra.vo/charlie.ogg"), ".ogg")
+    True
+    >>> has_ext_of(Path("bra.vo/charlie.ogg"), ".mp3", "mp4", "flac")
     False
-    >>> has_ext_of(Path("bra.vo/charlie.ogg"), "mp3", "mp4", "flac")
-    False
-    >>> has_ext_of(Path("bra.vo/charlie.ogg"), *["mp3", "mp4", "flac"])
-    False
+    >>> has_ext_of(Path("bra.vo/charlie.FLAC"), *["mp3", "mp4", ".flac"])
+    True
     """
-    path_ext = path.suffix.lstrip(".").upper()
-    for ext in extensions:
-        if path_ext == ext.lstrip(".").upper():
-            return True
-    return False
+    return path.suffix.lstrip(".").upper() in [
+        x.lstrip(".").upper() for x in extensions
+    ]
 
 
 def str_strip_numbers(str_alphanum: str) -> List[int]:
