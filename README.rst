@@ -139,7 +139,17 @@ Examples
 
 - Destination directory */run/media/user/F8950/Audiobooks/Source Album/* is created;
 
-- Track numbers are set according to the natural sort order (file names *..., 5, 6, 7, 8, 9, 10...*; regardless of the absence of the leading zeroes);
+- Track numbers are set according to the natural sort order, regardless of the absence of the original leading zeroes:
+
+::
+
+    01-mice-all-over-1.mp3
+    02-mice-all-over-2.mp3
+    ...
+    09-mice-all-over-9.mp3
+    10-mice-all-over-10.mp3
+    11-mice-all-over-11.mp3
+    ...
 
 - *Artist* is set to *Peter Crowcroft*;
 
@@ -166,7 +176,7 @@ One can play with it:
     >>> import damastes as d
 
     >>> d.list_safe_imports()
-    ['has_ext_of', 'human_fine', 'human_rough', 'list_safe_imports', 'make_initials', 'str_strip_numbers', 'strcmp_c', 'strcmp_naturally']
+    ['human_fine', 'human_rough', 'list_safe_imports', 'make_initials', 'str_strip_numbers', 'strcmp_c', 'strcmp_naturally']
 
     >>> help(d.list_safe_imports)
 
