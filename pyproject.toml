@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "damastes"
-version = "0.9.3"
+version = "0.9.4"
 description = "Damastes a.k.a. Procrustes, audiobook builder: copy and edit on the fly"
 authors = ["Tyrn <a@b.com>"]
 license = "MIT"

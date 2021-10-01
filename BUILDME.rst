@@ -1,8 +1,15 @@
 Damastes a.k.a. Procrustes
 **************************
 
-Build and install
-=================
+User's take
+===========
+
+::
+
+    $ pip install --user https://github.com/Tyrn/damastes.git
+
+Development
+===========
 
 ::
 
@@ -15,7 +22,7 @@ Exit venv or poetry shell, then:
     $ pip install dist/<...>.whl --user [-I]
 
 Use Git Hooks
-=============
+-------------
 
 ::
 
@@ -24,14 +31,14 @@ Use Git Hooks
     $ pre-commit run --all-files
 
 Format
-======
+------
 
 ::
 
     $ black .
 
 Test
-====
+----
 
 ::
 
@@ -39,7 +46,7 @@ Test
     $ mypy .
 
 Publish
-=======
+-------
 
 ::
 
