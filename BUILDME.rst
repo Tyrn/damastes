@@ -6,7 +6,7 @@ User's take
 
 ::
 
-    $ pip install --user https://github.com/Tyrn/damastes.git
+    $ pip install --user git+https://github.com/Tyrn/damastes.git
 
 Development
 ===========
