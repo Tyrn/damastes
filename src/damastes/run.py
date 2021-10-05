@@ -302,33 +302,6 @@ def _album() -> Iterator[Tuple[int, Path, Path, str]]:
     )
 
 
-RE_SEP = "."
-RE_HYPH = "-"
-RE_SPLIT_BY_SEP = rf"[\s{RE_SEP}]+"
-RE_SPLIT_BY_HYPH = rf"\s*(?:{RE_HYPH}\s*)+"
-RE_QUOTED_SUBSTRING = r"\"(?:\\.|[^\"\\])*\""
-
-
-def make_initials(authors: str) -> str:
-    """
-    Reduces authors to initials.
-
-    >>> make_initials('Ignacio "Castigador" Vazquez-Abrams, Estefania Cassingena Navone')
-    'I.V-A.,E.C.N.'
-    """
-    by_space = lambda s: RE_SEP.join(
-        x[0] for x in re.split(RE_SPLIT_BY_SEP, s) if x
-    ).upper()
-    by_hyph = (
-        lambda s: RE_HYPH.join(by_space(x) for x in re.split(RE_SPLIT_BY_HYPH, s))
-        + RE_SEP
-    )
-
-    sans_monikers = re.sub(RE_QUOTED_SUBSTRING, " ", authors)
-
-    return ",".join(by_hyph(author) for author in sans_monikers.split(","))
-
-
 def human_rough(bytes: int, units=["", "kB", "MB", "GB", "TB", "PB", "EB"]) -> str:
     """
     Returns a human readable string representation of bytes, roughly rounded.
@@ -612,6 +585,29 @@ def list_safe_imports(*, unsafe: List[str] = ["run"]) -> List[str]:
         if __name__ == m[1].__module__ and m[0] not in unsafe and m[0][0] != "_"
     ]
 
+
+def make_initials(authors: str) -> str:
+    """
+    Reduces authors to initials.
+
+    >>> make_initials('Ignacio "Castigador" Vazquez-Abrams, Estefania Cassingena Navone')
+    'I.V-A.,E.C.N.'
+    """
+    return ",".join(
+        RE_HYPH.join(
+            RE_SEP.join(y[0] for y in re.split(RE_SPLIT_BY_SEP, x) if y).upper()
+            for x in re.split(RE_SPLIT_BY_HYPH, author)
+        )
+        + RE_SEP
+        for author in re.sub(RE_QUOTED_SUBSTRING, " ", authors).split(",")
+    )
+
+
+RE_SEP = "."
+RE_HYPH = "-"
+RE_SPLIT_BY_SEP = rf"[\s{RE_SEP}]+"
+RE_SPLIT_BY_HYPH = rf"\s*(?:{RE_HYPH}\s*)+"
+RE_QUOTED_SUBSTRING = r"\"(?:\\.|[^\"\\])*\""
 
 NB = "\U0001f53b"
 INVALID_ICON = "\U0000274c"
