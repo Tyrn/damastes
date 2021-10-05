@@ -593,18 +593,19 @@ def make_initials(authors: str) -> str:
     >>> make_initials('Ignacio "Castigador" Vazquez-Abrams, Estefania Cassingena Navone')
     'I.V-A.,E.C.N.'
     """
-    return ",".join(
+    return RE_COMMA.join(
         RE_HYPH.join(
             RE_SEP.join(y[0] for y in re.split(RE_SPLIT_BY_SEP, x) if y).upper()
             for x in re.split(RE_SPLIT_BY_HYPH, author)
         )
         + RE_SEP
-        for author in re.sub(RE_QUOTED_SUBSTRING, " ", authors).split(",")
+        for author in re.sub(RE_QUOTED_SUBSTRING, " ", authors).split(RE_COMMA)
     )
 
 
 RE_SEP = "."
 RE_HYPH = "-"
+RE_COMMA = ","
 RE_SPLIT_BY_SEP = rf"[\s{RE_SEP}]+"
 RE_SPLIT_BY_HYPH = rf"\s*(?:{RE_HYPH}\s*)+"
 RE_QUOTED_SUBSTRING = r"\"(?:\\.|[^\"\\])*\""
