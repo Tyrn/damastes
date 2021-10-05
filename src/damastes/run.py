@@ -302,22 +302,29 @@ def _album() -> Iterator[Tuple[int, Path, Path, str]]:
     )
 
 
-def make_initials(authors: str, sep=".", trail=".", hyph="-") -> str:
+RE_SEP = "."
+RE_HYPH = "-"
+RE_SPLIT_BY_SEP = rf"[\s{RE_SEP}]+"
+RE_SPLIT_BY_HYPH = rf"\s*(?:{RE_HYPH}\s*)+"
+RE_QUOTED_SUBSTRING = r"\"(?:\\.|[^\"\\])*\""
+
+
+def make_initials(authors: str) -> str:
     """
     Reduces authors to initials.
 
     >>> make_initials('Ignacio "Castigador" Vazquez-Abrams, Estefania Cassingena Navone')
     'I.V-A.,E.C.N.'
     """
-    by_space = lambda s: sep.join(
-        x[0] for x in re.split(rf"[\s{sep}]+", s) if x
+    by_space = lambda s: RE_SEP.join(
+        x[0] for x in re.split(RE_SPLIT_BY_SEP, s) if x
     ).upper()
     by_hyph = (
-        lambda s: hyph.join(by_space(x) for x in re.split(rf"\s*(?:{hyph}\s*)+", s))
-        + trail
+        lambda s: RE_HYPH.join(by_space(x) for x in re.split(RE_SPLIT_BY_HYPH, s))
+        + RE_SEP
     )
 
-    sans_monikers = re.sub(r"\"(?:\\.|[^\"\\])*\"", " ", authors)
+    sans_monikers = re.sub(RE_QUOTED_SUBSTRING, " ", authors)
 
     return ",".join(by_hyph(author) for author in sans_monikers.split(","))
 
