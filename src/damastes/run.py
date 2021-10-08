@@ -594,11 +594,13 @@ def make_initials(authors: str) -> str:
     'I.V-A.,E.C.N.'
     """
     return RE_COMMA.join(
-        RE_HYPH.join(
-            RE_SEP.join(y[0] for y in RE_BY_SEP.split(x) if y).upper()
-            for x in RE_BY_HYPH.split(author)
-        )
-        + RE_SEP
+        (
+            RE_HYPH.join(
+                RE_SEP.join(y[0] for y in RE_BY_SEP.split(x) if y).upper()
+                for x in RE_BY_HYPH.split(author)
+            )
+            + RE_SEP
+        ).lstrip(RE_SEP)
         for author in RE_QUOTED_SUBSTRING.sub(" ", authors).split(RE_COMMA)
     )
 

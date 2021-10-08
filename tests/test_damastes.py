@@ -36,7 +36,11 @@ class TestPureFunctions:
         assert strcmp_naturally("alfa", "bravo") == -1
 
     def test_make_initials(self):
-        assert make_initials(" ") == "."
+        assert make_initials("") == ""
+        assert make_initials(" ") == ""
+        assert make_initials("....") == ""
+        assert make_initials(",,,") == ",,,"
+        assert make_initials(", a. g") == ",A.G."
         assert make_initials("John ronald reuel Tolkien") == "J.R.R.T."
         assert make_initials("  e.B.Sledge ") == "E.B.S."
         assert make_initials("Apsley Cherry-Garrard") == "A.C-G."
