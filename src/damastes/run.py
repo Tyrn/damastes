@@ -595,20 +595,20 @@ def make_initials(authors: str) -> str:
     """
     return RE_COMMA.join(
         RE_HYPH.join(
-            RE_SEP.join(y[0] for y in re.split(RE_SPLIT_BY_SEP, x) if y).upper()
-            for x in re.split(RE_SPLIT_BY_HYPH, author)
+            RE_SEP.join(y[0] for y in RE_BY_SEP.split(x) if y).upper()
+            for x in RE_BY_HYPH.split(author)
         )
         + RE_SEP
-        for author in re.sub(RE_QUOTED_SUBSTRING, " ", authors).split(RE_COMMA)
+        for author in RE_QUOTED_SUBSTRING.sub(" ", authors).split(RE_COMMA)
     )
 
 
 RE_SEP = "."
 RE_HYPH = "-"
 RE_COMMA = ","
-RE_SPLIT_BY_SEP = rf"[\s{RE_SEP}]+"
-RE_SPLIT_BY_HYPH = rf"\s*(?:{RE_HYPH}\s*)+"
-RE_QUOTED_SUBSTRING = r"\"(?:\\.|[^\"\\])*\""
+RE_BY_SEP = re.compile(rf"[\s{RE_SEP}]+")
+RE_BY_HYPH = re.compile(rf"\s*(?:{RE_HYPH}\s*)+")
+RE_QUOTED_SUBSTRING = re.compile(r"\"(?:\\.|[^\"\\])*\"")
 
 NB = "\U0001f53b"
 INVALID_ICON = "\U0000274c"
