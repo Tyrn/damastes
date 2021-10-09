@@ -38,9 +38,9 @@ class TestPureFunctions:
     def test_make_initials(self):
         assert make_initials("") == ""
         assert make_initials(" ") == ""
-        assert make_initials("....") == ""
-        assert make_initials(",,,") == ",,,"
-        assert make_initials(", a. g") == ",A.G."
+        assert make_initials(".. , .. ") == ""
+        assert make_initials(" ,, .,") == ""
+        assert make_initials(", a. g, ") == "A.G."
         assert make_initials("John ronald reuel Tolkien") == "J.R.R.T."
         assert make_initials("  e.B.Sledge ") == "E.B.S."
         assert make_initials("Apsley Cherry-Garrard") == "A.C-G."
@@ -49,9 +49,9 @@ class TestPureFunctions:
         assert make_initials("  Fitz-Simmons Ashton-Burke Leigh") == "F-S.A-B.L."
         assert make_initials('Arleigh "31-knot"Burke ') == "A.B."
         assert make_initials('Harry "Bing" Crosby, Kris "Tanto" Paronto') == "H.C.,K.P."
-        assert make_initials("a.s.,b.s.") == "A.S.,B.S."
+        assert make_initials("a.s ,  ,b.s.") == "A.S.,B.S."
         assert make_initials("A. Strugatsky, B...Strugatsky.") == "A.S.,B.S."
-        assert make_initials("Иржи Кропачек, Йозеф Новотный") == "И.К.,Й.Н."
+        assert make_initials("Иржи Кропачек,, Йозеф Новотный") == "И.К.,Й.Н."
         assert make_initials("Österreich über alles") == "Ö.Ü.A."
 
     def test_human_fine(self):

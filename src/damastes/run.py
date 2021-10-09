@@ -602,7 +602,8 @@ def make_initials(authors: str) -> str:
             + RE_SEP
         ).lstrip(RE_SEP)
         for author in RE_QUOTED_SUBSTRING.sub(" ", authors).split(RE_COMMA)
-    )
+        if author and not author.isspace()
+    ).strip(RE_COMMA)
 
 
 RE_SEP = "."
