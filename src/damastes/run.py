@@ -598,6 +598,7 @@ def make_initials(authors: str) -> str:
             HYPH.join(
                 SEP.join(y[0] for y in RE_BY_SEP.split(x) if y).upper()
                 for x in RE_BY_HYPH.split(author)
+                if x.replace(SEP, "").strip()
             )
             + SEP
         ).lstrip(SEP)
