@@ -603,7 +603,7 @@ def make_initials(authors: str) -> str:
         ).lstrip(SEP)
         for author in RE_QUOTED_SUBSTRING.sub(" ", authors).split(COMMA)
         if author.replace(SEP, "").replace(HYPH, "").strip()
-    ).strip(COMMA)
+    )
 
 
 SEP = "."
