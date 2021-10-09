@@ -593,24 +593,24 @@ def make_initials(authors: str) -> str:
     >>> make_initials('Ignacio "Castigador" Vazquez-Abrams, Estefania Cassingena Navone')
     'I.V-A.,E.C.N.'
     """
-    return RE_COMMA.join(
+    return COMMA.join(
         (
-            RE_HYPH.join(
-                RE_SEP.join(y[0] for y in RE_BY_SEP.split(x) if y).upper()
+            HYPH.join(
+                SEP.join(y[0] for y in RE_BY_SEP.split(x) if y).upper()
                 for x in RE_BY_HYPH.split(author)
             )
-            + RE_SEP
-        ).lstrip(RE_SEP)
-        for author in RE_QUOTED_SUBSTRING.sub(" ", authors).split(RE_COMMA)
-        if author and not author.isspace()
-    ).strip(RE_COMMA)
+            + SEP
+        ).lstrip(SEP)
+        for author in RE_QUOTED_SUBSTRING.sub(" ", authors).split(COMMA)
+        if author.replace(SEP, "").replace(HYPH, "").strip()
+    ).strip(COMMA)
 
 
-RE_SEP = "."
-RE_HYPH = "-"
-RE_COMMA = ","
-RE_BY_SEP = re.compile(rf"[\s{RE_SEP}]+")
-RE_BY_HYPH = re.compile(rf"\s*(?:{RE_HYPH}\s*)+")
+SEP = "."
+HYPH = "-"
+COMMA = ","
+RE_BY_SEP = re.compile(rf"[\s{SEP}]+")
+RE_BY_HYPH = re.compile(rf"\s*(?:{HYPH}\s*)+")
 RE_QUOTED_SUBSTRING = re.compile(r"\"(?:\\.|[^\"\\])*\"")
 
 NB = "\U0001f53b"
