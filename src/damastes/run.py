@@ -595,9 +595,9 @@ def make_initials(authors: str) -> str:
     """
     return COMMA.join(
         HYPH.join(
-            SEP.join(y[0] for y in RE_BY_SEP.split(x) if y).upper()
-            for x in RE_BY_HYPH.split(author)
-            if x.replace(SEP, "").strip()
+            SEP.join(name[0] for name in RE_BY_SEP.split(barrel) if name).upper()
+            for barrel in author.split(HYPH)
+            if barrel.replace(SEP, "").strip()
         )
         + SEP
         for author in RE_QUOTED_SUBSTRING.sub(" ", authors).split(COMMA)
