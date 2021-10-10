@@ -36,6 +36,11 @@ class TestPureFunctions:
         assert strcmp_naturally("alfa", "bravo") == -1
 
     def test_make_initials(self):
+        """
+        There are four delimiters: comma, hyphen, dot, and space.
+        make_initials() syntax philosophy: if a delimiter is
+        misplaced, it's ignored.
+        """
         assert make_initials("") == ""
         assert make_initials(" ") == ""
         assert make_initials(".. , .. ") == ""
