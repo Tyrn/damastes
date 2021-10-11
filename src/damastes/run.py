@@ -600,7 +600,9 @@ def make_initials(authors: str) -> str:
             if barrel.replace(SEP, "").strip()
         )
         + SEP
-        for author in RE_QUOTED_SUBSTRING.sub(" ", authors).split(COMMA)
+        for author in RE_QUOTED_SUBSTRING.sub(" ", authors)
+        .replace('"', " ")
+        .split(COMMA)
         if author.replace(SEP, "").replace(HYPH, "").strip()
     )
 

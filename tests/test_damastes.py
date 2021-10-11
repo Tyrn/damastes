@@ -55,6 +55,10 @@ class TestPureFunctions:
         assert make_initials("  Fitz-Simmons Ashton-Burke Leigh") == "F-S.A-B.L."
         assert make_initials('Arleigh "31-knot"Burke ') == "A.B."
         assert make_initials('Harry "Bing" Crosby, Kris "Tanto" Paronto') == "H.C.,K.P."
+        assert (
+            make_initials('William J. "Wild Bill" Donovan, Marta "Cinta Gonzalez')
+            == "W.J.D.,M.C.G."
+        )
         assert make_initials("a.s , - . ,b.s.") == "A.S.,B.S."
         assert make_initials("A. Strugatsky, B...Strugatsky.") == "A.S.,B.S."
         assert make_initials("Иржи Кропачек,, Йозеф Новотный") == "И.К.,Й.Н."
