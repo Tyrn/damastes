@@ -11,6 +11,7 @@ homepage = "https://github.com/Tyrn/damastes"
 python = "^3.9"
 mutagen = "^1.44"
 yaspin = "^2.1.0"
+click = "*"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

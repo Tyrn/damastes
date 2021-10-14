@@ -3,15 +3,35 @@ Audio album builder.
 """
 
 import sys
+import click
 from . import __version__
 from . import run  # type: ignore
 
 
-def main() -> int:
+@click.command()
+@click.help_option("-h", "--help")
+@click.version_option(__version__, "-V", "--version")
+@steady_parameters
+def main(**kwargs) -> int:
     """
-    Entry point.
+    Damastes a.k.a. Procrustes is a CLI utility for copying directories and subdirectories
+    containing supported audio files in sequence, naturally sorted.
+    The end result is a "flattened" copy of the source subtree. "Flattened" means
+    that only a namesake of the root source directory is created, where all the files get
+    copied to, names prefixed with a serial number. Tag "Track Number"
+    is set, tags "Title", "Artist", and "Album" can be replaced optionally.
+    The writing process is strictly sequential: either starting with the number one file,
+    or in the reverse order. This can be important for some mobile devices.
+    \U0000274c Broken media;
+    \U00002754 Suspicious media.
+
+    Example:
+
+    robinson-crusoe $ damastes -va 'Daniel "Goldeneye" Defoe' -u 'Robinson Crusoe' .
+    /run/media/player
     """
-    return run(version=f"Damastes {__version__}")
+    _set_args_click()
+    return _run(**kwargs)
 
 
 if __name__ == "__main__":
