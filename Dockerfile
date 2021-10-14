@@ -31,6 +31,7 @@ WORKDIR /home/$user
 ENV PATH=/home/$user/.local/bin:$PATH
 
 COPY --from=base /home/$user/$project/dist/ ./dist/
-RUN pip install ./dist/* --user
+RUN pip install ./dist/* --user && \
+    echo 'alias dm=damastes' >> .bashrc
 
 CMD ["bash"]
