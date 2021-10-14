@@ -1,6 +1,6 @@
 FROM python:3.9.6-slim AS base
 
-ARG user=damastes project=py-procr src=src
+ARG user=damastes project=damastes src=src
 
 # Non-root user.
 RUN useradd -ms /bin/bash "$user"
@@ -13,7 +13,7 @@ RUN pip install poetry --user && \
     mkdir /home/$user/$project
 WORKDIR /home/$user/$project
 COPY $src ./$src/
-COPY pyproject.toml poetry.lock ./
+COPY pyproject.toml poetry.lock README.rst ./
 
 # Build.
 RUN poetry config virtualenvs.create true && \
@@ -22,7 +22,7 @@ RUN poetry config virtualenvs.create true && \
 
 FROM python:3.9.6-slim
 
-ARG user=damastes project=py-procr
+ARG user=damastes project=damastes
 
 # Non-root user.
 RUN useradd -ms /bin/bash "$user"
