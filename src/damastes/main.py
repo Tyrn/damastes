@@ -102,14 +102,14 @@ def _steady_parameters(func):
     )
     @click.option(
         "-a",
-        "--artist-tag",
+        "--artist",
         type=str,
         default=None,
         help=click.style("Artist tag", fg="green") + ".",
     )
     @click.option(
-        "-g",
-        "--album-tag",
+        "-m",
+        "--album",
         type=str,
         default=None,
         help=click.style("Album tag", fg="green") + ".",

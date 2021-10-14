@@ -171,12 +171,12 @@ def _decorate_dir_name(i: int, path: Path) -> str:
     return ("" if _ARGS.strip_decorations else (str(i).zfill(3) + "-")) + path.name
 
 
-def _artist(*, prefix="", suffix="") -> str:
+def _artist_part(*, prefix="", suffix="") -> str:
     """
     Returns Artist, nicely shaped to be a part of a directory/file name.
     """
-    if _ARGS.artist_tag:
-        return prefix + _ARGS.artist_tag + suffix
+    if _ARGS.artist:
+        return prefix + _ARGS.artist + suffix
     return ""
 
 
@@ -192,7 +192,7 @@ def _decorate_file_name(i: int, dst_step: List[str], path: Path) -> str:
         else "-"
     )
     return prefix + (
-        _ARGS.unified_name + _artist(prefix=" - ") + path.suffix
+        _ARGS.unified_name + _artist_part(prefix=" - ") + path.suffix
         if _ARGS.unified_name
         else path.name
     )
@@ -272,7 +272,7 @@ def _album() -> Iterator[Tuple[int, Path, Path, str]]:
     """
     prefix = (str(_ARGS.album_num).zfill(2) + "-") if _ARGS.album_num else ""
     base_dst = prefix + (
-        _artist(suffix=" - ") + _ARGS.unified_name
+        _artist_part(suffix=" - ") + _ARGS.unified_name
         if _ARGS.unified_name
         else _ARGS.src_dir.name
     )
@@ -365,18 +365,18 @@ def _copy_album() -> None:
 
         if not _ARGS.drop_tracknumber:
             audio["tracknumber"] = str(i) + "/" + str(_FILES_TOTAL)
-        if _ARGS.artist_tag and _ARGS.album_tag:
+        if _ARGS.artist and _ARGS.album:
             audio["title"] = make_title(
-                make_initials(_ARGS.artist_tag) + " - " + _ARGS.album_tag
+                make_initials(_ARGS.artist) + " - " + _ARGS.album
             )
-            audio["artist"] = _ARGS.artist_tag
-            audio["album"] = _ARGS.album_tag
-        elif _ARGS.artist_tag:
-            audio["title"] = make_title(_ARGS.artist_tag)
-            audio["artist"] = _ARGS.artist_tag
-        elif _ARGS.album_tag:
-            audio["title"] = make_title(_ARGS.album_tag)
-            audio["album"] = _ARGS.album_tag
+            audio["artist"] = _ARGS.artist
+            audio["album"] = _ARGS.album
+        elif _ARGS.artist:
+            audio["title"] = make_title(_ARGS.artist)
+            audio["artist"] = _ARGS.artist
+        elif _ARGS.album:
+            audio["title"] = make_title(_ARGS.album)
+            audio["album"] = _ARGS.album
         audio.save()
 
     def copy_and_set(index: int, src: Path, dst: Path) -> None:
@@ -505,14 +505,14 @@ CLEAN_CONTEXT_PARAMS = {
     "prepend_subdir_name": False,
     "file_type": None,
     "unified_name": None,
-    "artist_tag": None,
-    "album_tag": None,
+    "artist": None,
+    "album": None,
     "album_num": None,
     "no_console": False,
 }  # 22 of them.
 
 
-class _RestrictedDotDict(dict):
+class RestrictedDotDict(dict):
     """
     Enables acces to dictionary entries via dot notation.
     An attempt at adding a new key raises an exception.
@@ -532,10 +532,10 @@ class _RestrictedDotDict(dict):
         self[key] = value
 
     def __repr__(self):
-        return "<_RestrictedDotDict " + dict.__repr__(self) + ">"
+        return "<RestrictedDotDict " + dict.__repr__(self) + ">"
 
 
-_ARGS = _RestrictedDotDict()
+_ARGS = RestrictedDotDict()
 _FILES_TOTAL = -1
 _INVALID_TOTAL = 0
 _SUSPICIOUS_TOTAL = 0
@@ -560,7 +560,7 @@ def _set_args_click() -> None:
     """
     global _ARGS
 
-    _ARGS = _RestrictedDotDict(copy.deepcopy(click.get_current_context().params))
+    _ARGS = RestrictedDotDict(copy.deepcopy(click.get_current_context().params))
 
 
 def _run() -> int:
@@ -586,8 +586,8 @@ def _run() -> int:
         _show(f'Destination path "{_ARGS.dst_dir}" is not there.')
         sys.exit(1)
 
-    if _ARGS.unified_name and _ARGS.album_tag is None:
-        _ARGS.album_tag = _ARGS.unified_name
+    if _ARGS.unified_name and _ARGS.album is None:
+        _ARGS.album = _ARGS.unified_name
 
     try:
         warnings.resetwarnings()
@@ -631,7 +631,7 @@ def run(**kwargs) -> int:
     """
     global _ARGS
 
-    _ARGS = _RestrictedDotDict(copy.deepcopy(CLEAN_CONTEXT_PARAMS))
+    _ARGS = RestrictedDotDict(copy.deepcopy(CLEAN_CONTEXT_PARAMS))
     for k, v in kwargs.items():
         if k not in _ARGS:
             _show(f'Nonexistent parameter "{k}"')

@@ -37,7 +37,7 @@ Try **Damastes**, this way:
 
 ::
 
-    Robinson Crusoe $ damastes -via 'Daniel Defoe' -g 'Robinson Crusoe' . ~/MyAudioLibrary
+    Robinson Crusoe $ damastes -via 'Daniel Defoe' -m 'Robinson Crusoe' . ~/MyAudioLibrary
 
 - ``MyAudioLibrary`` must exist
 
@@ -108,15 +108,21 @@ Options
 
 ``-i, --prepend-subdir-name``        *prepend current subdirectory name to a file name*
 
-``-e, --file-type FILE_TYPE``        *accept only audio files of the specified type, e.g.* ``-e flac``, ``-e '*64k.mp3'``
+``-e, --file-type TEXT``             *accept only audio files of the specified type, e.g.* ``-e flac``, ``-e '*64kb.mp3'``
 
-``-u, --unified-name UNIFIED_NAME``  *destination root directory name and file names are based on* ``UNIFIED_NAME``, *serial number prepended, file extensions retained*
+``-u, --unified-name TEXT``          *destination root directory name and file names are based on* ``TEXT``, *serial number prepended, file extensions retained*
 
-``-b, --album-num ALBUM_NUM``        *0..99; prepend* ``ALBUM_NUM`` *to the destination root directory name*
+``-a, --artist TEXT``                *artist tag*
 
-``-a, --artist-tag ARTIST_TAG``      *artist tag name*
+``-m, --album TEXT``                 *album tag*
 
-``-g, --album-tag ALBUM_TAG``        *album tag name*
+``-b, --album-num INTEGER``          *0..99; prepend* ``INTEGER`` *to the destination root directory name*
+
+Hidden options:
+
+``--context``                        *print clean context*
+
+``--no-console``                     *no console mode*
 
 Examples
 ========
@@ -135,7 +141,7 @@ Examples
 
 ::
 
-    Source Album $ damastes -a "Peter Crowcroft" -g "Mice All Over" . /run/media/user/F8950/Audiobooks/
+    Source Album $ damastes -a "Peter Crowcroft" -m "Mice All Over" . /run/media/user/F8950/Audiobooks/
 
 - Destination directory */run/media/user/F8950/Audiobooks/Source Album/* is created;
 
@@ -195,7 +201,7 @@ One can still use it, with care.
     >>> os.getcwd()
     '/home/user/dir-src'
     >>> from damastes import run
-    >>> run(verbose=True, artist_tag='Vladimir Nabokov', unified_name='Ada', src_dir='.', dst_dir='/home/user/dir-dst')
+    >>> run(verbose=True, artist='Vladimir Nabokov', unified_name='Ada', src_dir='.', dst_dir='/home/user/dir-dst')
        1/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/1-Ada - Vladimir Nabokov.mp3  ✔ +20277
        2/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/2-Ada - Vladimir Nabokov.mp3  ✔ +20257
        3/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/3-Ada - Vladimir Nabokov.mp3  ✔ +20081
@@ -204,5 +210,26 @@ One can still use it, with care.
      🟢 Done (5, 91.6MB; 3.8s).
     0
     >>>
+
+Alternate take:
+
+::
+
+    >>> import copy
+    >>> from damastes import *
+    >>> args = RestrictedDotDict(copy.deepcopy(CLEAN_CONTEXT_PARAMS))
+    >>> args.verbose = True
+    >>> args.artist = 'Vladimir Nabokov'
+    >>> args.album = 'Ada'
+    >>> args.src_dir = '/home/user/dir-src'
+    >>> args.dst_dir = '/home/user/dir-dst'
+    >>> args.overwrite = True
+    >>> run(**args)
+    ...
+    >>> args.no_console = True
+    >>> run(**args)
+    >>> args.no_console = False
+    >>> run(**args)
+    ...
 
 The tailing number like ``+20277`` means that the file grew fatter by 20277 bytes because of the set tags.
