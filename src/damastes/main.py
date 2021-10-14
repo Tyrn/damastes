@@ -164,10 +164,13 @@ def main(**kwargs) -> int:
     /run/media/player
     """
     _set_args_click()
+
     from .run import _ARGS  # type: ignore
+
     if _ARGS.context and not _ARGS.no_console:
         _print_clean_context_params()
         return 0
+
     return _run()
 
 
