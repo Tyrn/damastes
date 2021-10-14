@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "damastes"
-version = "0.9.4"
+version = "0.9.5"
 description = "Damastes a.k.a. Procrustes, audiobook builder: copy and edit on the fly"
 authors = ["Tyrn <a@b.com>"]
 license = "MIT"
@@ -11,7 +11,7 @@ homepage = "https://github.com/Tyrn/damastes"
 python = "^3.9"
 mutagen = "^1.44"
 yaspin = "^2.1.0"
-click = "*"
+click = "7.*"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

@@ -5,13 +5,15 @@ Audio album builder.
 import sys
 import click
 from . import __version__
-from . import run  # type: ignore
+from .run import _run  # type: ignore
+from .run import _steady_parameters  # type: ignore
+from .run import _set_args_click  # type: ignore
 
 
 @click.command()
 @click.help_option("-h", "--help")
 @click.version_option(__version__, "-V", "--version")
-@steady_parameters
+@_steady_parameters
 def main(**kwargs) -> int:
     """
     Damastes a.k.a. Procrustes is a CLI utility for copying directories and subdirectories
@@ -31,7 +33,7 @@ def main(**kwargs) -> int:
     /run/media/player
     """
     _set_args_click()
-    return _run(**kwargs)
+    return _run()
 
 
 if __name__ == "__main__":

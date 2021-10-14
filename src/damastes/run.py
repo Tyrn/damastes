@@ -9,7 +9,7 @@ import sys
 assert sys.version_info >= PY_VERSION, f"Python {PY_VERSION} or later required."
 
 from typing import List, Tuple, Iterator, Any
-import mutagen as mt
+import mutagen
 import os
 import re
 import fnmatch
@@ -17,8 +17,7 @@ import shutil
 import warnings
 import inspect
 import click
-import functools as ft
-from functools import wraps
+import functools
 from time import perf_counter
 from yaspin import yaspin
 from math import log
@@ -118,8 +117,8 @@ def _mutagen_file(name: Path, spinner=None):
     name_to_print: str = str(name) if _ARGS.verbose else name.name
 
     try:
-        file = mt.File(name, easy=True)
-    except mt.MutagenError as mt_error:
+        file = mutagen.File(name, easy=True)
+    except mutagen.MutagenError as mt_error:
         if spinner:
             spinner.write(f" {INVALID_ICON} >>{mt_error}>> {name_to_print}")
             _INVALID_TOTAL += 1
@@ -151,13 +150,13 @@ def _list_dir_groom(abs_path: Path, rev=False) -> Tuple[List[Path], List[Path]]:
     lst = os.listdir(abs_path)
     dirs = sorted(
         [Path(x) for x in lst if (abs_path / x).is_dir()],
-        key=ft.cmp_to_key(
+        key=functools.cmp_to_key(
             (lambda xp, yp: -_path_compare(xp, yp)) if rev else _path_compare
         ),
     )
     files = sorted(
         [Path(x) for x in lst if _is_audiofile(abs_path / x)],
-        key=ft.cmp_to_key(
+        key=functools.cmp_to_key(
             (lambda xf, yf: -_file_compare(xf, yf)) if rev else _file_compare
         ),
     )
@@ -431,143 +430,130 @@ def _copy_album() -> None:
         _show(f"Fatal error. files_total: {files_total}, _FILES_TOTAL: {_FILES_TOTAL}")
 
 
-def _retrieve_args(argv: List[str]) -> Any:
-    """
-    Parses the command line and returns a collection of arguments.
-    """
-    parser = argparse.ArgumentParser(
-        description=f"""
-    Damastes a.k.a. Procrustes is a CLI utility for copying directories and subdirectories
-    containing supported audio files in sequence, naturally sorted.
-    The end result is a "flattened" copy of the source subtree. "Flattened" means
-    that only a namesake of the root source directory is created, where all the files get
-    copied to, names prefixed with a serial number. Tag "Track Number"
-    is set, tags "Title", "Artist", and "Album" can be replaced optionally.
-    The writing process is strictly sequential: either starting with the number one file,
-    or in the reversed order. This can be important for some mobile devices.
-    {INVALID_ICON} Broken media;
-    {SUSPICIOUS_ICON} Suspicious media;
-    {NB} Really useful options.{NB}
-    """
+def _steady_parameters(func):
+    @click.option(
+        "-v",
+        "--verbose",
+        is_flag=True,
+        help=click.style("Verbose output", fg="green") + ".",
     )
-
-    parser.add_argument(
-        "-V",
-        "--version",
-        help="package version",
-        action="version",
-        version=_APP_VERSION,
+    @click.option(
+        "-d", "--drop-tracknumber", is_flag=True, help="Do not set track numbers."
     )
-    parser.add_argument(
-        "-v", "--verbose", help=f"{NB} verbose output {NB}", action="store_true"
-    )
-    parser.add_argument(
-        "-d", "--drop-tracknumber", help="do not set track numbers", action="store_true"
-    )
-    parser.add_argument(
+    @click.option(
         "-s",
         "--strip-decorations",
-        help="strip file and directory name decorations",
-        action="store_true",
+        is_flag=True,
+        help="Strip file and directory name decorations.",
     )
-    parser.add_argument(
-        "-f", "--file-title", help="use file name for title tag", action="store_true"
+    @click.option(
+        "-f", "--file-title", is_flag=True, help="Use file name for title tag."
     )
-    parser.add_argument(
+    @click.option(
         "-F",
         "--file-title-num",
-        help="use numbered file name for title tag",
-        action="store_true",
+        is_flag=True,
+        help="Use numbered file name for title tag.",
     )
-    parser.add_argument(
-        "-x", "--sort-lex", help="sort files lexicographically", action="store_true"
+    @click.option(
+        "-x", "--sort-lex", is_flag=True, help="Sort files lexicographically."
     )
-    parser.add_argument(
+    @click.option(
         "-t",
         "--tree-dst",
-        help="retain the tree structure of the source album at destination",
-        action="store_true",
+        is_flag=True,
+        help="Retain the tree structure of the source album at destination.",
     )
-    parser.add_argument(
-        "-p",
-        "--drop-dst",
-        help="do not create destination directory",
-        action="store_true",
+    @click.option(
+        "-p", "--drop-dst", is_flag=True, help="Do not create destination directory."
     )
-    parser.add_argument(
+    @click.option(
         "-r",
         "--reverse",
-        help="copy files in reverse order (number one file is the last to be copied)",
-        action="store_true",
+        is_flag=True,
+        help="Copy files in reverse order (number one file is the last to be copied).",
     )
-    parser.add_argument(
+    @click.option(
         "-w",
         "--overwrite",
-        help="silently remove existing destination directory (not recommended)",
-        action="store_true",
+        is_flag=True,
+        help="Silently remove existing destination directory ("
+        + click.style("not", fg="red")
+        + " recommended).",
     )
-    parser.add_argument(
+    @click.option(
         "-y",
         "--dry-run",
-        help="without actually modifying anything (trumps -w, too)",
-        action="store_true",
+        is_flag=True,
+        help="Without actually modifying anything (trumps "
+        + click.style("-w", fg="yellow")
+        + ", too).",
     )
-    parser.add_argument(
-        "-c",
-        "--count",
-        help="just count the files",
-        action="store_true",
-    )
-    parser.add_argument(
+    @click.option("-c", "--count", is_flag=True, help="Just count the files.")
+    @click.option(
         "-i",
         "--prepend-subdir-name",
-        help="prepend current subdirectory name to a file name",
-        action="store_true",
+        is_flag=True,
+        help="Prepend current subdirectory name to a file name.",
     )
-    parser.add_argument(
+    @click.option(
         "-e",
         "--file-type",
-        help="accept only specified audio files (e.g. -e flac, or even -e '*64k.mp3')",
+        type=str,
+        default=None,
+        help="Accept only specified audio files (e.g. "
+        + click.style("-e flac", fg="yellow")
+        + ", or even "
+        + click.style("-e '*64kb.mp3'", fg="yellow")
+        + ").",
     )
-    parser.add_argument(
+    @click.option(
         "-u",
         "--unified-name",
-        help=f"""
-                        {NB} destination root directory name and file names are based on UNIFIED_NAME,
-                        serial number prepended, file extensions retained; also album tag,
-                        if the latter is not specified explicitly {NB}
-                        """,
+        type=str,
+        default=None,
+        help="Destination "
+        + click.style("directory name", fg="green")
+        + " and "
+        + click.style("file names", fg="green")
+        + " are based on TEXT, file extensions retained; also "
+        + click.style("album tag", fg="green")
+        + ", if the latter is not specified explicitly.",
     )
-    parser.add_argument(
+    @click.option(
+        "-a",
+        "--artist-tag",
+        type=str,
+        default=None,
+        help=click.style("Artist tag", fg="green") + ".",
+    )
+    @click.option(
+        "-g",
+        "--album-tag",
+        type=str,
+        default=None,
+        help=click.style("Album tag", fg="green") + ".",
+    )
+    @click.option(
         "-b",
         "--album-num",
-        help="0..99; prepend ALBUM_NUM to the destination root directory name",
+        type=int,
+        default=None,
+        help="0..99; prepend INTEGER to the destination root directory name.",
     )
-    parser.add_argument("-a", "--artist-tag", help=f"{NB} artist tag name {NB}")
-    parser.add_argument("-g", "--album-tag", help=f"{NB} album tag name {NB}")
-    parser.add_argument("src_dir", help="source directory")
-    parser.add_argument("dst_dir", help="general destination directory")
-    args = parser.parse_args(argv)
-    args.src_dir = Path(
-        args.src_dir
-    ).absolute()  # Takes care of the trailing slash, too.
-    args.dst_dir = Path(args.dst_dir).absolute()
+    @click.option("--context", is_flag=True, hidden=True, help="Print clean context.")
+    @click.option("--no-console", is_flag=True, hidden=True, help="No console mode.")
+    @click.argument("src_dir", type=click.Path(exists=True, resolve_path=True))
+    @click.argument("dst_dir", type=click.Path(exists=True, resolve_path=True))
+    @functools.wraps(func)
+    def parameters(**kwargs):
+        func(**kwargs)
 
-    if not args.src_dir.is_dir():
-        _show(f'Source directory "{args.src_dir}" is not there.')
-        sys.exit(1)
-    if not args.dst_dir.is_dir():
-        _show(f'Destination path "{args.dst_dir}" is not there.')
-        sys.exit(1)
-
-    if args.unified_name and args.album_tag is None:
-        args.album_tag = args.unified_name
-
-    return args
+    return parameters
 
 
 def _show(string: str, *, end="\n", file=sys.stdout, flush=False) -> None:
-    if _APP_VERSION:
+    if not _ARGS.no_console:
         return print(string, end=end, file=file, flush=flush)
 
 
@@ -621,52 +607,129 @@ SUSPICIOUS_ICON = "\U00002754"
 DONE_ICON = "\U0001f7e2"
 COLUMN_ICON = "\U00002714"
 KNOWN_EXTENSIONS = ["MP3", "OGG", "M4A", "M4B", "OPUS", "FLAC", "APE"]
+CLEAN_CONTEXT_PARAMS = {
+    "context": False,
+    "verbose": False,
+    "src_dir": None,
+    "dst_dir": None,
+    "drop_tracknumber": False,
+    "strip_decorations": False,
+    "file_title": False,
+    "file_title_num": False,
+    "sort_lex": False,
+    "tree_dst": False,
+    "drop_dst": False,
+    "reverse": False,
+    "overwrite": False,
+    "dry_run": False,
+    "count": False,
+    "prepend_subdir_name": False,
+    "file_type": None,
+    "unified_name": None,
+    "artist_tag": None,
+    "album_tag": None,
+    "album_num": None,
+    "no_console": False,
+}  # 22 of them.
 
-_ARGS: Any = None
+
+class _RestrictedDotDict(dict):
+    """
+    Enables acces to dictionary entries via dot notation.
+    An attempt at adding a new key raises an exception.
+    """
+
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError as k:
+            raise AttributeError(k)
+
+    def __setattr__(self, key, value):
+        try:
+            self[key]
+        except KeyError as k:
+            raise AttributeError(k)
+        self[key] = value
+
+    def __repr__(self):
+        return "<_RestrictedDotDict " + dict.__repr__(self) + ">"
+
+
+_ARGS = _RestrictedDotDict()
 _FILES_TOTAL = -1
 _INVALID_TOTAL = 0
 _SUSPICIOUS_TOTAL = 0
-_APP_VERSION = ""
 _START_TIME = 0.0
 
 
-def _reset_all() -> None:
-    global _ARGS
+def _reset_counters() -> None:
     global _FILES_TOTAL
     global _INVALID_TOTAL
     global _SUSPICIOUS_TOTAL
-    global _APP_VERSION
     global _START_TIME
 
-    _ARGS = None
     _FILES_TOTAL = -1
     _INVALID_TOTAL = 0
     _SUSPICIOUS_TOTAL = 0
-    _APP_VERSION = ""
     _START_TIME = perf_counter()
 
 
-def run(*, argv: List[str] = sys.argv[1:], version="") -> int:
+def _set_args_click() -> None:
     """
-    Runs the whole Procrustes business according to argv options.
-    Non-empty version means full console output required by
-    a command line utility.
+    To be called once from main() before _run().
     """
-    global _ARGS, _FILES_TOTAL, _APP_VERSION
+    global _ARGS
+
+    _ARGS = _RestrictedDotDict(dict(click.get_current_context().params))
+
+
+def _run() -> int:
+    """
+    Runs the whole Procrustes business according to
+    preset context.
+
+    To be called once either from main() or from run(),
+    after setting the context.
+    """
+    global _FILES_TOTAL
+
+    # Tweak context presumably set by main() or run().
+    _ARGS.src_dir = Path(
+        _ARGS.src_dir
+    ).absolute()  # Takes care of the trailing slash, too.
+    _ARGS.dst_dir = Path(_ARGS.dst_dir).absolute()
+
+    if not _ARGS.src_dir.is_dir():
+        _show(f'Source directory "{_ARGS.src_dir}" is not there.')
+        sys.exit(1)
+    if not _ARGS.dst_dir.is_dir():
+        _show(f'Destination path "{_ARGS.dst_dir}" is not there.')
+        sys.exit(1)
+
+    if _ARGS.unified_name and _ARGS.album_tag is None:
+        _ARGS.album_tag = _ARGS.unified_name
 
     try:
         warnings.resetwarnings()
         warnings.simplefilter("ignore")
 
-        _reset_all()
-        _APP_VERSION = version
-        _ARGS = _retrieve_args(argv)
+        _reset_counters()
 
-        if _APP_VERSION:
+        if _ARGS.context and not _ARGS.no_console:
+            _show("CLEAN_CONTEXT_PARAMS = {")
+            count = 0
+            for k, v in click.get_current_context().params.items():
+                _show(f'    "{k}": {False if isinstance(v, bool) else None},')
+                count += 1
+            _show(f"}}  # {count} of them.")
+            return 0
+
+        if _ARGS.no_console:
+            _FILES_TOTAL, src_total = _audiofiles_count(_ARGS.src_dir)
+        else:
             with yaspin() as sp:
                 _FILES_TOTAL, src_total = _audiofiles_count(_ARGS.src_dir, sp)
-        else:
-            _FILES_TOTAL, src_total = _audiofiles_count(_ARGS.src_dir)
 
         if _ARGS.count:
             _show(f" {DONE_ICON} Valid: {_FILES_TOTAL} file(s)", end="")
@@ -689,5 +752,25 @@ def run(*, argv: List[str] = sys.argv[1:], version="") -> int:
     return 0
 
 
+def run(**kwargs) -> int:
+    """
+    Sets up context parameters manually via kwargs
+    and runs the whole Procrustes business.
+
+    To be used from Python code.
+    """
+    global _ARGS
+
+    _ARGS = _RestrictedDotDict(dict(CLEAN_CONTEXT_PARAMS))
+    for k, v in kwargs.items():
+        if k not in _ARGS:
+            _show(f'Nonexistent parameter "{k}"')
+            return 1
+        _ARGS[k] = v
+
+    return _run()
+
+
 if __name__ == "__main__":
-    sys.exit(run(version="Procrustes running..."))
+    print(f"Not runnable module {Path(__file__).name}", file=sys.stderr)
+    sys.exit(1)
