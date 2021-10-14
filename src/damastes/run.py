@@ -1,6 +1,7 @@
 """
 Audio album builder as a library. See description.
 """
+import copy
 
 PY_VERSION = (3, 6, 0)
 
@@ -430,128 +431,6 @@ def _copy_album() -> None:
         _show(f"Fatal error. files_total: {files_total}, _FILES_TOTAL: {_FILES_TOTAL}")
 
 
-def _steady_parameters(func):
-    @click.option(
-        "-v",
-        "--verbose",
-        is_flag=True,
-        help=click.style("Verbose output", fg="green") + ".",
-    )
-    @click.option(
-        "-d", "--drop-tracknumber", is_flag=True, help="Do not set track numbers."
-    )
-    @click.option(
-        "-s",
-        "--strip-decorations",
-        is_flag=True,
-        help="Strip file and directory name decorations.",
-    )
-    @click.option(
-        "-f", "--file-title", is_flag=True, help="Use file name for title tag."
-    )
-    @click.option(
-        "-F",
-        "--file-title-num",
-        is_flag=True,
-        help="Use numbered file name for title tag.",
-    )
-    @click.option(
-        "-x", "--sort-lex", is_flag=True, help="Sort files lexicographically."
-    )
-    @click.option(
-        "-t",
-        "--tree-dst",
-        is_flag=True,
-        help="Retain the tree structure of the source album at destination.",
-    )
-    @click.option(
-        "-p", "--drop-dst", is_flag=True, help="Do not create destination directory."
-    )
-    @click.option(
-        "-r",
-        "--reverse",
-        is_flag=True,
-        help="Copy files in reverse order (number one file is the last to be copied).",
-    )
-    @click.option(
-        "-w",
-        "--overwrite",
-        is_flag=True,
-        help="Silently remove existing destination directory ("
-        + click.style("not", fg="red")
-        + " recommended).",
-    )
-    @click.option(
-        "-y",
-        "--dry-run",
-        is_flag=True,
-        help="Without actually modifying anything (trumps "
-        + click.style("-w", fg="yellow")
-        + ", too).",
-    )
-    @click.option("-c", "--count", is_flag=True, help="Just count the files.")
-    @click.option(
-        "-i",
-        "--prepend-subdir-name",
-        is_flag=True,
-        help="Prepend current subdirectory name to a file name.",
-    )
-    @click.option(
-        "-e",
-        "--file-type",
-        type=str,
-        default=None,
-        help="Accept only specified audio files (e.g. "
-        + click.style("-e flac", fg="yellow")
-        + ", or even "
-        + click.style("-e '*64kb.mp3'", fg="yellow")
-        + ").",
-    )
-    @click.option(
-        "-u",
-        "--unified-name",
-        type=str,
-        default=None,
-        help="Destination "
-        + click.style("directory name", fg="green")
-        + " and "
-        + click.style("file names", fg="green")
-        + " are based on TEXT, file extensions retained; also "
-        + click.style("album tag", fg="green")
-        + ", if the latter is not specified explicitly.",
-    )
-    @click.option(
-        "-a",
-        "--artist-tag",
-        type=str,
-        default=None,
-        help=click.style("Artist tag", fg="green") + ".",
-    )
-    @click.option(
-        "-g",
-        "--album-tag",
-        type=str,
-        default=None,
-        help=click.style("Album tag", fg="green") + ".",
-    )
-    @click.option(
-        "-b",
-        "--album-num",
-        type=int,
-        default=None,
-        help="0..99; prepend INTEGER to the destination root directory name.",
-    )
-    @click.option("--context", is_flag=True, hidden=True, help="Print clean context.")
-    @click.option("--no-console", is_flag=True, hidden=True, help="No console mode.")
-    @click.argument("src_dir", type=click.Path(exists=True, resolve_path=True))
-    @click.argument("dst_dir", type=click.Path(exists=True, resolve_path=True))
-    @functools.wraps(func)
-    def parameters(**kwargs):
-        func(**kwargs)
-
-    return parameters
-
-
 def _show(string: str, *, end="\n", file=sys.stdout, flush=False) -> None:
     if not _ARGS.no_console:
         return print(string, end=end, file=file, flush=flush)
@@ -681,7 +560,7 @@ def _set_args_click() -> None:
     """
     global _ARGS
 
-    _ARGS = _RestrictedDotDict(dict(click.get_current_context().params))
+    _ARGS = _RestrictedDotDict(copy.deepcopy(click.get_current_context().params))
 
 
 def _run() -> int:
@@ -715,15 +594,6 @@ def _run() -> int:
         warnings.simplefilter("ignore")
 
         _reset_counters()
-
-        if _ARGS.context and not _ARGS.no_console:
-            _show("CLEAN_CONTEXT_PARAMS = {")
-            count = 0
-            for k, v in click.get_current_context().params.items():
-                _show(f'    "{k}": {False if isinstance(v, bool) else None},')
-                count += 1
-            _show(f"}}  # {count} of them.")
-            return 0
 
         if _ARGS.no_console:
             _FILES_TOTAL, src_total = _audiofiles_count(_ARGS.src_dir)
@@ -761,7 +631,7 @@ def run(**kwargs) -> int:
     """
     global _ARGS
 
-    _ARGS = _RestrictedDotDict(dict(CLEAN_CONTEXT_PARAMS))
+    _ARGS = _RestrictedDotDict(copy.deepcopy(CLEAN_CONTEXT_PARAMS))
     for k, v in kwargs.items():
         if k not in _ARGS:
             _show(f'Nonexistent parameter "{k}"')
