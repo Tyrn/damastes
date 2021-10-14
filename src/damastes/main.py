@@ -163,7 +163,7 @@ def main(**kwargs) -> int:
     robinson-crusoe $ damastes -va 'Daniel "Goldeneye" Defoe' -u 'Robinson Crusoe' .
     /run/media/player
     """
-    _set_args_click()
+    _set_args_click(click.get_current_context().params)
 
     from .run import _ARGS  # type: ignore
 

@@ -17,7 +17,6 @@ import fnmatch
 import shutil
 import warnings
 import inspect
-import click
 import functools
 from time import perf_counter
 from yaspin import yaspin
@@ -554,13 +553,13 @@ def _reset_counters() -> None:
     _START_TIME = perf_counter()
 
 
-def _set_args_click() -> None:
+def _set_args_click(context_params: dict) -> None:
     """
     To be called once from main() before _run().
     """
     global _ARGS
 
-    _ARGS = RestrictedDotDict(copy.deepcopy(click.get_current_context().params))
+    _ARGS = RestrictedDotDict(copy.deepcopy(context_params))
 
 
 def _run() -> int:
