@@ -60,7 +60,7 @@ without leading zeroes, etc.
 
 Meanwhile, one cannot listen to an audiobook with the tracks in the wrong
 order. **Damastes** tries hard to sort the tracks properly.
-To check the track order visually use ``-v``, and avoid ``-u``.
+To check the track order visually use ``-v`` or ``-vi``, and avoid ``-u``.
 
 **Damastes** renames directories and audio files, replacing tags,
 if necessary, while copying the album to destination. Source files
