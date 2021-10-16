@@ -124,6 +124,10 @@ Hidden options:
 
 ``--no-console``                     *no console mode*
 
+Example::
+
+    $ damastes --context . .
+
 Examples
 ========
 

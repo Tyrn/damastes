@@ -542,7 +542,7 @@ _FILES_TOTAL = -1
 _INVALID_TOTAL = 0
 _SUSPICIOUS_TOTAL = 0
 _START_TIME = 0.0
-_SHORT_LOG = []
+_SHORT_LOG: List[str] = []
 
 
 def _reset_counters() -> None:
