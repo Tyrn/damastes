@@ -1,4 +1,4 @@
-FROM python:3.9.7-slim AS base
+FROM python:3.9.6-slim AS base
 
 ARG user=damastes project=damastes src=src
 
@@ -20,7 +20,7 @@ RUN poetry config virtualenvs.create true && \
     poetry install --no-dev && \
     poetry build -f sdist
 
-FROM python:3.9.7-slim
+FROM python:3.9.6-slim
 
 ARG user=damastes project=damastes
 
