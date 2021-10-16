@@ -636,9 +636,9 @@ def _run() -> int:
             _show(f" {INVALID_ICON} Broken: {_INVALID_TOTAL} file(s)")
         if _SUSPICIOUS_TOTAL > 0:
             _show(f" {SUSPICIOUS_ICON} Suspicious: {_SUSPICIOUS_TOTAL} file(s)")
-        if _SHORT_LOG:
-            for line in _SHORT_LOG:
-                _show(f" {WARNING_ICON} {line}")
+
+        for line in _SHORT_LOG:
+            _show(f" {WARNING_ICON} {line}")
 
     except KeyboardInterrupt:
         _show(f" {WARNING_ICON} Aborted manually.", file=sys.stderr)

@@ -120,13 +120,9 @@ Options
 
 Hidden options:
 
-``--context``                        *print clean context*
+``--context``                        *print clean context*, ``$ damastes --context . .``
 
 ``--no-console``                     *no console mode*
-
-Example::
-
-    $ damastes --context . .
 
 Examples
 ========
