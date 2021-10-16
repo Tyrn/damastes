@@ -3,7 +3,7 @@ Audio album builder as a library. See description.
 """
 import copy
 
-PY_VERSION = (3, 6, 0)
+PY_VERSION = (3, 9, 0)
 
 import sys
 
@@ -280,7 +280,8 @@ def _album() -> Iterator[Tuple[int, Path, Path, str]]:
 
     if _FILES_TOTAL < 1:
         _show(
-            f'There are no supported audio files in the source directory "{_ARGS.src_dir}".'
+            f" {WARNING_ICON} There are no supported audio files"
+            + f' in the source directory "{_ARGS.src_dir}".'
         )
         sys.exit(1)
 
@@ -290,10 +291,12 @@ def _album() -> Iterator[Tuple[int, Path, Path, str]]:
                 try:
                     shutil.rmtree(executive_dst)
                 except FileNotFoundError:
-                    _show(f'Failed to remove "{executive_dst}".')
+                    _show(f' {WARNING_ICON} Failed to remove "{executive_dst}".')
                     sys.exit(1)
             else:
-                _show(f'Destination directory "{executive_dst}" already exists.')
+                _show(
+                    f' {WARNING_ICON} Target directory "{executive_dst}" already exists.'
+                )
                 sys.exit(1)
         executive_dst.mkdir()
 
@@ -479,7 +482,7 @@ RE_BY_SEP = re.compile(rf"[\s{SEP}]+")
 RE_BY_HYPH = re.compile(rf"\s*(?:{HYPH}\s*)+")
 RE_QUOTED_SUBSTRING = re.compile(r"\"(?:\\.|[^\"\\])*\"")
 
-NB = "\U0001f53b"
+WARNING_ICON = "\U0001f4a7"
 INVALID_ICON = "\U0000274c"
 SUSPICIOUS_ICON = "\U00002754"
 DONE_ICON = "\U0001f7e2"
@@ -539,6 +542,7 @@ _FILES_TOTAL = -1
 _INVALID_TOTAL = 0
 _SUSPICIOUS_TOTAL = 0
 _START_TIME = 0.0
+_SHORT_LOG = []
 
 
 def _reset_counters() -> None:
@@ -546,11 +550,13 @@ def _reset_counters() -> None:
     global _INVALID_TOTAL
     global _SUSPICIOUS_TOTAL
     global _START_TIME
+    global _SHORT_LOG
 
     _FILES_TOTAL = -1
     _INVALID_TOTAL = 0
     _SUSPICIOUS_TOTAL = 0
     _START_TIME = perf_counter()
+    _SHORT_LOG = []
 
 
 def _set_args_click(context_params: dict) -> None:
@@ -572,6 +578,8 @@ def _run() -> int:
     """
     global _FILES_TOTAL
 
+    _reset_counters()
+
     # Tweak context presumably set by main() or run().
     _ARGS.src_dir = Path(
         _ARGS.src_dir
@@ -579,11 +587,24 @@ def _run() -> int:
     _ARGS.dst_dir = Path(_ARGS.dst_dir).absolute()
 
     if not _ARGS.src_dir.is_dir():
-        _show(f'Source directory "{_ARGS.src_dir}" is not there.')
+        _show(f' {WARNING_ICON} Source directory "{_ARGS.src_dir}" is not there.')
         sys.exit(1)
     if not _ARGS.dst_dir.is_dir():
-        _show(f'Destination path "{_ARGS.dst_dir}" is not there.')
+        _show(f' {WARNING_ICON} Target directory "{_ARGS.dst_dir}" is not there.')
         sys.exit(1)
+
+    if not _ARGS.count and _ARGS.dst_dir.is_relative_to(_ARGS.src_dir):
+        dst_msg = f'Target directory "{_ARGS.dst_dir}"'
+        src_msg = f'is inside source "{_ARGS.src_dir}"'
+        if _ARGS.dry_run:
+            _SHORT_LOG.append(dst_msg)
+            _SHORT_LOG.append(src_msg)
+            _SHORT_LOG.append("It won't run.")
+        else:
+            _show(f" {WARNING_ICON} {dst_msg}")
+            _show(f" {WARNING_ICON} {src_msg}")
+            _show(f" {WARNING_ICON} No go.")
+            exit(1)
 
     if _ARGS.unified_name and _ARGS.album is None:
         _ARGS.album = _ARGS.unified_name
@@ -592,8 +613,6 @@ def _run() -> int:
         warnings.resetwarnings()
         warnings.simplefilter("ignore")
 
-        _reset_counters()
-
         if _ARGS.no_console:
             _FILES_TOTAL, src_total = _audiofiles_count(_ARGS.src_dir)
         else:
@@ -601,7 +620,11 @@ def _run() -> int:
                 _FILES_TOTAL, src_total = _audiofiles_count(_ARGS.src_dir, sp)
 
         if _ARGS.count:
-            _show(f" {DONE_ICON} Valid: {_FILES_TOTAL} file(s)", end="")
+            _show(
+                f" {DONE_ICON if _FILES_TOTAL else WARNING_ICON}"
+                + f" Valid: {_FILES_TOTAL} file(s)",
+                end="",
+            )
             _show(f"; Volume: {human_fine(src_total)}", end="")
             if _FILES_TOTAL > 1:
                 _show(f"; Average: {human_fine(src_total // _FILES_TOTAL)}", end="")
@@ -613,9 +636,12 @@ def _run() -> int:
             _show(f" {INVALID_ICON} Broken: {_INVALID_TOTAL} file(s)")
         if _SUSPICIOUS_TOTAL > 0:
             _show(f" {SUSPICIOUS_ICON} Suspicious: {_SUSPICIOUS_TOTAL} file(s)")
+        if _SHORT_LOG:
+            for line in _SHORT_LOG:
+                _show(f" {WARNING_ICON} {line}")
 
     except KeyboardInterrupt:
-        _show("Aborted manually.", file=sys.stderr)
+        _show(f" {WARNING_ICON} Aborted manually.", file=sys.stderr)
         return 1
 
     return 0
@@ -633,7 +659,7 @@ def run(**kwargs) -> int:
     _ARGS = RestrictedDotDict(copy.deepcopy(CLEAN_CONTEXT_PARAMS))
     for k, v in kwargs.items():
         if k not in _ARGS:
-            _show(f'Nonexistent parameter "{k}"')
+            _show(f' {WARNING_ICON} Nonexistent parameter "{k}"')
             return 1
         _ARGS[k] = v
 

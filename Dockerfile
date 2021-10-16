@@ -1,4 +1,4 @@
-FROM python:3.9.6-slim AS base
+FROM python:3.9.7-slim AS base
 
 ARG user=damastes project=damastes src=src
 
@@ -9,7 +9,7 @@ WORKDIR /home/$user
 ENV PATH=/home/$user/.local/bin:$PATH
 
 # Project.
-RUN pip install poetry --user && \
+RUN pip install poetry==1.1.11 --user && \
     mkdir /home/$user/$project
 WORKDIR /home/$user/$project
 COPY $src ./$src/
@@ -20,7 +20,7 @@ RUN poetry config virtualenvs.create true && \
     poetry install --no-dev && \
     poetry build -f sdist
 
-FROM python:3.9.6-slim
+FROM python:3.9.7-slim
 
 ARG user=damastes project=damastes
 

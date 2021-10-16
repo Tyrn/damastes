@@ -211,6 +211,8 @@ One can still use it, with care.
     0
     >>>
 
+The tailing number like ``+20277`` means that the file grew fatter by 20277 bytes because of the set tags.
+
 Alternate take:
 
 ::
@@ -232,4 +234,3 @@ Alternate take:
     >>> run(**args)
     ...
 
-The tailing number like ``+20277`` means that the file grew fatter by 20277 bytes because of the set tags.
