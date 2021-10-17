@@ -604,7 +604,7 @@ def _run() -> int:
             _show(f" {WARNING_ICON} {dst_msg}")
             _show(f" {WARNING_ICON} {src_msg}")
             _show(f" {WARNING_ICON} No go.")
-            exit(1)
+            sys.exit(1)
 
     if _ARGS.unified_name and _ARGS.album is None:
         _ARGS.album = _ARGS.unified_name
