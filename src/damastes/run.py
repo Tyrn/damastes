@@ -667,5 +667,8 @@ def run(**kwargs) -> int:
 
 
 if __name__ == "__main__":
-    print(f"Not runnable module {Path(__file__).name}", file=sys.stderr)
+    print(
+        f" {WARNING_ICON} Module [{Path(__file__).name}] is not runnable.",
+        file=sys.stderr,
+    )
     sys.exit(1)
