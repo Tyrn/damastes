@@ -516,7 +516,7 @@ CLEAN_CONTEXT_PARAMS = {
 
 class RestrictedDotDict(dict):
     """
-    Enables acces to dictionary entries via dot notation.
+    Enables access to dictionary entries via dot notation.
     An attempt at adding a new key raises an exception.
     """
 
