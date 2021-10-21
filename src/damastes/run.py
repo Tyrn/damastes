@@ -151,13 +151,13 @@ def _list_dir_groom(abs_path: Path, rev=False) -> Tuple[List[Path], List[Path]]:
     dirs = sorted(
         [Path(x) for x in lst if (abs_path / x).is_dir()],
         key=functools.cmp_to_key(
-            (lambda xp, yp: -_path_compare(xp, yp)) if rev else _path_compare
+            (lambda xp, yp: _path_compare(yp, xp)) if rev else _path_compare
         ),
     )
     files = sorted(
         [Path(x) for x in lst if _is_audiofile(abs_path / x)],
         key=functools.cmp_to_key(
-            (lambda xf, yf: -_file_compare(xf, yf)) if rev else _file_compare
+            (lambda xf, yf: _file_compare(yf, xf)) if rev else _file_compare
         ),
     )
     return dirs, files
@@ -201,8 +201,11 @@ def _walk_file_tree(
     src_dir: Path, dst_root: Path, fcount: List[int], dst_step: List[str]
 ) -> Iterator[Tuple[int, Path, Path, str]]:
     """
-    Recursively traverses the source directory and yields a tuple of copying attributes;
-    the destination directory and file names get decorated according to options.
+    Recursively traverses the source directory and yields a tuple of
+    copying attributes:
+    index, source file path, destination directory path, target file name.
+
+    The destination directory and file names get decorated according to options.
     """
     dirs, files = _list_dir_groom(src_dir, _ARGS.reverse)
 
