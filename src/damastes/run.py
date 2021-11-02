@@ -642,6 +642,7 @@ def _run() -> int:
 
         for line in _SHORT_LOG:
             _show(f" {WARNING_ICON} {line}")
+        _SHORT_LOG.clear()
 
     except KeyboardInterrupt:
         _show(f" {WARNING_ICON} Aborted manually.", file=sys.stderr)
