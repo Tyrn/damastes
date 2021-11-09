@@ -147,6 +147,9 @@ def _list_dir_groom(abs_path: Path, rev=False) -> Tuple[List[Path], List[Path]]:
     offspring directory names (1) naturally sorted list
     of offspring file names.
     """
+    if _is_audiofile(abs_path):
+        return [], [Path(abs_path.name)]
+
     lst = os.listdir(abs_path)
     dirs = sorted(
         [Path(x) for x in lst if (abs_path / x).is_dir()],
@@ -208,6 +211,8 @@ def _walk_file_tree(
     The destination directory and file names get decorated according to options.
     """
     dirs, files = _list_dir_groom(src_dir, _ARGS.reverse)
+    if _is_audiofile(src_dir):
+        src_dir = src_dir.parent
 
     def dir_flat(dirs):
         for directory in dirs:
@@ -254,6 +259,12 @@ def _audiofiles_count(directory: Path, spinner=None) -> Tuple[int, int]:
     """
     Returns full recursive count of audiofiles in directory.
     """
+    if _is_audiofile(directory, spinner):
+        return 1, directory.stat().st_size
+
+    if directory.is_file():
+        return 0, 0
+
     cnt, size = 0, 0
 
     for root, _dirs, files in os.walk(directory):
@@ -276,6 +287,8 @@ def _album() -> Iterator[Tuple[int, Path, Path, str]]:
     base_dst = prefix + (
         _artist_part(suffix=" - ") + _ARGS.unified_name
         if _ARGS.unified_name
+        else _ARGS.src_dir.stem
+        if _ARGS.src_dir.is_file()
         else _ARGS.src_dir.name
     )
 
@@ -589,14 +602,18 @@ def _run() -> int:
     ).absolute()  # Takes care of the trailing slash, too.
     _ARGS.dst_dir = Path(_ARGS.dst_dir).absolute()
 
-    if not _ARGS.src_dir.is_dir():
+    if not _ARGS.src_dir.is_dir() and not _ARGS.src_dir.is_file():
         _show(f' {WARNING_ICON} Source directory "{_ARGS.src_dir}" is not there.')
         sys.exit(1)
     if not _ARGS.dst_dir.is_dir():
         _show(f' {WARNING_ICON} Target directory "{_ARGS.dst_dir}" is not there.')
         sys.exit(1)
 
-    if not _ARGS.count and _ARGS.dst_dir.is_relative_to(_ARGS.src_dir):
+    if (
+        not _ARGS.count
+        and not _ARGS.src_dir.is_file()
+        and _ARGS.dst_dir.is_relative_to(_ARGS.src_dir)
+    ):
         dst_msg = f'Target directory "{_ARGS.dst_dir}"'
         src_msg = f'is inside source "{_ARGS.src_dir}"'
         if _ARGS.dry_run:
