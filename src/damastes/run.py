@@ -147,9 +147,6 @@ def _list_dir_groom(abs_path: Path, rev=False) -> Tuple[List[Path], List[Path]]:
     offspring directory names (1) naturally sorted list
     of offspring file names.
     """
-    if _is_audiofile(abs_path):
-        return [], [Path(abs_path.name)]
-
     lst = os.listdir(abs_path)
     dirs = sorted(
         [Path(x) for x in lst if (abs_path / x).is_dir()],
@@ -210,9 +207,11 @@ def _walk_file_tree(
 
     The destination directory and file names get decorated according to options.
     """
-    dirs, files = _list_dir_groom(src_dir, _ARGS.reverse)
     if _is_audiofile(src_dir):
+        dirs, files = [], [Path(src_dir.name)]
         src_dir = src_dir.parent
+    else:
+        dirs, files = _list_dir_groom(src_dir, _ARGS.reverse)
 
     def dir_flat(dirs):
         for directory in dirs:

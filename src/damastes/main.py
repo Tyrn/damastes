@@ -160,8 +160,12 @@ def main(**kwargs) -> int:
 
     Example:
 
-    robinson-crusoe $ damastes -va 'Daniel "Goldeneye" Defoe' -u 'Robinson Crusoe' .
+    robinson-crusoe $ damastes -va 'Daniel "Goldeneye" Defoe' -m 'Robinson Crusoe' .
     /run/media/player
+
+    A single file is allowed as a source:
+
+    library $ damastes -va 'Vladimir Nabokov' -u 'Ada' ada.ogg .
     """
     _set_args_click(click.get_current_context().params)
 
