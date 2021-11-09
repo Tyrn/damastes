@@ -141,28 +141,6 @@ def _is_audiofile(name: Path, spinner=None) -> bool:
     return False
 
 
-def _list_dir_groom(abs_path: Path, rev=False) -> Tuple[List[Path], List[Path]]:
-    """
-    Returns a tuple of: (0) naturally sorted list of
-    offspring directory names (1) naturally sorted list
-    of offspring file names.
-    """
-    lst = os.listdir(abs_path)
-    dirs = sorted(
-        [Path(x) for x in lst if (abs_path / x).is_dir()],
-        key=functools.cmp_to_key(
-            (lambda xp, yp: _path_compare(yp, xp)) if rev else _path_compare
-        ),
-    )
-    files = sorted(
-        [Path(x) for x in lst if _is_audiofile(abs_path / x)],
-        key=functools.cmp_to_key(
-            (lambda xf, yf: _file_compare(yf, xf)) if rev else _file_compare
-        ),
-    )
-    return dirs, files
-
-
 def _decorate_dir_name(i: int, path: Path) -> str:
     """
     Prepends decimal i to path name.
@@ -208,10 +186,27 @@ def _walk_file_tree(
     The destination directory and file names get decorated according to options.
     """
     if _is_audiofile(src_dir):
-        dirs, files = [], [Path(src_dir.name)]
+        dirs: List[Path] = []
+        files: List[Path] = [Path(src_dir.name)]
         src_dir = src_dir.parent
     else:
-        dirs, files = _list_dir_groom(src_dir, _ARGS.reverse)
+        lst = os.listdir(src_dir)
+        dirs = sorted(
+            [Path(x) for x in lst if (src_dir / x).is_dir()],
+            key=functools.cmp_to_key(
+                (lambda xp, yp: _path_compare(yp, xp))
+                if _ARGS.reverse
+                else _path_compare
+            ),
+        )
+        files = sorted(
+            [Path(x) for x in lst if _is_audiofile(src_dir / x)],
+            key=functools.cmp_to_key(
+                (lambda xf, yf: _file_compare(yf, xf))
+                if _ARGS.reverse
+                else _file_compare
+            ),
+        )
 
     def dir_flat(dirs):
         for directory in dirs:
