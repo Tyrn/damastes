@@ -176,7 +176,7 @@ def _decorate_file_name(i: int, dst_step: List[str], path: Path) -> str:
 
 
 def _walk_file_tree(
-    src_dir: Path, dst_root: Path, fcount: List[int], dst_step: List[str]
+    src: Path, dst_root: Path, fcount: List[int], dst_step: List[str]
 ) -> Iterator[Tuple[int, Path, Path, str]]:
     """
     Recursively traverses the source directory and yields a tuple of
@@ -185,14 +185,14 @@ def _walk_file_tree(
 
     The destination directory and file names get decorated according to options.
     """
-    if _is_audiofile(src_dir):
+    if _is_audiofile(src):
         dirs: List[Path] = []
-        files: List[Path] = [Path(src_dir.name)]
-        src_dir = src_dir.parent
+        files: List[Path] = [Path(src.name)]
+        src = src.parent
     else:
-        lst = os.listdir(src_dir)
+        lst = os.listdir(src)
         dirs = sorted(
-            [Path(x) for x in lst if (src_dir / x).is_dir()],
+            [Path(x) for x in lst if (src / x).is_dir()],
             key=functools.cmp_to_key(
                 (lambda xp, yp: _path_compare(yp, xp))
                 if _ARGS.reverse
@@ -200,7 +200,7 @@ def _walk_file_tree(
             ),
         )
         files = sorted(
-            [Path(x) for x in lst if _is_audiofile(src_dir / x)],
+            [Path(x) for x in lst if _is_audiofile(src / x)],
             key=functools.cmp_to_key(
                 (lambda xf, yf: _file_compare(yf, xf))
                 if _ARGS.reverse
@@ -212,11 +212,11 @@ def _walk_file_tree(
         for directory in dirs:
             step = list(dst_step)
             step.append(directory.name)
-            yield from _walk_file_tree(src_dir / directory, dst_root, fcount, step)
+            yield from _walk_file_tree(src / directory, dst_root, fcount, step)
 
     def file_flat(files):
         for file in files:
-            yield fcount[0], src_dir / file, dst_root, _decorate_file_name(
+            yield fcount[0], src / file, dst_root, _decorate_file_name(
                 fcount[0], dst_step, file
             )
             fcount[0] += -1 if _ARGS.reverse else 1
@@ -228,11 +228,11 @@ def _walk_file_tree(
         for i, directory in enumerate(dirs):
             step = list(dst_step)
             step.append(_decorate_dir_name(reverse(i, dirs), directory))
-            yield from _walk_file_tree(src_dir / directory, dst_root, fcount, step)
+            yield from _walk_file_tree(src / directory, dst_root, fcount, step)
 
     def file_tree(files):
         for i, file in enumerate(files):
-            yield fcount[0], src_dir / file, dst_root.joinpath(
+            yield fcount[0], src / file, dst_root.joinpath(
                 *dst_step
             ), _decorate_file_name(reverse(i, files), dst_step, file)
             fcount[0] += -1 if _ARGS.reverse else 1
@@ -281,9 +281,9 @@ def _album() -> Iterator[Tuple[int, Path, Path, str]]:
     base_dst = prefix + (
         _artist_part(suffix=" - ") + _ARGS.unified_name
         if _ARGS.unified_name
-        else _ARGS.src_dir.stem
-        if _ARGS.src_dir.is_file()
-        else _ARGS.src_dir.name
+        else _ARGS.src.stem
+        if _ARGS.src.is_file()
+        else _ARGS.src.name
     )
 
     executive_dst = _ARGS.dst_dir / ("" if _ARGS.drop_dst else base_dst)
@@ -291,7 +291,7 @@ def _album() -> Iterator[Tuple[int, Path, Path, str]]:
     if _FILES_TOTAL < 1:
         _show(
             f" {WARNING_ICON} There are no supported audio files"
-            + f' in the source directory "{_ARGS.src_dir}".'
+            + f' in the source directory "{_ARGS.src}".'
         )
         sys.exit(1)
 
@@ -311,7 +311,7 @@ def _album() -> Iterator[Tuple[int, Path, Path, str]]:
         executive_dst.mkdir()
 
     return _walk_file_tree(
-        _ARGS.src_dir, executive_dst, [_FILES_TOTAL if _ARGS.reverse else 1], []
+        _ARGS.src, executive_dst, [_FILES_TOTAL if _ARGS.reverse else 1], []
     )
 
 
@@ -501,7 +501,7 @@ KNOWN_EXTENSIONS = ["MP3", "OGG", "M4A", "M4B", "OPUS", "WMA", "FLAC", "APE"]
 CLEAN_CONTEXT_PARAMS = {
     "context": False,
     "verbose": False,
-    "src_dir": None,
+    "src": None,
     "dst_dir": None,
     "drop_tracknumber": False,
     "strip_decorations": False,
@@ -591,13 +591,11 @@ def _run() -> int:
     _reset_counters()
 
     # Tweak context presumably set by main() or run().
-    _ARGS.src_dir = Path(
-        _ARGS.src_dir
-    ).absolute()  # Takes care of the trailing slash, too.
+    _ARGS.src = Path(_ARGS.src).absolute()  # Takes care of the trailing slash, too.
     _ARGS.dst_dir = Path(_ARGS.dst_dir).absolute()
 
-    if not _ARGS.src_dir.is_dir() and not _ARGS.src_dir.is_file():
-        _show(f' {WARNING_ICON} Source directory "{_ARGS.src_dir}" is not there.')
+    if not _ARGS.src.is_dir() and not _ARGS.src.is_file():
+        _show(f' {WARNING_ICON} Source directory "{_ARGS.src}" is not there.')
         sys.exit(1)
     if not _ARGS.dst_dir.is_dir():
         _show(f' {WARNING_ICON} Target directory "{_ARGS.dst_dir}" is not there.')
@@ -605,11 +603,11 @@ def _run() -> int:
 
     if (
         not _ARGS.count
-        and not _ARGS.src_dir.is_file()
-        and _ARGS.dst_dir.is_relative_to(_ARGS.src_dir)
+        and not _ARGS.src.is_file()
+        and _ARGS.dst_dir.is_relative_to(_ARGS.src)
     ):
         dst_msg = f'Target directory "{_ARGS.dst_dir}"'
-        src_msg = f'is inside source "{_ARGS.src_dir}"'
+        src_msg = f'is inside source "{_ARGS.src}"'
         if _ARGS.dry_run:
             _SHORT_LOG.append(dst_msg)
             _SHORT_LOG.append(src_msg)
@@ -628,10 +626,10 @@ def _run() -> int:
         warnings.simplefilter("ignore")
 
         if _ARGS.no_console:
-            _FILES_TOTAL, src_total = _audiofiles_count(_ARGS.src_dir)
+            _FILES_TOTAL, src_total = _audiofiles_count(_ARGS.src)
         else:
             with yaspin() as sp:
-                _FILES_TOTAL, src_total = _audiofiles_count(_ARGS.src_dir, sp)
+                _FILES_TOTAL, src_total = _audiofiles_count(_ARGS.src, sp)
 
         if _ARGS.count:
             _show(

@@ -123,7 +123,7 @@ def _steady_parameters(func):
     )
     @click.option("--context", is_flag=True, hidden=True, help="Print clean context.")
     @click.option("--no-console", is_flag=True, hidden=True, help="No console mode.")
-    @click.argument("src_dir", type=click.Path(exists=True, resolve_path=True))
+    @click.argument("src", type=click.Path(exists=True, resolve_path=True))
     @click.argument("dst_dir", type=click.Path(exists=True, resolve_path=True))
     @functools.wraps(func)
     def parameters(**kwargs):
@@ -158,12 +158,12 @@ def main(**kwargs) -> int:
     \U0000274c Broken media;
     \U00002754 Suspicious media.
 
-    Example:
+    Examples; SRC as a directory:
 
     robinson-crusoe $ damastes -va 'Daniel "Goldeneye" Defoe' -m 'Robinson Crusoe' .
     /run/media/player
 
-    A single file is allowed as a source:
+    SRC as a single file:
 
     library $ damastes -va 'Vladimir Nabokov' -u 'Ada' ada.ogg .
     """

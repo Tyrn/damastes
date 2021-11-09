@@ -201,7 +201,7 @@ One can still use it, with care.
     >>> os.getcwd()
     '/home/user/dir-src'
     >>> from damastes import run
-    >>> run(verbose=True, artist='Vladimir Nabokov', unified_name='Ada', src_dir='.', dst_dir='/home/user/dir-dst')
+    >>> run(verbose=True, artist='Vladimir Nabokov', unified_name='Ada', src='.', dst_dir='/home/user/dir-dst')
        1/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/1-Ada - Vladimir Nabokov.mp3  ✔ +20277
        2/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/2-Ada - Vladimir Nabokov.mp3  ✔ +20257
        3/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/3-Ada - Vladimir Nabokov.mp3  ✔ +20081
@@ -223,7 +223,7 @@ Alternate take:
     >>> args.verbose = True
     >>> args.artist = 'Vladimir Nabokov'
     >>> args.album = 'Ada'
-    >>> args.src_dir = '/home/user/dir-src'
+    >>> args.src = '/home/user/dir-src'
     >>> args.dst_dir = '/home/user/dir-dst'
     >>> args.overwrite = True
     >>> run(**args)
