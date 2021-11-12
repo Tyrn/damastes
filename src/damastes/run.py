@@ -411,8 +411,13 @@ def _copy_album() -> None:
         src_bytes, dst_bytes = src.stat().st_size, 0
         if not _ARGS.dry_run:
             dst_path.mkdir(parents=True, exist_ok=True)
-            copy_and_set_via_tmp(i, src, dst)
-            dst_bytes = dst.stat().st_size
+            if dst.is_file():
+                _SHORT_LOG.append(
+                    f'File "{dst.name}" already copied. Review your options.'
+                )
+            else:
+                copy_and_set_via_tmp(i, src, dst)
+                dst_bytes = dst.stat().st_size
         if _ARGS.verbose:
             _show(f"{i:>4}/{_FILES_TOTAL} {COLUMN_ICON} {dst}", end="")
             if dst_bytes != src_bytes:
