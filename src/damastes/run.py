@@ -121,11 +121,12 @@ def _mutagen_file(name: Path, spinner=None):
     except mutagen.MutagenError as mt_error:
         if spinner:
             spinner.write(f" {INVALID_ICON} >>{mt_error}>> {name_to_print}")
-            _INVALID_TOTAL += 1
+        _INVALID_TOTAL += 1
         return None
 
-    if spinner and file is None and ext in KNOWN_EXTENSIONS:
-        spinner.write(f" {SUSPICIOUS_ICON} {name_to_print}")
+    if file is None and ext in KNOWN_EXTENSIONS:
+        if spinner:
+            spinner.write(f" {SUSPICIOUS_ICON} {name_to_print}")
         _SUSPICIOUS_TOTAL += 1
     return file
 
