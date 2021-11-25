@@ -62,6 +62,7 @@ class TestPureFunctions:
         assert make_initials("a.s , - . ,b.s.") == "A.S.,B.S."
         assert make_initials("A. Strugatsky, B...Strugatsky.") == "A.S.,B.S."
         assert make_initials("Иржи Кропачек,, Йозеф Новотный") == "И.К.,Й.Н."
+        assert make_initials("Шарль д'Артаньян") == "Ш.д'А."
         assert make_initials("Österreich über alles") == "Ö.Ü.A."
 
     def test_human_fine(self):

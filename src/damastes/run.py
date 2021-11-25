@@ -476,10 +476,25 @@ def make_initials(authors: str) -> str:
 
     >>> make_initials('Ignacio "Castigador" Vazquez-Abrams, Estefania Cassingena Navone')
     'I.V-A.,E.C.N.'
+    >>> make_initials("Rory O'Connor, Seumas MacManus, Christine McConnell")
+    "R.O'C.,S.MacM.,C.McC."
+    >>> make_initials("Charles d'Artagnan, Ross Macdonald")
+    "C.d'A.,R.M."
     """
+
+    def form_initial(name: str) -> str:
+        if len(name) > 3 and name[:3] == "Mac" and name[3].isupper():
+            return name[:4]
+        if len(name) > 2:
+            if name[:2] == "Mc" and name[2].isupper():
+                return name[:3]
+            if name[0].upper() in ["O", "D", "О", "Д"] and name[1] == "'":
+                return name[0] + "'" + name[2].upper()
+        return name[0].upper()
+
     return COMMA.join(
         HYPH.join(
-            SEP.join(name[0] for name in RE_BY_SEP.split(barrel) if name).upper()
+            SEP.join(form_initial(name) for name in RE_BY_SEP.split(barrel) if name)
             for barrel in author.split(HYPH)
             if barrel.replace(SEP, "").strip()
         )
