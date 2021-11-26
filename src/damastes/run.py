@@ -491,6 +491,32 @@ def make_initials(authors: str) -> str:
                 return name[:3]
             if name[0].upper() in ["O", "D", "О", "Д"] and name[1] == "'":
                 return name[0] + "'" + name[2].upper()
+        if name in [
+            "von",
+            "фон",
+            "van",
+            "ван",
+            "der",
+            "дер",
+            "til",
+            "тиль",
+            "zu",
+            "цу",
+            "af",
+            "of",
+            "из",
+            "de",
+            "де",
+            "des",
+            "дез",
+            "del",
+            "дель",
+            "du",
+            "дю",
+            "la",
+            "ля",
+        ]:
+            return name[0]
         return name[0].upper()
 
     return COMMA.join(

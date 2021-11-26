@@ -63,6 +63,17 @@ class TestPureFunctions:
         assert make_initials("A. Strugatsky, B...Strugatsky.") == "A.S.,B.S."
         assert make_initials("Иржи Кропачек,, Йозеф Новотный") == "И.К.,Й.Н."
         assert make_initials("Язон динАльт, Шарль д'Артаньян") == "Я.динА.,Ш.д'А."
+        assert (
+            make_initials("Charles de Batz de Castelmore d'Artagnan")
+            == "C.d.B.d.C.d'A."
+        )
+        assert (
+            make_initials("Mario Del Monaco, Hutchinson of London") == "M.D.M.,H.o.L."
+        )
+        assert make_initials("De Beers, Guido van Rossum") == "D.B.,G.v.R."
+        assert make_initials("Манфред фон Рихтгофен") == "М.ф.Р."
+        assert make_initials("Armand Jean du Plessis") == "A.J.d.P."
+        assert make_initials("johannes diderik van der waals") == "J.D.v.d.W."
         assert make_initials("Österreich über alles") == "Ö.Ü.A."
 
     def test_human_fine(self):
