@@ -478,13 +478,14 @@ def make_initials(authors: str) -> str:
     'I.V-A.,E.C.N.'
     >>> make_initials("Rory O'Connor, Seumas MacManus, Christine McConnell")
     "R.O'C.,S.MacM.,C.McC."
-    >>> make_initials("Charles d'Artagnan, Ross Macdonald")
-    "C.d'A.,R.M."
+    >>> make_initials("Jason dinAlt, Charles d'Artagnan, D'Arcy McNickle, Ross Macdonald")
+    "J.dinA.,C.d'A.,D'A.McN.,R.M."
     """
 
     def form_initial(name: str) -> str:
-        if len(name) > 3 and name[:3] == "Mac" and name[3].isupper():
-            return name[:4]
+        if len(name) > 3:
+            if name[:3] in ["Mac", "din", "дин"] and name[3].isupper():
+                return name[:4]
         if len(name) > 2:
             if name[:2] == "Mc" and name[2].isupper():
                 return name[:3]
