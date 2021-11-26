@@ -487,7 +487,7 @@ def make_initials(authors: str) -> str:
             if name[:3] in ["Mac", "din", "дин"] and name[3].isupper():
                 return name[:4]
         if len(name) > 2:
-            if name[:2] == "Mc" and name[2].isupper():
+            if name[:2] in ["Mc", "Di"] and name[2].isupper():
                 return name[:3]
             if name[0].upper() in ["O", "D", "О", "Д"] and name[1] == "'":
                 return name[0] + "'" + name[2].upper()
@@ -503,6 +503,7 @@ def make_initials(authors: str) -> str:
             "zu",
             "цу",
             "af",
+            "аф",
             "of",
             "из",
             "de",
