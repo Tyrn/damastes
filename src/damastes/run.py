@@ -516,6 +516,8 @@ def make_initials(authors: str) -> str:
             "дю",
             "la",
             "ля",
+            "haut",
+            "от",
         ]:
             return name[0]
         return name[0].upper()

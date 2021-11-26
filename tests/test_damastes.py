@@ -70,6 +70,8 @@ class TestPureFunctions:
         assert (
             make_initials("Mario Del Monaco, Hutchinson of London") == "M.D.M.,H.o.L."
         )
+        assert make_initials("Anselm haut Rodric") == "A.h.R."
+        assert make_initials("Ансельм от Родрик") == "А.о.Р."
         assert make_initials("Leonardo Wilhelm DiCaprio") == "L.W.DiC."
         assert make_initials("De Beers, Guido van Rossum") == "D.B.,G.v.R."
         assert make_initials("Манфред фон Рихтгофен") == "М.ф.Р."
