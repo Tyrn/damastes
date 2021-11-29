@@ -515,6 +515,7 @@ def make_initials(authors: str) -> str:
             "du",
             "дю",
             "la",
+            "ла",
             "ля",
             "haut",
             "от",
