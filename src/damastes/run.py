@@ -517,6 +517,8 @@ def make_initials(authors: str) -> str:
             "la",
             "ла",
             "ля",
+            "le",
+            "ле",
             "haut",
             "от",
         ]:
