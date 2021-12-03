@@ -1,5 +1,8 @@
+import pytest
+import copy
 from src.damastes import __version__
 from src.damastes import *
+import src.damastes.run
 
 
 class TestPureFunctions:
@@ -90,3 +93,13 @@ class TestPureFunctions:
         assert human_fine(1024 ** 2) == "1.0MB"
         assert human_fine(1024 ** 3) == "1.00GB"
         assert human_fine(1024 ** 4) == "1.00TB"
+
+
+from src.damastes.run import _path_compare
+
+
+def test_path_compare(monkeypatch):
+    args = RestrictedDotDict(copy.deepcopy(CLEAN_CONTEXT_PARAMS))
+    args.sort_lex = True
+    monkeypatch.setattr(src.damastes, "_ARGS", args)
+    assert _path_compare("alfa", "alfa") == 0
