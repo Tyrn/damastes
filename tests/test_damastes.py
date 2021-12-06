@@ -2,7 +2,7 @@ import pytest
 import copy
 from src.damastes import __version__
 from src.damastes import *
-import src.damastes.run
+import src.damastes.shoot as shoot
 
 
 class TestPureFunctions:
@@ -95,11 +95,14 @@ class TestPureFunctions:
         assert human_fine(1024 ** 4) == "1.00TB"
 
 
-from src.damastes.run import _path_compare
+class TestNonPureHelpers:
+    def new_args(self):
+        return RestrictedDotDict(copy.deepcopy(CLEAN_CONTEXT_PARAMS))
 
-
-def test_path_compare(monkeypatch):
-    args = RestrictedDotDict(copy.deepcopy(CLEAN_CONTEXT_PARAMS))
-    args.sort_lex = True
-    monkeypatch.setattr(src.damastes, "_ARGS", args)
-    assert _path_compare("alfa", "alfa") == 0
+    def test_path_compare(self, monkeypatch):
+        args = self.new_args()
+        monkeypatch.setattr(shoot, "_ARGS", args)
+        args.sort_lex = True
+        assert shoot._path_compare("10alfa", "2bravo") == -1
+        args.sort_lex = False
+        assert shoot._path_compare("10alfa", "2bravo") == 1
