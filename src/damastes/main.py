@@ -126,13 +126,13 @@ def _steady_parameters(func):
     @click.argument("src", type=click.Path(exists=True, resolve_path=True))
     @click.argument("dst_dir", type=click.Path(exists=True, resolve_path=True))
     @functools.wraps(func)
-    def parameters(**kwargs):
+    def parameters(**kwargs):  # pragma: no cover
         func(**kwargs)
 
     return parameters
 
 
-def _print_clean_context_params() -> None:
+def _print_clean_context_params() -> None:  # pragma: no cover
     print("CLEAN_CONTEXT_PARAMS = {")
     count = 0
     for k, v in click.get_current_context().params.items():
@@ -145,7 +145,7 @@ def _print_clean_context_params() -> None:
 @click.help_option("-h", "--help")
 @click.version_option(__version__, "-V", "--version")
 @_steady_parameters
-def main(**kwargs) -> int:
+def main(**kwargs) -> int:  # pragma: no cover
     """
     Damastes a.k.a. Procrustes is a CLI utility for copying directories and subdirectories
     containing supported audio files in sequence, naturally sorted.
@@ -178,5 +178,5 @@ def main(**kwargs) -> int:
     return _run()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     sys.exit(main())

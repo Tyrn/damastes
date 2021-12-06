@@ -1,5 +1,3 @@
-import pytest
-import copy
 from src.damastes import __version__
 from src.damastes import *
 import src.damastes.shoot as shoot
@@ -99,10 +97,41 @@ class TestNonPureHelpers:
     def new_args(self):
         return RestrictedDotDict(copy.deepcopy(CLEAN_CONTEXT_PARAMS))
 
-    def test_path_compare(self, monkeypatch):
+    def test_compare(self, monkeypatch):
         args = self.new_args()
         monkeypatch.setattr(shoot, "_ARGS", args)
+
         args.sort_lex = True
-        assert shoot._path_compare("10alfa", "2bravo") == -1
+        assert shoot._path_compare(Path("alfa"), Path("alfa" + os.path.sep)) == 0
+        assert shoot._path_compare(Path("10alfa"), Path("2bravo")) == -1
+        assert shoot._file_compare(Path("10alfa"), Path("2bravo")) == -1
+        assert shoot._file_compare(Path("alfa.ogg"), Path("alfa.mp3")) == 0
+        assert shoot._file_compare(Path("Alfa.ogg"), Path("alfa.mp3")) == -1
         args.sort_lex = False
-        assert shoot._path_compare("10alfa", "2bravo") == 1
+        assert shoot._path_compare(Path("10alfa"), Path("2bravo")) == 1
+        assert shoot._file_compare(Path("10alfa"), Path("2bravo")) == 1
+
+    def test_decorate(self, monkeypatch):
+        args = self.new_args()
+        monkeypatch.setattr(shoot, "_ARGS", args)
+        monkeypatch.setattr(shoot, "_FILES_TOTAL", 42)
+
+        assert shoot._decorate_dir_name(0, Path("charlie")) == "000-charlie"
+        args.strip_decorations = True
+        assert shoot._decorate_dir_name(0, Path("charlie")) == "charlie"
+
+        assert shoot._artist_part(prefix=" - ", suffix=" - ") == ""
+        args.artist = "Daniel Defoe"
+        assert shoot._artist_part(prefix=" - ", suffix=" - ") == " - Daniel Defoe - "
+        assert shoot._artist_part(prefix=" - ") == " - Daniel Defoe"
+        assert shoot._artist_part() == "Daniel Defoe"
+
+        assert (
+            shoot._decorate_file_name(7, ["deeper"], Path("delta.m4a")) == "delta.m4a"
+        )
+        args.strip_decorations = False
+        args.prepend_subdir_name = True
+        assert (
+            shoot._decorate_file_name(7, ["deeper", "yet"], Path("delta.m4a"))
+            == "07-deeper-yet-delta.m4a"
+        )

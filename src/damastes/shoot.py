@@ -98,7 +98,7 @@ def _file_compare(path_x: Path, path_y: Path) -> Ord:
     )
 
 
-def _mutagen_file(name: Path, spinner=None):
+def _mutagen_file(name: Path, spinner=None):  # pragma: no cover
     """
     Returns Mutagen thing, if name looks like an audio file path, else returns None.
     """
@@ -131,7 +131,7 @@ def _mutagen_file(name: Path, spinner=None):
     return file
 
 
-def _is_audiofile(name: Path, spinner=None) -> bool:
+def _is_audiofile(name: Path, spinner=None) -> bool:  # pragma: no cover
     """
     Returns True, if name is an audio file, else returns False.
     """
@@ -178,7 +178,7 @@ def _decorate_file_name(i: int, dst_step: List[str], path: Path) -> str:
 
 def _walk_file_tree(
     src: Path, dst_root: Path, fcount: List[int], dst_step: List[str]
-) -> Iterator[Tuple[int, Path, Path, str]]:
+) -> Iterator[Tuple[int, Path, Path, str]]:  # pragma: no cover
     """
     Recursively traverses the source directory and yields a tuple of
     copying attributes:
@@ -250,7 +250,9 @@ def _walk_file_tree(
         yield from file_fund(files)
 
 
-def _audiofiles_count(directory: Path, spinner=None) -> Tuple[int, int]:
+def _audiofiles_count(
+    directory: Path, spinner=None
+) -> Tuple[int, int]:  # pragma: no cover
     """
     Returns full recursive count of audiofiles in directory.
     """
@@ -273,7 +275,7 @@ def _audiofiles_count(directory: Path, spinner=None) -> Tuple[int, int]:
     return cnt, size
 
 
-def _album() -> Iterator[Tuple[int, Path, Path, str]]:
+def _album() -> Iterator[Tuple[int, Path, Path, str]]:  # pragma: no cover
     """
     Sets up boilerplate required by the options and returns the ammo belt generator
     of (src, dst) pairs.
@@ -354,12 +356,10 @@ def human_fine(bytes: int) -> str:
         return f"{{:.{num_decimals}f}}{{}}".format(quotient, unit)
     if bytes == 0:
         return "0"
-    if bytes == 1:
-        return "1"
-    return f"human_fine error; bytes: {bytes}"
+    return "1" if bytes == 1 else f"human_fine error; bytes: {bytes}"
 
 
-def _copy_album() -> None:
+def _copy_album() -> None:  # pragma: no cover
     """
     Runs through the ammo belt and does copying, in the reverse order if necessary.
     """
@@ -449,7 +449,9 @@ def _copy_album() -> None:
         _show(f"Fatal error. files_total: {files_total}, _FILES_TOTAL: {_FILES_TOTAL}")
 
 
-def _show(string: str, *, end="\n", file=sys.stdout, flush=False) -> None:
+def _show(
+    string: str, *, end="\n", file=sys.stdout, flush=False
+) -> None:  # pragma: no cover
     if not _ARGS.no_console:
         return print(string, end=end, file=file, flush=flush)
 
@@ -578,7 +580,7 @@ CLEAN_CONTEXT_PARAMS = {
 }  # 22 of them.
 
 
-class RestrictedDotDict(dict):
+class RestrictedDotDict(dict):  # pragma: no cover
     """
     Enables access to dictionary entries via dot notation.
     An attempt at adding a new key raises an exception.
@@ -609,7 +611,7 @@ _START_TIME = 0.0
 _SHORT_LOG: List[str] = []
 
 
-def _reset_counters() -> None:
+def _reset_counters() -> None:  # pragma: no cover
     global _FILES_TOTAL
     global _INVALID_TOTAL
     global _SUSPICIOUS_TOTAL
@@ -623,7 +625,7 @@ def _reset_counters() -> None:
     _SHORT_LOG = []
 
 
-def _set_args_click(context_params: dict) -> None:
+def _set_args_click(context_params: dict) -> None:  # pragma: no cover
     """
     To be called once from main() before _run().
     """
@@ -632,7 +634,7 @@ def _set_args_click(context_params: dict) -> None:
     _ARGS = RestrictedDotDict(copy.deepcopy(context_params))
 
 
-def _run() -> int:
+def _run() -> int:  # pragma: no cover
     """
     Runs the whole Procrustes business according to
     preset context.
@@ -714,7 +716,7 @@ def _run() -> int:
     return 0
 
 
-def run(**kwargs) -> int:
+def run(**kwargs) -> int:  # pragma: no cover
     """
     Sets up context parameters manually via kwargs
     and runs the whole Procrustes business.
@@ -733,7 +735,7 @@ def run(**kwargs) -> int:
     return _run()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     print(
         f" {WARNING_ICON} Module [{Path(__file__).name}] is not runnable.",
         file=sys.stderr,
