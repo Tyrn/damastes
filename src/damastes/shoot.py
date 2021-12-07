@@ -485,17 +485,19 @@ def make_initials(authors: str) -> str:
     """
 
     def form_initial(name: str) -> str:
-        cut = name.split("'")  # Deal with ' inside.
-        if len(cut) > 1 and cut[1]:
+
+        if len(cut := name.split("'")) > 1 and cut[1]:  # Deal with '.
             if cut[1][0].islower() and cut[0]:
                 return cut[0][0].upper()
             return cut[0] + "'" + cut[1][0]
-        if len(name) > 3:
-            if name[:3] in ["Mac", "din", "дин"] and name[3].isupper():
-                return name[:4]
-        if len(name) > 2:
-            if name[:2] in ["Mc", "Di"] and name[2].isupper():
-                return name[:3]
+
+        if len(name) > 1:  # Deal with prefixes.
+            prefix = name[0]
+            for ch in name[1:]:
+                prefix += ch
+                if ch.isupper():
+                    return prefix
+
         if name in [
             "von",
             "фон",

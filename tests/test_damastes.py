@@ -87,6 +87,9 @@ class TestPureFunctions:
         assert make_initials("'") == "'."
         assert make_initials("'B") == "'B."
         assert make_initials("'b") == "'b."
+        assert make_initials("dA") == "dA."
+        assert make_initials("DA") == "DA."
+        assert make_initials("DAMadar") == "DA."
 
     def test_human_fine(self):
         assert human_fine(0) == "0"
