@@ -80,6 +80,13 @@ class TestPureFunctions:
         assert make_initials("johannes diderik van der waals") == "J.D.v.d.W."
         assert make_initials("Österreich über alles") == "Ö.Ü.A."
         assert make_initials("José Eduardo dos Santos") == "J.E.d.S."
+        assert make_initials("Gnda'Ke") == "Gnda'K."
+        assert make_initials("gnda'ke") == "G."
+        assert make_initials("gnda'") == "G."
+        assert make_initials("'Bravo") == "'B."
+        assert make_initials("'") == "'."
+        assert make_initials("'B") == "'B."
+        assert make_initials("'b") == "'b."
 
     def test_human_fine(self):
         assert human_fine(0) == "0"
