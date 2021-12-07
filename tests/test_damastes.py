@@ -79,6 +79,7 @@ class TestPureFunctions:
         assert make_initials("Armand Jean du Plessis") == "A.J.d.P."
         assert make_initials("johannes diderik van der waals") == "J.D.v.d.W."
         assert make_initials("Österreich über alles") == "Ö.Ü.A."
+        assert make_initials("José Eduardo dos Santos") == "J.E.d.S."
 
     def test_human_fine(self):
         assert human_fine(0) == "0"
@@ -134,4 +135,9 @@ class TestNonPureHelpers:
         assert (
             shoot._decorate_file_name(7, ["deeper", "yet"], Path("delta.m4a"))
             == "07-deeper-yet-delta.m4a"
+        )
+        monkeypatch.setattr(shoot, "_FILES_TOTAL", 533)
+        assert (
+            shoot._decorate_file_name(7, ["deeper"], Path("delta.m4a"))
+            == "007-deeper-delta.m4a"
         )
