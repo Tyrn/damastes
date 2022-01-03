@@ -1,4 +1,4 @@
-# poetry
+# Poetry
 /dist/
 /.venv/
 __pycache__/
@@ -6,6 +6,10 @@ __pypackages__/
 *.egg-info/
 #poetry.lock
 .coverage
+
+# Special cases
+procrustes
+*.pkg.tar.zst
 
 # IDE
 *.vim
