@@ -3,17 +3,15 @@
 #
 # Requires in the project root:
 #
-# (1) procrustes executable;
-# (2) taglib-git*.pkg.tar.zst package;
+# (1) procrustes executable, built on bullseye;
+# TODO, all the rest.
 
-FROM archlinux AS base
+FROM python:3.10.1-slim-bullseye AS base
 
 ARG user=damastes project=damastes src=src
 
-RUN pacman -Syy && \
-    pacman -S --noconfirm python-pip && \
-    useradd -ms /bin/bash "$user"
 # Non-root user.
+RUN useradd -ms /bin/bash "$user"
 USER $user
 WORKDIR /home/$user
 ENV PATH=/home/$user/.local/bin:$PATH
@@ -30,24 +28,18 @@ RUN poetry config virtualenvs.create true && \
     poetry install --no-dev && \
     poetry build -f sdist
 
-FROM archlinux
+FROM python:3.10.1-slim-bullseye
 
 ARG user=damastes project=damastes
 
-COPY taglib-git*.pkg.tar.zst ./
-RUN pacman -Syy && \
-    pacman -S --noconfirm python-pip && \
-    pacman -U --noconfirm taglib-git*.pkg.tar.zst && \
-    useradd -ms /bin/bash "$user"
 # Non-root user.
+RUN useradd -ms /bin/bash "$user"
 USER $user
 WORKDIR /home/$user
 ENV PATH=/home/$user/.local/bin:$PATH
 
 COPY --from=base /home/$user/$project/dist/ ./dist/
 RUN pip install ./dist/* --user && \
-    echo 'alias dm=damastes' >> .bashrc && \
-    echo 'alias dp=procrustes' >> .bashrc
-COPY procrustes /home/$user/.local/bin
+    echo 'alias dm=damastes' >> .bashrc
 
 CMD ["bash"]
