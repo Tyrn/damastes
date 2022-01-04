@@ -10,6 +10,7 @@ __pypackages__/
 # Special cases
 procrustes
 *.pkg.tar.zst
+*.deb
 
 # IDE
 *.vim

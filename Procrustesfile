@@ -34,10 +34,10 @@ FROM archlinux
 
 ARG user=damastes project=damastes
 
-COPY taglib-git* ./
+COPY taglib-git*.pkg.tar.zst ./
 RUN pacman -Syy && \
     pacman -S --noconfirm python-pip && \
-    pacman -U --noconfirm taglib-git* && \
+    pacman -U --noconfirm taglib-git*.pkg.tar.zst && \
     useradd -ms /bin/bash "$user"
 # Non-root user.
 USER $user
