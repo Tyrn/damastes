@@ -4,7 +4,6 @@
 # Requires in the project root:
 #
 # (1) procrustes executable, built on bullseye;
-# TODO, all the rest.
 
 FROM python:3.10.1-slim-bullseye AS base
 
@@ -32,14 +31,18 @@ FROM python:3.10.1-slim-bullseye
 
 ARG user=damastes project=damastes
 
+RUN apt-get update && \
+    apt-get install -y libtagc0-dev && \
+    useradd -ms /bin/bash "$user"
 # Non-root user.
-RUN useradd -ms /bin/bash "$user"
 USER $user
 WORKDIR /home/$user
 ENV PATH=/home/$user/.local/bin:$PATH
 
 COPY --from=base /home/$user/$project/dist/ ./dist/
 RUN pip install ./dist/* --user && \
-    echo 'alias dm=damastes' >> .bashrc
+    echo 'alias dm=damastes' >> .bashrc && \
+    echo 'alias dp=procrustes' >> .bashrc
+COPY procrustes /home/$user/.local/bin
 
 CMD ["bash"]
