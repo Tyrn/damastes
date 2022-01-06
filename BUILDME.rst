@@ -87,9 +87,9 @@ Run
 
 ::
 
-    $ docker run -it --name damastes --rm --mount type=bind,source="$HOME"/,target=/home/mnt damastes
+    $ docker run -it --name damastes --rm --mount type=bind,source="$HOME"/,target=/enjoy --mount type=bind,source=/run/media,target=/run/media -w /enjoy damastes:latest
 
-- ``--name damastes`` is the container name; tailing ``target=/home/mnt damastes`` is the image name.
+- ``:latest`` is optional; ``damastes:latest`` is the image name.
 
 Docker Compose
 ==============
@@ -107,8 +107,11 @@ Configuration
         volumes:
           - type: bind
             source: $HOME
-            target: /home/mnt
-        working_dir: /home/mnt
+            target: /enjoy
+          - type: bind
+            source: /run/media
+            target: /run/media
+        working_dir: /enjoy
 
 Run
 ---

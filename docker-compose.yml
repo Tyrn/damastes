@@ -4,5 +4,8 @@ services:
     volumes:
       - type: bind
         source: $HOME
-        target: /home/mnt
-    working_dir: /home/mnt
+        target: /enjoy
+      - type: bind
+        source: /run/media
+        target: /run/media
+    working_dir: /enjoy
