@@ -49,6 +49,9 @@ ARG user=damastes project=damastes
 
 RUN apt-get update && \
     apt-get install -y libtagc0-dev && \
+    apt-get install -y tree && \
+    apt-get install -y less && \
+    apt-get install -y wget && \
     useradd -ms /bin/bash "$user"
 # Non-root user.
 USER $user
@@ -57,6 +60,11 @@ ENV PATH=/home/$user/.local/bin:$PATH
 
 COPY --from=poetrybase /home/$user/$project/dist/ ./dist/
 RUN pip install ./dist/* --user && \
+    wget https://raw.githubusercontent.com/rupa/z/master/z.sh -O z.sh && \
+    echo '. ~/z.sh' >> .bashrc && \
+    echo 'alias ll="ls -lh"' >> .bashrc && \
+    echo 'alias lls="ll | less"' >> .bashrc && \
+    echo 'alias lss="ls | less"' >> .bashrc && \
     echo 'alias dm=damastes' >> .bashrc && \
     echo 'alias dp=procrustes' >> .bashrc
 COPY --from=cargobase /home/$cuser/$cproject/target/release/$cproject .local/bin
