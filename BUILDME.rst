@@ -80,7 +80,7 @@ Build
 
 ::
 
-    $ docker build -t damastes --rm .
+    $ docker build -t damastes [-f Procrustesfile] --rm .
 
 Run
 ---
