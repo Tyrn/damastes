@@ -1,11 +1,26 @@
-# Highly unofficial image, including both Damastes
-# and Procrustes.
-#
-# Requires in the project root:
-#
-# (1) procrustes executable, built on bullseye;
+# This image contains both Damastes
+# and Procrustes utilities.
 
-FROM python:3.10.1-slim-bullseye AS base
+FROM rust:1.57.0-slim-bullseye AS cargobase
+
+ARG cuser=procrustes cproject=procrustes
+
+RUN apt-get update && \
+    apt-get install -y git && \
+    apt-get install -y libtagc0-dev && \
+    useradd -ms /bin/bash "$cuser"
+# Non-root user.
+USER $cuser
+WORKDIR /home/$cuser
+
+# Project.
+RUN git clone https://github.com/Tyrn/$cproject
+WORKDIR /home/$cuser/$cproject
+
+# Build.
+RUN cargo build --release
+
+FROM python:3.10.1-slim-bullseye AS poetrybase
 
 ARG user=damastes project=damastes src=src
 
@@ -29,6 +44,7 @@ RUN poetry config virtualenvs.create true && \
 
 FROM python:3.10.1-slim-bullseye
 
+ARG cuser=procrustes cproject=procrustes
 ARG user=damastes project=damastes
 
 RUN apt-get update && \
@@ -39,10 +55,10 @@ USER $user
 WORKDIR /home/$user
 ENV PATH=/home/$user/.local/bin:$PATH
 
-COPY --from=base /home/$user/$project/dist/ ./dist/
+COPY --from=poetrybase /home/$user/$project/dist/ ./dist/
 RUN pip install ./dist/* --user && \
     echo 'alias dm=damastes' >> .bashrc && \
     echo 'alias dp=procrustes' >> .bashrc
-COPY procrustes /home/$user/.local/bin
+COPY --from=cargobase /home/$cuser/$cproject/target/release/$cproject .local/bin
 
 CMD ["bash"]
