@@ -94,28 +94,15 @@ Run
 Docker Compose
 ==============
 
-Configuration
--------------
-
-*docker-compose.yml*:
-
-::
-
-    services:
-      damastes:
-        image: damastes:latest
-        volumes:
-          - type: bind
-            source: $HOME
-            target: /enjoy
-          - type: bind
-            source: /run/media
-            target: /run/media
-        working_dir: /enjoy
-
 Run
 ---
 
 ::
 
     $ docker-compose run --rm damastes
+
+also possible:
+
+::
+
+    $ docker-compose -f docker-compose.yml run --rm damastes
