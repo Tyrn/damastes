@@ -87,7 +87,7 @@ Run
 
 ::
 
-    $ docker run -it --name damastes --rm --mount type=bind,source="$HOME"/,target=/enjoy --mount type=bind,source=/run/media,target=/run/media -w /enjoy damastes:latest
+    $ docker run -it --name damastes --rm --mount type=bind,source="$HOME"/,target=/enjoy --mount type=bind,source=/run/media,target=/run/media,bind-propagation=shared -w /enjoy damastes:latest
 
 - ``:latest`` is optional; ``damastes:latest`` is the image name.
 

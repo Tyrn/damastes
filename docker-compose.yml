@@ -8,4 +8,6 @@ services:
       - type: bind
         source: /run/media
         target: /run/media
+        bind:
+          propagation: shared
     working_dir: /enjoy
