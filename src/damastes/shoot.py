@@ -121,13 +121,13 @@ def _mutagen_file(name: Path, spinner=None):  # pragma: no cover
     except mutagen.MutagenError as mt_error:
         if spinner:
             spinner.write(f" {INVALID_ICON} >>{mt_error}>> {name_to_print}")
-        _INVALID_TOTAL += 1
+            _INVALID_TOTAL += 1
         return None
 
     if file is None and ext in KNOWN_EXTENSIONS:
         if spinner:
             spinner.write(f" {SUSPICIOUS_ICON} {name_to_print}")
-        _SUSPICIOUS_TOTAL += 1
+            _SUSPICIOUS_TOTAL += 1
     return file
 
 
@@ -275,16 +275,25 @@ def _audiofiles_count(
     return cnt, size
 
 
-def dst_calculate() -> Path:
-    prefix = (str(_ARGS.album_num).zfill(2) + "-") if _ARGS.album_num else ""
-    base_dst = prefix + (
-        _artist_part(suffix=" - ") + _ARGS.unified_name
-        if _ARGS.unified_name
-        else _ARGS.src.stem
-        if _ARGS.src.is_file()
-        else _ARGS.src.name
+def dst_calculate() -> str:
+    """
+    Calculates destination directory, if any, to be appended to
+    the destination path from the command line.
+    """
+    return (
+        ""
+        if _ARGS.drop_dst
+        else (
+            ((str(_ARGS.album_num).zfill(2) + "-") if _ARGS.album_num else "")
+            + (
+                _artist_part(suffix=" - ") + _ARGS.unified_name
+                if _ARGS.unified_name
+                else _ARGS.src.stem
+                if _ARGS.src.is_file()
+                else _ARGS.src.name
+            )
+        )
     )
-    return "" if _ARGS.drop_dst else base_dst
 
 
 def _album() -> Iterator[Tuple[int, Path, Path, str]]:  # pragma: no cover
