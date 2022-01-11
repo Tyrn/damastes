@@ -278,7 +278,7 @@ def _audiofiles_count(
 def dst_calculate() -> str:
     """
     Calculates destination directory, if any, to be appended to
-    the destination path from the command line.
+    the destination path collected from the command line.
     """
     return (
         ""
@@ -687,10 +687,10 @@ def _run() -> int:  # pragma: no cover
         warnings.simplefilter("ignore")
 
         if _ARGS.no_console:
-            _FILES_TOTAL, src_total = _audiofiles_count(_ARGS.src)
+            _FILES_TOTAL, bytes_total = _audiofiles_count(_ARGS.src)
         else:
             with yaspin() as sp:
-                _FILES_TOTAL, src_total = _audiofiles_count(_ARGS.src, sp)
+                _FILES_TOTAL, bytes_total = _audiofiles_count(_ARGS.src, sp)
 
         if _ARGS.count:
             _show(
@@ -698,9 +698,9 @@ def _run() -> int:  # pragma: no cover
                 + f" Valid: {_FILES_TOTAL} file(s)",
                 end="",
             )
-            _show(f"; Volume: {human_fine(src_total)}", end="")
+            _show(f"; Volume: {human_fine(bytes_total)}", end="")
             if _FILES_TOTAL > 1:
-                _show(f"; Average: {human_fine(src_total // _FILES_TOTAL)}", end="")
+                _show(f"; Average: {human_fine(bytes_total // _FILES_TOTAL)}", end="")
             _show(f"; Time: {(perf_counter() - _START_TIME):.1f}s")
         else:
             _INVALID_TOTAL = 0
