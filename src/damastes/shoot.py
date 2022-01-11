@@ -275,11 +275,7 @@ def _audiofiles_count(
     return cnt, size
 
 
-def _album() -> Iterator[Tuple[int, Path, Path, str]]:  # pragma: no cover
-    """
-    Sets up boilerplate required by the options and returns the ammo belt generator
-    of (src, dst) pairs.
-    """
+def dst_calculate() -> Path:
     prefix = (str(_ARGS.album_num).zfill(2) + "-") if _ARGS.album_num else ""
     base_dst = prefix + (
         _artist_part(suffix=" - ") + _ARGS.unified_name
@@ -288,9 +284,14 @@ def _album() -> Iterator[Tuple[int, Path, Path, str]]:  # pragma: no cover
         if _ARGS.src.is_file()
         else _ARGS.src.name
     )
+    return "" if _ARGS.drop_dst else base_dst
 
-    executive_dst = _ARGS.dst_dir / ("" if _ARGS.drop_dst else base_dst)
 
+def _album() -> Iterator[Tuple[int, Path, Path, str]]:  # pragma: no cover
+    """
+    Sets up boilerplate required by the options and returns the ammo belt generator
+    of (src, dst) pairs.
+    """
     if _FILES_TOTAL < 1:
         _show(
             f" {WARNING_ICON} There are no supported audio files"
@@ -299,22 +300,22 @@ def _album() -> Iterator[Tuple[int, Path, Path, str]]:  # pragma: no cover
         sys.exit(1)
 
     if not _ARGS.drop_dst and not _ARGS.dry_run:
-        if executive_dst.exists():
+        if _ARGS.dst_dir.exists():
             if _ARGS.overwrite:
                 try:
-                    shutil.rmtree(executive_dst)
+                    shutil.rmtree(_ARGS.dst_dir)
                 except FileNotFoundError:
-                    _show(f' {WARNING_ICON} Failed to remove "{executive_dst}".')
+                    _show(f' {WARNING_ICON} Failed to remove "{_ARGS.dst_dir}".')
                     sys.exit(1)
             else:
                 _show(
-                    f' {WARNING_ICON} Target directory "{executive_dst}" already exists.'
+                    f' {WARNING_ICON} Target directory "{_ARGS.dst_dir}" already exists.'
                 )
                 sys.exit(1)
-        executive_dst.mkdir()
+        _ARGS.dst_dir.mkdir()
 
     return _walk_file_tree(
-        _ARGS.src, executive_dst, [_FILES_TOTAL if _ARGS.reverse else 1], []
+        _ARGS.src, _ARGS.dst_dir, [_FILES_TOTAL if _ARGS.reverse else 1], []
     )
 
 
@@ -664,6 +665,7 @@ def _run() -> int:  # pragma: no cover
     if not _ARGS.dst_dir.is_dir():
         _show(f' {WARNING_ICON} Target directory "{_ARGS.dst_dir}" is not there.')
         sys.exit(1)
+    _ARGS.dst_dir = _ARGS.dst_dir / dst_calculate()
 
     if (
         not _ARGS.count
