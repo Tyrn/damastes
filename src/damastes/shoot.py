@@ -121,13 +121,13 @@ def _mutagen_file(name: Path, spinner=None):  # pragma: no cover
     except mutagen.MutagenError as mt_error:
         if spinner:
             spinner.write(f" {INVALID_ICON} >>{mt_error}>> {name_to_print}")
-            _INVALID_TOTAL += 1
+        _INVALID_TOTAL += 1
         return None
 
     if file is None and ext in KNOWN_EXTENSIONS:
         if spinner:
             spinner.write(f" {SUSPICIOUS_ICON} {name_to_print}")
-            _SUSPICIOUS_TOTAL += 1
+        _SUSPICIOUS_TOTAL += 1
     return file
 
 
@@ -622,34 +622,12 @@ class RestrictedDotDict(dict):  # pragma: no cover
 
 
 _ARGS = RestrictedDotDict()
+
 _FILES_TOTAL = -1
 _INVALID_TOTAL = 0
 _SUSPICIOUS_TOTAL = 0
 _START_TIME = 0.0
 _SHORT_LOG: List[str] = []
-
-
-def _reset_counters() -> None:  # pragma: no cover
-    global _FILES_TOTAL
-    global _INVALID_TOTAL
-    global _SUSPICIOUS_TOTAL
-    global _START_TIME
-    global _SHORT_LOG
-
-    _FILES_TOTAL = -1
-    _INVALID_TOTAL = 0
-    _SUSPICIOUS_TOTAL = 0
-    _START_TIME = perf_counter()
-    _SHORT_LOG = []
-
-
-def _set_args_click(context_params: dict) -> None:  # pragma: no cover
-    """
-    To be called once from main() before _run().
-    """
-    global _ARGS
-
-    _ARGS = RestrictedDotDict(copy.deepcopy(context_params))
 
 
 def _run() -> int:  # pragma: no cover
@@ -661,8 +639,16 @@ def _run() -> int:  # pragma: no cover
     after setting the context.
     """
     global _FILES_TOTAL
+    global _INVALID_TOTAL
+    global _SUSPICIOUS_TOTAL
+    global _START_TIME
+    global _SHORT_LOG
 
-    _reset_counters()
+    _FILES_TOTAL = -1
+    _INVALID_TOTAL = 0
+    _SUSPICIOUS_TOTAL = 0
+    _START_TIME = perf_counter()
+    _SHORT_LOG = []
 
     # Tweak context presumably set by main() or run().
     _ARGS.src = Path(_ARGS.src).absolute()  # Takes care of the trailing slash, too.
@@ -717,6 +703,9 @@ def _run() -> int:  # pragma: no cover
                 _show(f"; Average: {human_fine(src_total // _FILES_TOTAL)}", end="")
             _show(f"; Time: {(perf_counter() - _START_TIME):.1f}s")
         else:
+            _INVALID_TOTAL = 0
+            _SUSPICIOUS_TOTAL = 0
+
             _copy_album()
 
         if _INVALID_TOTAL > 0:
@@ -733,6 +722,15 @@ def _run() -> int:  # pragma: no cover
         return 1
 
     return 0
+
+
+def _set_args_click(context_params: dict) -> None:  # pragma: no cover
+    """
+    To be called once from main() before _run().
+    """
+    global _ARGS
+
+    _ARGS = RestrictedDotDict(copy.deepcopy(context_params))
 
 
 def run(**kwargs) -> int:  # pragma: no cover
