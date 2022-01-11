@@ -178,7 +178,7 @@ def _decorate_file_name(i: int, dst_step: List[str], path: Path) -> str:
 
 def _walk_file_tree(
     src: Path, dst_root: Path, fcount: List[int], dst_step: List[str]
-) -> Iterator[Tuple[int, Path, Path, str]]:  # pragma: no cover
+) -> Iterator[Tuple[int, List[str], str]]:  # pragma: no cover
     """
     Recursively traverses the source directory and yields a tuple of
     copying attributes:
@@ -217,25 +217,21 @@ def _walk_file_tree(
 
     def file_flat(files):
         for file in files:
-            yield fcount[0], src / file, dst_root, _decorate_file_name(
-                fcount[0], dst_step, file
-            )
+            yield fcount[0], dst_step, file
             fcount[0] += -1 if _ARGS.reverse else 1
 
     def reverse(i, lst):
         return len(lst) - i if _ARGS.reverse else i + 1
 
     def dir_tree(dirs):
-        for i, directory in enumerate(dirs):
+        for directory in dirs:
             step = list(dst_step)
-            step.append(_decorate_dir_name(reverse(i, dirs), directory))
+            step.append(directory.name)
             yield from _walk_file_tree(src / directory, dst_root, fcount, step)
 
     def file_tree(files):
-        for i, file in enumerate(files):
-            yield fcount[0], src / file, dst_root.joinpath(
-                *dst_step
-            ), _decorate_file_name(reverse(i, files), dst_step, file)
+        for file in files:
+            yield fcount[0], dst_step, file
             fcount[0] += -1 if _ARGS.reverse else 1
 
     dir_fund, file_fund = (
@@ -296,7 +292,7 @@ def dst_calculate() -> str:
     )
 
 
-def _album() -> Iterator[Tuple[int, Path, Path, str]]:  # pragma: no cover
+def _album() -> Iterator[Tuple[int, List[str], str]]:  # pragma: no cover
     """
     Sets up boilerplate required by the options and returns the ammo belt generator
     of (src, dst) pairs.
@@ -446,7 +442,16 @@ def _copy_album() -> None:  # pragma: no cover
     src_total, dst_total, files_total = 0, 0, 0
 
     for entry in _album():
-        src_bytes, dst_bytes = copy_file(entry)
+        i, step, src_file = entry
+        ety = (
+            i,
+            _ARGS.src.joinpath(*step) / src_file,
+            _ARGS.dst_dir.joinpath(*step) if _ARGS.tree_dst else _ARGS.dst_dir,
+            _decorate_file_name(i, step, Path(src_file)),
+        )
+
+        src_bytes, dst_bytes = copy_file(ety)
+
         src_total += src_bytes
         dst_total += dst_bytes
         files_total += 1
