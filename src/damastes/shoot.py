@@ -158,15 +158,15 @@ def _artist_part(*, prefix="", suffix="") -> str:
     return ""
 
 
-def _decorate_file_name(i: int, dst_step: List[str], path: Path) -> str:
+def _decorate_file_name(i: int, step_down: List[str], path: Path) -> str:
     """
     Prepends zero padded decimal i to path name.
     """
     if _ARGS.strip_decorations:
         return path.name
     prefix = str(i).zfill(len(str(_FILES_TOTAL))) + (
-        "-" + "-".join(dst_step) + "-"
-        if _ARGS.prepend_subdir_name and not _ARGS.tree_dst and len(dst_step) > 0
+        "-" + "-".join(step_down) + "-"
+        if _ARGS.prepend_subdir_name and not _ARGS.tree_dst and len(step_down) > 0
         else "-"
     )
     return prefix + (
@@ -177,14 +177,13 @@ def _decorate_file_name(i: int, dst_step: List[str], path: Path) -> str:
 
 
 def _walk_file_tree(
-    src: Path, dst_root: Path, fcount: List[int], dst_step: List[str]
+    src: Path, step_down: List[str], fcount: List[int]
 ) -> Iterator[Tuple[int, List[str], str]]:  # pragma: no cover
     """
-    Recursively traverses the source directory and yields a tuple of
-    copying attributes:
-    index, source file path, destination directory path, target file name.
-
-    The destination directory and file names get decorated according to options.
+    Walks down the src tree, accumulating step_down on each recursion level.
+    Yields a tuple of:
+    (index, list of subdirectories {to be created
+    at destination/to make it possible}, audiofile name)
     """
     if _is_audiofile(src):
         dirs: List[Path] = []
@@ -209,41 +208,23 @@ def _walk_file_tree(
             ),
         )
 
-    def dir_flat(dirs):
+    def walk_into(dirs):
         for directory in dirs:
-            step = list(dst_step)
+            step = list(step_down)
             step.append(directory.name)
-            yield from _walk_file_tree(src / directory, dst_root, fcount, step)
+            yield from _walk_file_tree(src / directory, step, fcount)
 
-    def file_flat(files):
+    def walk_along(files):
         for file in files:
-            yield fcount[0], dst_step, file
+            yield fcount[0], step_down, file
             fcount[0] += -1 if _ARGS.reverse else 1
-
-    def reverse(i, lst):
-        return len(lst) - i if _ARGS.reverse else i + 1
-
-    def dir_tree(dirs):
-        for directory in dirs:
-            step = list(dst_step)
-            step.append(directory.name)
-            yield from _walk_file_tree(src / directory, dst_root, fcount, step)
-
-    def file_tree(files):
-        for file in files:
-            yield fcount[0], dst_step, file
-            fcount[0] += -1 if _ARGS.reverse else 1
-
-    dir_fund, file_fund = (
-        (dir_tree, file_tree) if _ARGS.tree_dst else (dir_flat, file_flat)
-    )
 
     if _ARGS.reverse:
-        yield from file_fund(files)
-        yield from dir_fund(dirs)
+        yield from walk_along(files)
+        yield from walk_into(dirs)
     else:
-        yield from dir_fund(dirs)
-        yield from file_fund(files)
+        yield from walk_into(dirs)
+        yield from walk_along(files)
 
 
 def _audiofiles_count(
@@ -319,9 +300,7 @@ def _album() -> Iterator[Tuple[int, List[str], str]]:  # pragma: no cover
                 sys.exit(1)
         _ARGS.dst_dir.mkdir()
 
-    return _walk_file_tree(
-        _ARGS.src, _ARGS.dst_dir, [_FILES_TOTAL if _ARGS.reverse else 1], []
-    )
+    return _walk_file_tree(_ARGS.src, [], [_FILES_TOTAL if _ARGS.reverse else 1])
 
 
 def human_rough(bytes: int, units=["", "kB", "MB", "GB", "TB", "PB", "EB"]) -> str:
@@ -411,10 +390,17 @@ def _copy_album() -> None:  # pragma: no cover
         shutil.copy(tmp, dst)
         os.remove(tmp)
 
-    def copy_file(entry: Tuple[int, Path, Path, str]) -> Tuple[int, int]:
-        i, src, dst_path, target_file_name = entry
-        dst = dst_path / target_file_name
+    def copy_file(entry: Tuple[int, List[str], str]) -> Tuple[int, int]:
+        i, step_down, src_file = entry
+
+        src = _ARGS.src.joinpath(*step_down) / src_file
+        dst_path = (
+            _ARGS.dst_dir.joinpath(*step_down) if _ARGS.tree_dst else _ARGS.dst_dir
+        )
+        dst = dst_path / _decorate_file_name(i, step_down, Path(src_file))
+
         src_bytes, dst_bytes = src.stat().st_size, 0
+
         if not _ARGS.dry_run:
             dst_path.mkdir(parents=True, exist_ok=True)
             if dst.is_file():
@@ -424,6 +410,7 @@ def _copy_album() -> None:  # pragma: no cover
             else:
                 copy_and_set_via_tmp(i, src, dst)
                 dst_bytes = dst.stat().st_size
+
         if _ARGS.verbose:
             _show(f"{i:>4}/{_FILES_TOTAL} {COLUMN_ICON} {dst}", end="")
             if dst_bytes != src_bytes:
@@ -434,6 +421,7 @@ def _copy_album() -> None:  # pragma: no cover
             _show("")
         else:
             _show(".", end="", flush=True)
+
         return src_bytes, dst_bytes
 
     if not _ARGS.verbose:
@@ -442,16 +430,7 @@ def _copy_album() -> None:  # pragma: no cover
     src_total, dst_total, files_total = 0, 0, 0
 
     for entry in _album():
-        i, step, src_file = entry
-        ety = (
-            i,
-            _ARGS.src.joinpath(*step) / src_file,
-            _ARGS.dst_dir.joinpath(*step) if _ARGS.tree_dst else _ARGS.dst_dir,
-            _decorate_file_name(i, step, Path(src_file)),
-        )
-
-        src_bytes, dst_bytes = copy_file(ety)
-
+        src_bytes, dst_bytes = copy_file(entry)
         src_total += src_bytes
         dst_total += dst_bytes
         files_total += 1
