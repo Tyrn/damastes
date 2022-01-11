@@ -162,7 +162,7 @@ def _decorate_file_name(i: int, step_down: List[str], path: Path) -> str:
     """
     Prepends zero padded decimal i to path name.
     """
-    if _ARGS.strip_decorations:
+    if _ARGS.strip_decorations and _ARGS.tree_dst:
         return path.name
     prefix = str(i).zfill(len(str(_FILES_TOTAL))) + (
         "-" + "-".join(step_down) + "-"
