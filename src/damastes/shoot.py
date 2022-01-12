@@ -252,7 +252,7 @@ def _audiofiles_count(
     return cnt, size
 
 
-def dst_calculate() -> str:
+def _dst_calculate() -> str:
     """
     Calculates destination directory, if any, to be appended to
     the destination path collected from the command line.
@@ -642,7 +642,7 @@ def _run() -> int:  # pragma: no cover
     if not _ARGS.dst_dir.is_dir():
         _show(f' {WARNING_ICON} Target directory "{_ARGS.dst_dir}" is not there.')
         sys.exit(1)
-    _ARGS.dst_dir = _ARGS.dst_dir / dst_calculate()
+    _ARGS.dst_dir = _ARGS.dst_dir / _dst_calculate()
 
     if (
         not _ARGS.count
