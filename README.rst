@@ -181,14 +181,14 @@ One can play with it:
 
     >>> import damastes as d
 
-    >>> d.list_safe_imports()
-    ['human_fine', 'human_rough', 'list_safe_imports', 'make_initials', 'str_strip_numbers', 'strcmp_c', 'strcmp_naturally']
+    >>> d.safe_imports()
+    ['human_fine', 'human_rough', 'safe_imports', 'initials', 'str_strip_numbers', 'strcmp_c', 'strcmp_naturally']
 
-    >>> help(d.list_safe_imports)
+    >>> help(d.safe_imports)
 
-    >>> help(d.make_initials)
+    >>> help(d.initials)
 
-    >>> d.make_initials('William J. "Wild Bill" Donovan, Joseph Gordon-Levitt')
+    >>> d.initials('William J. "Wild Bill" Donovan, Joseph Gordon-Levitt')
     'W.J.D.,J.G-L.'
     >>>
 
