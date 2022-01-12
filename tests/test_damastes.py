@@ -42,54 +42,49 @@ class TestPureFunctions:
         make_initials() syntax philosophy: if a delimiter is
         misplaced, it's ignored.
         """
-        assert make_initials("") == ""
-        assert make_initials(" ") == ""
-        assert make_initials(".. , .. ") == ""
-        assert make_initials(" ,, .,") == ""
-        assert make_initials(", a. g, ") == "A.G."
-        assert make_initials("- , -I.V.-A,E.C.N-, .") == "I.V-A.,E.C.N."
-        assert make_initials("John ronald reuel Tolkien") == "J.R.R.T."
-        assert make_initials("  e.B.Sledge ") == "E.B.S."
-        assert make_initials("Apsley Cherry-Garrard") == "A.C-G."
-        assert make_initials("Windsor Saxe-\tCoburg - Gotha") == "W.S-C-G."
-        assert make_initials("Elisabeth Kubler-- - Ross") == "E.K-R."
-        assert make_initials("  Fitz-Simmons Ashton-Burke Leigh") == "F-S.A-B.L."
-        assert make_initials('Arleigh "31-knot"Burke ') == "A.B."
-        assert make_initials('Harry "Bing" Crosby, Kris "Tanto" Paronto') == "H.C.,K.P."
+        assert initials("") == ""
+        assert initials(" ") == ""
+        assert initials(".. , .. ") == ""
+        assert initials(" ,, .,") == ""
+        assert initials(", a. g, ") == "A.G."
+        assert initials("- , -I.V.-A,E.C.N-, .") == "I.V-A.,E.C.N."
+        assert initials("John ronald reuel Tolkien") == "J.R.R.T."
+        assert initials("  e.B.Sledge ") == "E.B.S."
+        assert initials("Apsley Cherry-Garrard") == "A.C-G."
+        assert initials("Windsor Saxe-\tCoburg - Gotha") == "W.S-C-G."
+        assert initials("Elisabeth Kubler-- - Ross") == "E.K-R."
+        assert initials("  Fitz-Simmons Ashton-Burke Leigh") == "F-S.A-B.L."
+        assert initials('Arleigh "31-knot"Burke ') == "A.B."
+        assert initials('Harry "Bing" Crosby, Kris "Tanto" Paronto') == "H.C.,K.P."
         assert (
-            make_initials('William J. "Wild Bill" Donovan, Marta "Cinta Gonzalez')
+            initials('William J. "Wild Bill" Donovan, Marta "Cinta Gonzalez')
             == "W.J.D.,M.C.G."
         )
-        assert make_initials("a.s , - . ,b.s.") == "A.S.,B.S."
-        assert make_initials("A. Strugatsky, B...Strugatsky.") == "A.S.,B.S."
-        assert make_initials("Иржи Кропачек,, Йозеф Новотный") == "И.К.,Й.Н."
-        assert make_initials("Язон динАльт, Шарль д'Артаньян") == "Я.динА.,Ш.д'А."
-        assert (
-            make_initials("Charles de Batz de Castelmore d'Artagnan")
-            == "C.d.B.d.C.d'A."
-        )
-        assert (
-            make_initials("Mario Del Monaco, Hutchinson of London") == "M.D.M.,H.o.L."
-        )
-        assert make_initials("Anselm haut Rodric") == "A.h.R."
-        assert make_initials("Ансельм от Родрик") == "А.о.Р."
-        assert make_initials("Leonardo Wilhelm DiCaprio") == "L.W.DiC."
-        assert make_initials("De Beers, Guido van Rossum") == "D.B.,G.v.R."
-        assert make_initials("Манфред фон Рихтгофен") == "М.ф.Р."
-        assert make_initials("Armand Jean du Plessis") == "A.J.d.P."
-        assert make_initials("johannes diderik van der waals") == "J.D.v.d.W."
-        assert make_initials("Österreich über alles") == "Ö.Ü.A."
-        assert make_initials("José Eduardo dos Santos") == "J.E.d.S."
-        assert make_initials("Gnda'Ke") == "Gnda'K."
-        assert make_initials("gnda'ke") == "G."
-        assert make_initials("gnda'") == "G."
-        assert make_initials("'Bravo") == "'B."
-        assert make_initials("'") == "'."
-        assert make_initials("'B") == "'B."
-        assert make_initials("'b") == "'b."
-        assert make_initials("dA") == "dA."
-        assert make_initials("DA") == "DA."
-        assert make_initials("DAMadar") == "DA."
+        assert initials("a.s , - . ,b.s.") == "A.S.,B.S."
+        assert initials("A. Strugatsky, B...Strugatsky.") == "A.S.,B.S."
+        assert initials("Иржи Кропачек,, Йозеф Новотный") == "И.К.,Й.Н."
+        assert initials("Язон динАльт, Шарль д'Артаньян") == "Я.динА.,Ш.д'А."
+        assert initials("Charles de Batz de Castelmore d'Artagnan") == "C.d.B.d.C.d'A."
+        assert initials("Mario Del Monaco, Hutchinson of London") == "M.D.M.,H.o.L."
+        assert initials("Anselm haut Rodric") == "A.h.R."
+        assert initials("Ансельм от Родрик") == "А.о.Р."
+        assert initials("Leonardo Wilhelm DiCaprio") == "L.W.DiC."
+        assert initials("De Beers, Guido van Rossum") == "D.B.,G.v.R."
+        assert initials("Манфред фон Рихтгофен") == "М.ф.Р."
+        assert initials("Armand Jean du Plessis") == "A.J.d.P."
+        assert initials("johannes diderik van der waals") == "J.D.v.d.W."
+        assert initials("Österreich über alles") == "Ö.Ü.A."
+        assert initials("José Eduardo dos Santos") == "J.E.d.S."
+        assert initials("Gnda'Ke") == "Gnda'K."
+        assert initials("gnda'ke") == "G."
+        assert initials("gnda'") == "G."
+        assert initials("'Bravo") == "'B."
+        assert initials("'") == "'."
+        assert initials("'B") == "'B."
+        assert initials("'b") == "'b."
+        assert initials("dA") == "dA."
+        assert initials("DA") == "DA."
+        assert initials("DAMadar") == "DA."
 
     def test_human_fine(self):
         assert human_fine(0) == "0"
@@ -127,27 +122,34 @@ class TestNonPureHelpers:
         monkeypatch.setattr(shoot, "_ARGS", args)
         monkeypatch.setattr(shoot, "_FILES_TOTAL", 42)
 
-        assert shoot._decorate_dir_name(0, Path("charlie")) == "000-charlie"
-        args.strip_decorations = True
-        assert shoot._decorate_dir_name(0, Path("charlie")) == "charlie"
-
         assert shoot._artist_part(prefix=" - ", suffix=" - ") == ""
         args.artist = "Daniel Defoe"
         assert shoot._artist_part(prefix=" - ", suffix=" - ") == " - Daniel Defoe - "
         assert shoot._artist_part(prefix=" - ") == " - Daniel Defoe"
         assert shoot._artist_part() == "Daniel Defoe"
 
-        assert (
-            shoot._decorate_file_name(7, ["deeper"], Path("delta.m4a")) == "delta.m4a"
-        )
+        assert shoot._dir_decorate(0, Path("charlie")) == "000-charlie"
+        args.strip_decorations = True
+        assert shoot._dir_decorate(0, Path("charlie")) == "charlie"
+
         args.strip_decorations = False
+        assert shoot._file_decorate(7, ["deeper"], Path("delta.m4a")) == "07-delta.m4a"
         args.prepend_subdir_name = True
         assert (
-            shoot._decorate_file_name(7, ["deeper", "yet"], Path("delta.m4a"))
+            shoot._file_decorate(7, ["deeper", "yet"], Path("delta.m4a"))
             == "07-deeper-yet-delta.m4a"
         )
-        monkeypatch.setattr(shoot, "_FILES_TOTAL", 533)
+        args.strip_decorations = True
         assert (
-            shoot._decorate_file_name(7, ["deeper"], Path("delta.m4a"))
+            shoot._file_decorate(7, ["deeper"], Path("delta.m4a"))
+            == "07-deeper-delta.m4a"
+        )
+        args.tree_dst = True
+        assert shoot._file_decorate(7, ["deeper"], Path("delta.m4a")) == "delta.m4a"
+        monkeypatch.setattr(shoot, "_FILES_TOTAL", 533)
+        args.strip_decorations = False
+        args.tree_dst = False
+        assert (
+            shoot._file_decorate(7, ["deeper"], Path("delta.m4a"))
             == "007-deeper-delta.m4a"
         )

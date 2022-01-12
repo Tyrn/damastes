@@ -142,11 +142,11 @@ def _is_audiofile(name: Path, spinner=None) -> bool:  # pragma: no cover
     return False
 
 
-def _decorate_dir_name(i: int, path: Path) -> str:
+def _dir_decorate(i: int, dir: Path) -> str:
     """
     Prepends decimal i to path name.
     """
-    return ("" if _ARGS.strip_decorations else (str(i).zfill(3) + "-")) + path.name
+    return ("" if _ARGS.strip_decorations else (str(i).zfill(3) + "-")) + dir.name
 
 
 def _artist_part(*, prefix="", suffix="") -> str:
@@ -158,25 +158,25 @@ def _artist_part(*, prefix="", suffix="") -> str:
     return ""
 
 
-def _decorate_file_name(i: int, step_down: List[str], path: Path) -> str:
+def _file_decorate(i: int, step_down: List[str], file: Path) -> str:
     """
     Prepends zero padded decimal i to path name.
     """
     if _ARGS.strip_decorations and _ARGS.tree_dst:
-        return path.name
+        return file.name
     prefix = str(i).zfill(len(str(_FILES_TOTAL))) + (
         "-" + "-".join(step_down) + "-"
         if _ARGS.prepend_subdir_name and not _ARGS.tree_dst and len(step_down) > 0
         else "-"
     )
     return prefix + (
-        _ARGS.unified_name + _artist_part(prefix=" - ") + path.suffix
+        _ARGS.unified_name + _artist_part(prefix=" - ") + file.suffix
         if _ARGS.unified_name
-        else path.name
+        else file.name
     )
 
 
-def _walk_file_tree(
+def _dir_walk(
     src: Path, step_down: List[str], fcount: List[int]
 ) -> Iterator[Tuple[int, List[str], str]]:  # pragma: no cover
     """
@@ -212,7 +212,7 @@ def _walk_file_tree(
         for directory in dirs:
             step = list(step_down)
             step.append(directory.name)
-            yield from _walk_file_tree(src / directory, step, fcount)
+            yield from _dir_walk(src / directory, step, fcount)
 
     def walk_along(files):
         for file in files:
@@ -300,7 +300,7 @@ def _album() -> Iterator[Tuple[int, List[str], str]]:  # pragma: no cover
                 sys.exit(1)
         _ARGS.dst_dir.mkdir()
 
-    return _walk_file_tree(_ARGS.src, [], [_FILES_TOTAL if _ARGS.reverse else 1])
+    return _dir_walk(_ARGS.src, [], [_FILES_TOTAL if _ARGS.reverse else 1])
 
 
 def human_rough(bytes: int, units=["", "kB", "MB", "GB", "TB", "PB", "EB"]) -> str:
@@ -344,7 +344,7 @@ def human_fine(bytes: int) -> str:
     return "1" if bytes == 1 else f"human_fine error; bytes: {bytes}"
 
 
-def _copy_album() -> None:  # pragma: no cover
+def _album_copy() -> None:  # pragma: no cover
     """
     Runs through the ammo belt and does copying, in the reverse order if necessary.
     """
@@ -364,9 +364,7 @@ def _copy_album() -> None:  # pragma: no cover
         if not _ARGS.drop_tracknumber:
             audio["tracknumber"] = str(i) + "/" + str(_FILES_TOTAL)
         if _ARGS.artist and _ARGS.album:
-            audio["title"] = make_title(
-                make_initials(_ARGS.artist) + " - " + _ARGS.album
-            )
+            audio["title"] = make_title(initials(_ARGS.artist) + " - " + _ARGS.album)
             audio["artist"] = _ARGS.artist
             audio["album"] = _ARGS.album
         elif _ARGS.artist:
@@ -390,14 +388,14 @@ def _copy_album() -> None:  # pragma: no cover
         shutil.copy(tmp, dst)
         os.remove(tmp)
 
-    def copy_file(entry: Tuple[int, List[str], str]) -> Tuple[int, int]:
+    def file_copy(entry: Tuple[int, List[str], str]) -> Tuple[int, int]:
         i, step_down, src_file = entry
 
         src = _ARGS.src.joinpath(*step_down) / src_file
         dst_path = (
             _ARGS.dst_dir.joinpath(*step_down) if _ARGS.tree_dst else _ARGS.dst_dir
         )
-        dst = dst_path / _decorate_file_name(i, step_down, Path(src_file))
+        dst = dst_path / _file_decorate(i, step_down, Path(src_file))
 
         src_bytes, dst_bytes = src.stat().st_size, 0
 
@@ -430,7 +428,7 @@ def _copy_album() -> None:  # pragma: no cover
     src_total, dst_total, files_total = 0, 0, 0
 
     for entry in _album():
-        src_bytes, dst_bytes = copy_file(entry)
+        src_bytes, dst_bytes = file_copy(entry)
         src_total += src_bytes
         dst_total += dst_bytes
         files_total += 1
@@ -450,13 +448,13 @@ def _show(
         return print(string, end=end, file=file, flush=flush)
 
 
-def list_safe_imports(*, unsafe: List[str] = ["run"]) -> List[str]:
+def safe_imports(*, unsafe: List[str] = ["run"]) -> List[str]:
     """
     Returns a list of general purpose functions without side effects,
     presumably safe to import and run anywhere. The presence of a
     doctest is usually a good sign of safety :)
 
-    >>> 'list_safe_imports' in list_safe_imports()
+    >>> 'safe_imports' in safe_imports()
     True
     """
     return [
@@ -466,15 +464,15 @@ def list_safe_imports(*, unsafe: List[str] = ["run"]) -> List[str]:
     ]
 
 
-def make_initials(authors: str) -> str:
+def initials(authors: str) -> str:
     """
     Reduces authors to initials.
 
-    >>> make_initials('Ignacio "Castigador" Vazquez-Abrams, Estefania Cassingena Navone')
+    >>> initials('Ignacio "Castigador" Vazquez-Abrams, Estefania Cassingena Navone')
     'I.V-A.,E.C.N.'
-    >>> make_initials("Rory O'Connor, Seumas MacManus, Christine McConnell")
+    >>> initials("Rory O'Connor, Seumas MacManus, Christine McConnell")
     "R.O'C.,S.MacM.,C.McC."
-    >>> make_initials("Jason dinAlt, Charles d'Artagnan, D'Arcy McNickle, Ross Macdonald")
+    >>> initials("Jason dinAlt, Charles d'Artagnan, D'Arcy McNickle, Ross Macdonald")
     "J.dinA.,C.d'A.,D'A.McN.,R.M."
     """
 
@@ -690,7 +688,7 @@ def _run() -> int:  # pragma: no cover
             _INVALID_TOTAL = 0
             _SUSPICIOUS_TOTAL = 0
 
-            _copy_album()
+            _album_copy()
 
         if _INVALID_TOTAL > 0:
             _show(f" {INVALID_ICON} Broken: {_INVALID_TOTAL} file(s)")
