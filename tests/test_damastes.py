@@ -94,9 +94,9 @@ class TestPureFunctions:
         assert human_fine(123456789) == "117.7MB"
         assert human_fine(123456789123) == "114.98GB"
         assert human_fine(1024) == "1kB"
-        assert human_fine(1024 ** 2) == "1.0MB"
-        assert human_fine(1024 ** 3) == "1.00GB"
-        assert human_fine(1024 ** 4) == "1.00TB"
+        assert human_fine(1024**2) == "1.0MB"
+        assert human_fine(1024**3) == "1.00GB"
+        assert human_fine(1024**4) == "1.00TB"
 
 
 class TestNonPureHelpers:

@@ -336,7 +336,7 @@ def human_fine(bytes: int) -> str:
 
     if bytes > 1:
         exponent = min(int(log(bytes, 1024)), len(unit_list) - 1)
-        quotient = float(bytes) / 1024 ** exponent
+        quotient = float(bytes) / 1024**exponent
         unit, num_decimals = unit_list[exponent]
         return f"{{:.{num_decimals}f}}{{}}".format(quotient, unit)
     if bytes == 0:
@@ -505,6 +505,8 @@ def initials(authors: str) -> str:
             "аф",
             "of",
             "из",
+            "da",
+            "да",
             "de",
             "де",
             "des",
