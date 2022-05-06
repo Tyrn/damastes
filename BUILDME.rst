@@ -91,6 +91,19 @@ Run
 
 - ``:latest`` is optional; ``damastes:latest`` is the image name.
 
+Detach
+------
+
+- Detach and leave it running: ``C-p C-q``
+- Detach and kill the container: ``exit`` or ``C-d``
+
+Attach
+------
+
+::
+
+    $ docker exec -it <CONTAINER ID> bash
+
 Docker Compose
 ==============
 
