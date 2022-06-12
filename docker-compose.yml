@@ -1,8 +1,9 @@
 services:
   damastes:
     image: damastes:latest
-    tty: true
-    container_name: damastes
+    stdin_open: true           # docker run -i
+    tty: true                  # docker run -t
+    container_name: damastes   # Single container allowed.
     volumes:
       - type: bind
         source: $HOME
@@ -11,5 +12,5 @@ services:
         source: /run/media
         target: /run/media
         bind:
-          propagation: shared
+          propagation: shared  # USB sticks provided for.
     working_dir: /enjoy

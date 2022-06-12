@@ -89,7 +89,7 @@ Run
 
     $ docker run -it --name damastes --rm --mount type=bind,source="$HOME"/,target=/enjoy --mount type=bind,source=/run/media,target=/run/media,bind-propagation=shared -w /enjoy damastes:latest
 
-- ``:latest`` is optional; ``damastes:latest`` is the image name.
+- ``--name damastes`` is the container name; ``damastes[:latest]`` is the image name.
 
 Detach
 ------
@@ -102,7 +102,7 @@ Attach
 
 ::
 
-    $ docker exec -it <CONTAINER ID> bash
+    $ docker exec -it damastes bash
 
 Docker Compose
 ==============
@@ -112,10 +112,10 @@ Run
 
 ::
 
-    $ docker-compose run --rm damastes
+    $ docker-compose up -d
 
 also possible:
 
 ::
 
-    $ docker-compose -f docker-compose.yml run --rm damastes
+    $ docker-compose -f docker-compose.yml run --name damastes --rm damastes
