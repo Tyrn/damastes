@@ -1,6 +1,8 @@
 services:
   damastes:
     image: damastes:latest
+    tty: true
+    container_name: damastes
     volumes:
       - type: bind
         source: $HOME
