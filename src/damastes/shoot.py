@@ -165,7 +165,7 @@ def _file_decorate(i: int, step_down: List[str], file: Path) -> str:
     if _ARGS.strip_decorations and _ARGS.tree_dst:
         return file.name
     prefix = str(i).zfill(len(str(_FILES_TOTAL))) + (
-        "-" + "-".join(step_down) + "-"
+        "-[" + "-".join(step_down) + "]-"
         if _ARGS.prepend_subdir_name and not _ARGS.tree_dst and len(step_down) > 0
         else "-"
     )
