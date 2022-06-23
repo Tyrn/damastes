@@ -137,12 +137,12 @@ class TestNonPureHelpers:
         args.prepend_subdir_name = True
         assert (
             shoot._file_decorate(7, ["deeper", "yet"], Path("delta.m4a"))
-            == "07-deeper-yet-delta.m4a"
+            == "07-[deeper-yet]-delta.m4a"
         )
         args.strip_decorations = True
         assert (
             shoot._file_decorate(7, ["deeper"], Path("delta.m4a"))
-            == "07-deeper-delta.m4a"
+            == "07-[deeper]-delta.m4a"
         )
         args.tree_dst = True
         assert shoot._file_decorate(7, ["deeper"], Path("delta.m4a")) == "delta.m4a"
@@ -151,5 +151,5 @@ class TestNonPureHelpers:
         args.tree_dst = False
         assert (
             shoot._file_decorate(7, ["deeper"], Path("delta.m4a"))
-            == "007-deeper-delta.m4a"
+            == "007-[deeper]-delta.m4a"
         )
