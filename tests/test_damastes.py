@@ -137,7 +137,7 @@ class TestNonPureHelpers:
         args.prepend_subdir_name = True
         assert (
             shoot._file_decorate(7, ["deeper", "yet"], Path("delta.m4a"))
-            == "07-[deeper-yet]-delta.m4a"
+            == "07-[deeper][yet]-delta.m4a"
         )
         args.strip_decorations = True
         assert (
