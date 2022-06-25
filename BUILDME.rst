@@ -104,6 +104,13 @@ Attach
 
     $ docker exec -it damastes bash
 
+Make persistent
+---------------
+
+::
+
+    $ docker update --restart unless-stopped damastes
+
 Docker Compose
 ==============
 
