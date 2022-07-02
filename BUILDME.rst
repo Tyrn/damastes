@@ -14,11 +14,6 @@ Development
 ::
 
     $ poetry build
-
-Exit venv or poetry shell, then:
-
-::
-
     $ pip install dist/<...>.whl --user [-I]
 
 Use Git Hooks
@@ -26,24 +21,38 @@ Use Git Hooks
 
 ::
 
-    $ pre-commit install
+    $ poetry shell
+    (.venv) $ pre-commit install
     ...
-    $ pre-commit run --all-files
+    (.venv) $ pre-commit run --all-files
 
 Format
 ------
 
 ::
 
-    $ black .
+    $ poetry shell
+    (.venv) $ black .
+
+or
+
+::
+
+    $ poetry run black .
 
 Test
 ----
 
 ::
 
-    $ pytest [--doctest-modules] [-v]
-    $ mypy .
+    $ poetry shell
+    (.venv) $ pytest [--doctest-modules] [-v]
+    (.venv) $ mypy .
+
+Poetry shell
+------------
+
+To exit Poetry shell press **Ctrl+D**
 
 Publish
 -------
