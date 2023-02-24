@@ -89,6 +89,11 @@ Build
 
 ::
 
+    $ yay -S docker-buildx
+    $ docker buildx install
+
+::
+
     $ docker build -t damastes [-f Procrustesfile] --rm .
 
 Run
