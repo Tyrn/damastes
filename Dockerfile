@@ -9,7 +9,7 @@ WORKDIR /home/$user
 ENV PATH=/home/$user/.local/bin:$PATH
 
 # Project.
-RUN pip install poetry==1.1.11 --user && \
+RUN pip install poetry==1.3.2 --user && \
     mkdir /home/$user/$project
 WORKDIR /home/$user/$project
 COPY $src ./$src/
