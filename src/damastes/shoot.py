@@ -19,7 +19,7 @@ import warnings
 import inspect
 import functools
 from time import perf_counter
-from yaspin import yaspin
+from yaspin import yaspin  # type: ignore
 from math import log
 from pathlib import Path
 from tempfile import mkstemp
