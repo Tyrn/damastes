@@ -3,7 +3,7 @@ Audio album builder as a library. See description.
 """
 import copy
 
-PY_VERSION = (3, 9, 0)
+PY_VERSION = (3, 10, 0)
 
 import sys
 
@@ -484,6 +484,24 @@ def initials(authors: str) -> str:
             return cut[0] + "'" + cut[1][0]
 
         if len(name) > 1:  # Deal with prefixes.
+            match name:
+                case "Старший":
+                    return "Ст"
+                case "Ст":
+                    return name
+                case "ст":
+                    return name
+                case "Sr":
+                    return name
+                case "Младший":
+                    return "Мл"
+                case "Мл":
+                    return name
+                case "мл":
+                    return name
+                case "Jr":
+                    return name
+
             prefix = name[0]
             for ch in name[1:]:
                 prefix += ch
@@ -531,6 +549,7 @@ def initials(authors: str) -> str:
             "ле",
             "haut",
             "от",
+            "the",
         ]:
             return name[0]
         return name[0].upper()

@@ -87,6 +87,13 @@ class TestPureFunctions:
         assert initials("dA") == "dA."
         assert initials("DA") == "DA."
         assert initials("DAMadar") == "DA."
+        assert initials("Плиний Старший") == "П.Ст."
+        assert initials("Pliny the Elder") == "P.t.E."
+        assert initials("Плиний Младший") == "П.Мл."
+        assert initials("Плиний Мл.") == "П.Мл."
+        assert initials("George Smith Patton Jr.") == "G.S.P.Jr."
+        assert initials("Джордж Смит паттон ст") == "Д.С.П.ст."
+        assert initials("Redington Sr") == "R.Sr."
 
     def test_human_fine(self):
         assert human_fine(0) == "0"
