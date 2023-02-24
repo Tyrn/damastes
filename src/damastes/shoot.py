@@ -487,11 +487,9 @@ def initials(authors: str) -> str:
             match name:
                 case "Старший":
                     return "Ст"
-                case "Ст" | "ст" | "Sr":
-                    return name
                 case "Младший":
                     return "Мл"
-                case "Мл" | "мл" | "Jr":
+                case "Ст" | "ст" | "Sr" | "Мл" | "мл" | "Jr":
                     return name
 
             prefix = name[0]
