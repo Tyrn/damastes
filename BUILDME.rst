@@ -125,6 +125,14 @@ Make persistent
 
     $ docker update --restart unless-stopped damastes
 
+Save & load image
+-----------------
+
+::
+
+    $ docker save -o image.tar ImageID-or-Name
+    $ docker load -i image.tar
+
 Docker Compose
 ==============
 
