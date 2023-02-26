@@ -186,8 +186,8 @@ def _dir_walk(
     """
     Walks down the src tree, accumulating step_down on each recursion level.
     Yields a tuple of:
-    (index, list of subdirectories {to be created
-    at destination/to make it possible}, audiofile name)
+    (index, list of subdirectories to be joined
+    at destination if necessary, source audiofile name)
     """
     if _is_audiofile(src):
         dirs: List[Path] = []
@@ -279,8 +279,9 @@ def _dst_calculate() -> str:
 
 def _album() -> _DirWalkIterator:  # pragma: no cover
     """
-    Sets up boilerplate required by the options and returns the ammo belt generator
-    of (src, dst) pairs.
+    Sets up boilerplate required by the options and returns the ammo belt generator of
+    (index, list of subdirectories to be joined
+    at destination if necessary, source audiofile name) tuples.
     """
     if _FILES_TOTAL < 1:
         _show(
