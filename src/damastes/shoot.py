@@ -212,13 +212,13 @@ def _dir_walk(
             ),
         )
 
-    def walk_into(dirs) -> _DirWalkIterator:
+    def walk_into(dirs: List[Path]) -> _DirWalkIterator:
         for directory in dirs:
             step = list(step_down)
             step.append(directory.name)
             yield from _dir_walk(src / directory, step, fcount)
 
-    def walk_along(files) -> _DirWalkIterator:
+    def walk_along(files: List[Path]) -> _DirWalkIterator:
         for file in files:
             yield fcount[0], step_down, file
             fcount[0] += -1 if _ARGS.reverse else 1
