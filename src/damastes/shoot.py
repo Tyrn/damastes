@@ -176,7 +176,7 @@ def _file_decorate(i: int, step_down: List[str], file: Path) -> str:
     )
 
 
-_DirWalkItem = Tuple[int, List[str], str]
+_DirWalkItem = Tuple[int, List[str], Path]
 _DirWalkIterator = Iterator[_DirWalkItem]
 
 
@@ -220,7 +220,7 @@ def _dir_walk(
 
     def walk_along(files) -> _DirWalkIterator:
         for file in files:
-            yield fcount[0], step_down, str(file)
+            yield fcount[0], step_down, file
             fcount[0] += -1 if _ARGS.reverse else 1
 
     if _ARGS.reverse:
@@ -401,7 +401,7 @@ def _album_copy() -> None:  # pragma: no cover
         dst_path = (
             _ARGS.dst_dir.joinpath(*step_down) if _ARGS.tree_dst else _ARGS.dst_dir
         )
-        dst = dst_path / _file_decorate(i, step_down, Path(src_file))
+        dst = dst_path / _file_decorate(i, step_down, src_file)
 
         src_bytes, dst_bytes = src.stat().st_size, 0
 
