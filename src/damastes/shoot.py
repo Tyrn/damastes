@@ -352,8 +352,6 @@ def _album_copy() -> None:  # pragma: no cover
     artist_initials: str = initials(_ARGS.artist) if _ARGS.artist else ""
 
     def set_tags(i: int, source: Path, path: Path) -> None:
-        nonlocal artist_initials
-
         def make_title(tagging: str) -> str:
             if _ARGS.file_title_num:
                 return str(i) + ">" + source.stem
