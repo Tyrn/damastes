@@ -220,7 +220,7 @@ def _dir_walk(
 
     def walk_along(files) -> _DirWalkIterator:
         for file in files:
-            yield fcount[0], step_down, file
+            yield fcount[0], step_down, str(file)
             fcount[0] += -1 if _ARGS.reverse else 1
 
     if _ARGS.reverse:
