@@ -176,9 +176,13 @@ def _file_decorate(i: int, step_down: List[str], file: Path) -> str:
     )
 
 
+_DirWalkItem = Tuple[int, List[str], str]
+_DirWalkIterator = Iterator[_DirWalkItem]
+
+
 def _dir_walk(
     src: Path, step_down: List[str], fcount: List[int]
-) -> Iterator[Tuple[int, List[str], str]]:  # pragma: no cover
+) -> _DirWalkIterator:  # pragma: no cover
     """
     Walks down the src tree, accumulating step_down on each recursion level.
     Yields a tuple of:
@@ -208,13 +212,13 @@ def _dir_walk(
             ),
         )
 
-    def walk_into(dirs):
+    def walk_into(dirs) -> _DirWalkIterator:
         for directory in dirs:
             step = list(step_down)
             step.append(directory.name)
             yield from _dir_walk(src / directory, step, fcount)
 
-    def walk_along(files):
+    def walk_along(files) -> _DirWalkIterator:
         for file in files:
             yield fcount[0], step_down, file
             fcount[0] += -1 if _ARGS.reverse else 1
@@ -273,7 +277,7 @@ def _dst_calculate() -> str:
     )
 
 
-def _album() -> Iterator[Tuple[int, List[str], str]]:  # pragma: no cover
+def _album() -> _DirWalkIterator:  # pragma: no cover
     """
     Sets up boilerplate required by the options and returns the ammo belt generator
     of (src, dst) pairs.
@@ -390,7 +394,7 @@ def _album_copy() -> None:  # pragma: no cover
         shutil.copy(tmp, dst)
         os.remove(tmp)
 
-    def file_copy(entry: Tuple[int, List[str], str]) -> Tuple[int, int]:
+    def file_copy(entry: _DirWalkItem) -> Tuple[int, int]:
         i, step_down, src_file = entry
 
         src = _ARGS.src.joinpath(*step_down) / src_file
