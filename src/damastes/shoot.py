@@ -349,7 +349,11 @@ def _album_copy() -> None:  # pragma: no cover
     Runs through the ammo belt and does copying, in the reverse order if necessary.
     """
 
+    artist_initials: str = initials(_ARGS.artist) if _ARGS.artist else ""
+
     def set_tags(i: int, source: Path, path: Path) -> None:
+        nonlocal artist_initials
+
         def make_title(tagging: str) -> str:
             if _ARGS.file_title_num:
                 return str(i) + ">" + source.stem
@@ -364,7 +368,7 @@ def _album_copy() -> None:  # pragma: no cover
         if not _ARGS.drop_tracknumber:
             audio["tracknumber"] = str(i) + "/" + str(_FILES_TOTAL)
         if _ARGS.artist and _ARGS.album:
-            audio["title"] = make_title(initials(_ARGS.artist) + " - " + _ARGS.album)
+            audio["title"] = make_title(artist_initials + " - " + _ARGS.album)
             audio["artist"] = _ARGS.artist
             audio["album"] = _ARGS.album
         elif _ARGS.artist:
