@@ -65,10 +65,8 @@ RUN pip install ./dist/* --user && \
     echo 'alias lss="ls --color=always | less -r"' >> .bashrc && \
     echo 'alias dm=damastes' >> .bashrc && \
     echo 'alias dp=procrustes' >> .bashrc && \
-    echo 'eval "$(zoxide init bash)"' >> .bashrc && \
-    echo 'alias cd=z' >> .bashrc && \
-    echo 'mkdir -p .run__cd__dot_dot' >> .bashrc && \
-    echo 'z .run__cd__dot_dot' >> .bashrc
+    echo 'eval "$(zoxide init bash --hook=prompt)"' >> .bashrc && \
+    echo 'alias cd=z' >> .bashrc
 COPY --from=cargobase /home/$cuser/$cproject/target/release/$cproject .local/bin
 
 CMD ["bash"]
