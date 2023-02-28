@@ -96,6 +96,8 @@ Build
 
     $ docker build -t damastes [-f Procrustesfile] --rm .
 
+*NB* 2023-02-28: Only *Procrustesfile* is under development!
+
 Run
 ---
 
