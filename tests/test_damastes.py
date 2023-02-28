@@ -137,11 +137,6 @@ class TestNonPureHelpers:
         assert shoot._artist_part(prefix=" - ") == " - Daniel Defoe"
         assert shoot._artist_part() == "Daniel Defoe"
 
-        assert shoot._dir_decorate(0, Path("charlie")) == "000-charlie"
-        args.strip_decorations = True
-        assert shoot._dir_decorate(0, Path("charlie")) == "charlie"
-
-        args.strip_decorations = False
         assert shoot._file_decorate(7, ["deeper"], Path("delta.m4a")) == "07-delta.m4a"
         args.prepend_subdir_name = True
         assert (
