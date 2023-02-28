@@ -142,13 +142,6 @@ def _is_audiofile(name: Path, spinner=None) -> bool:  # pragma: no cover
     return False
 
 
-def _dir_decorate(i: int, dir: Path) -> str:
-    """
-    Prepends decimal i to path name.
-    """
-    return ("" if _ARGS.strip_decorations else (str(i).zfill(3) + "-")) + dir.name
-
-
 def _artist_part(*, prefix="", suffix="") -> str:
     """
     Returns Artist, nicely shaped to be a part of a directory/file name.
