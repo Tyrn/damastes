@@ -214,7 +214,7 @@ def _dir_walk(
     def walk_along(files: List[Path]) -> _DirWalkIterator:
         for file in files:
             yield fcount[0], step_down, file
-            fcount[0] += -1 if _ARGS.reverse else 1
+            fcount[0] += fcount[1]  # [counter, const increment_by]
 
     if _ARGS.reverse:
         yield from walk_along(files)
@@ -298,7 +298,7 @@ def _album() -> _DirWalkIterator:  # pragma: no cover
                 sys.exit(1)
         _ARGS.dst_dir.mkdir()
 
-    return _dir_walk(_ARGS.src, [], [_FILES_TOTAL if _ARGS.reverse else 1])
+    return _dir_walk(_ARGS.src, [], [_FILES_TOTAL, -1] if _ARGS.reverse else [1, 1])
 
 
 def human_rough(bytes: int, units=["", "kB", "MB", "GB", "TB", "PB", "EB"]) -> str:
