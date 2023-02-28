@@ -39,7 +39,7 @@ COPY pyproject.toml poetry.lock README.rst ./
 
 # Build.
 RUN poetry config virtualenvs.create true && \
-    poetry install --no-dev && \
+    poetry install --without dev && \
     poetry build -f sdist
 
 FROM python:3.10.1-slim-bullseye
