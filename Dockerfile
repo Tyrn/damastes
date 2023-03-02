@@ -27,7 +27,7 @@ ARG user=damastes project=damastes
 RUN apt-get update && \
     apt-get install -y tree && \
     apt-get install -y less && \
-    apt-get install -y wget && \
+    apt-get install -y zoxide && \
     useradd -ms /bin/bash "$user"
 # Non-root user.
 USER $user
@@ -36,11 +36,11 @@ ENV PATH=/home/$user/.local/bin:$PATH
 
 COPY --from=base /home/$user/$project/dist/ ./dist/
 RUN pip install ./dist/* --user && \
-    wget https://raw.githubusercontent.com/rupa/z/master/z.sh -O z.sh && \
-    echo '. ~/z.sh' >> .bashrc && \
     echo 'alias ll="ls -lh"' >> .bashrc && \
     echo 'alias lls="ls -lh --color=always | less -r"' >> .bashrc && \
     echo 'alias lss="ls --color=always | less -r"' >> .bashrc && \
-    echo 'alias dm=damastes' >> .bashrc
+    echo 'alias dm=damastes' >> .bashrc && \
+    echo 'eval "$(zoxide init bash --hook=prompt)"' >> .bashrc && \
+    echo 'alias cd=z' >> .bashrc
 
 CMD ["bash"]
