@@ -17,5 +17,6 @@ procrustes
 .nvimlog
 *.geany
 .idea
+.vscode
 *.sublime-project
 *.sublime-workspace
