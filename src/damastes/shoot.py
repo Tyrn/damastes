@@ -102,7 +102,7 @@ def _mutagen_file(name: Path, spinner=None):  # pragma: no cover
     """
     Returns Mutagen thing, if name looks like an audio file path, else returns None.
     """
-    global _INVALID_TOTAL, _SUSPICIOUS_TOTAL
+    global _INVALID_TOTAL, _SUSPICIOUS_TOTAL  # pylint:disable=global-statement
     ext = name.suffix.lstrip(".").upper()
     atp = _ARGS.file_type
 
@@ -121,13 +121,13 @@ def _mutagen_file(name: Path, spinner=None):  # pragma: no cover
     except mutagen.MutagenError as mt_error:
         if spinner:
             spinner.write(f" {INVALID_ICON} >>{mt_error}>> {name_to_print}")
-        _INVALID_TOTAL += 1
+        _INVALID_TOTAL += 1  # pylint:disable=undefined-variable
         return None
 
     if file is None and ext in KNOWN_EXTENSIONS:
         if spinner:
             spinner.write(f" {SUSPICIOUS_ICON} {name_to_print}")
-        _SUSPICIOUS_TOTAL += 1
+        _SUSPICIOUS_TOTAL += 1  # pylint:disable=undefined-variable
     return file
 
 
