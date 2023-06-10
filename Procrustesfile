@@ -1,7 +1,7 @@
 # This image contains both Damastes
 # and Procrustes utilities.
 
-FROM rust:1.57.0-slim-bullseye AS cargobase
+FROM rust:1.70.0-slim-bullseye AS cargobase
 
 ARG cuser=procrustes cproject=procrustes
 
