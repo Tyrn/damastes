@@ -477,7 +477,6 @@ def initials(authors: str) -> str:
     """
 
     def form_initial(name: str) -> str:
-
         if len(cut := name.split("'")) > 1 and cut[1]:  # Deal with '.
             if cut[1][0].islower() and cut[0]:
                 return cut[0][0].upper()
