@@ -1,4 +1,4 @@
-FROM python:3.10.1-slim-bullseye AS base
+FROM python:3.11.4-slim-bullseye AS base
 
 ARG user=damastes project=damastes src=src
 
@@ -9,7 +9,7 @@ WORKDIR /home/$user
 ENV PATH=/home/$user/.local/bin:$PATH
 
 # Project.
-RUN pip install poetry==1.4.0 --user && \
+RUN pip install poetry==1.5.1 --user && \
     mkdir /home/$user/$project
 WORKDIR /home/$user/$project
 COPY $src ./$src/
@@ -20,7 +20,7 @@ RUN poetry config virtualenvs.create true && \
     poetry install --no-dev && \
     poetry build -f sdist
 
-FROM python:3.10.1-slim-bullseye
+FROM python:3.11.4-slim-bullseye
 
 ARG user=damastes project=damastes
 
