@@ -2,27 +2,26 @@
 Audio album builder as a library. See description.
 """
 import copy
-
-PY_VERSION = (3, 10, 0)
-
-import sys
-
-assert sys.version_info >= PY_VERSION, f"Python {PY_VERSION} or later required."
-
-from typing import List, Tuple, Iterator, Any
-import mutagen
+import fnmatch
+import functools
+import inspect
 import os
 import re
-import fnmatch
 import shutil
+import sys
 import warnings
-import inspect
-import functools
-from time import perf_counter
-from yaspin import yaspin  # type: ignore
 from math import log
 from pathlib import Path
 from tempfile import mkstemp
+from time import perf_counter
+from typing import Iterator, List, Tuple
+
+import mutagen
+from yaspin import yaspin  # type: ignore
+
+PY_VERSION = (3, 10, 0)
+
+assert sys.version_info >= PY_VERSION, f"Python {PY_VERSION} or later required."
 
 
 def str_strip_numbers(str_alphanum: str) -> List[int]:
