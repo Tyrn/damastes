@@ -25,6 +25,7 @@ black = "^23.3.0"
 pre-commit = "^3.3.2"
 pylint = "^2.17.4"
 pyright = "^1.1.314"
+virtualenvwrapper = "^4.8.4"
 
 [build-system]
 requires = ["poetry>=0.12"]
