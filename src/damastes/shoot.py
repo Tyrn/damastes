@@ -21,7 +21,9 @@ from yaspin import yaspin  # type: ignore
 
 PY_VERSION = (3, 10, 0)
 
-assert sys.version_info >= PY_VERSION, f"Python {PY_VERSION} or later required."
+assert (
+    sys.version_info >= PY_VERSION
+), f"Python {PY_VERSION[0]}.{PY_VERSION[1]}.{PY_VERSION[2]} or later required."
 
 
 def str_strip_numbers(str_alphanum: str) -> List[int]:
