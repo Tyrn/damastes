@@ -118,8 +118,8 @@ def _mutagen_file(name: Path, spinner=None):  # pragma: no cover
     name_to_print: str = str(name) if _ARGS.verbose else name.name
 
     try:
-        file = mutagen.File(name, easy=True)
-    except mutagen.MutagenError as mt_error:
+        file = mutagen.File(name, easy=True)  # type: ignore
+    except mutagen.MutagenError as mt_error:  # type: ignore
         if spinner:
             spinner.write(f" {INVALID_ICON} >>{mt_error}>> {name_to_print}")
         _INVALID_TOTAL += 1  # pylint:disable=undefined-variable
