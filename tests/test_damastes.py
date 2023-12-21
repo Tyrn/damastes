@@ -32,6 +32,8 @@ class TestPureFunctions:
         assert "0".isdigit() == True
         assert "42".isdigit() == True
         assert "-42".isdigit() == False
+        assert "4₂".isdigit() == True
+        assert "4²".isdigit() == True
 
     def test_str_strip_numbers(self):
         assert str_strip_numbers("ab11cdd2k.144") == [11, 2, 144]
