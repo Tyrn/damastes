@@ -3,16 +3,12 @@ import os
 from pathlib import Path
 
 import src.damastes.shoot as shoot
-from src.damastes import (
-    CLEAN_CONTEXT_PARAMS,
-    RestrictedDotDict,
-    __version__,
-    human_fine,
-    initials,
-    str_strip_numbers,
-    strcmp_c,
-    strcmp_naturally,
-)
+# fmt: off
+from src.damastes import (CLEAN_CONTEXT_PARAMS, RestrictedDotDict, __version__,
+                          human_fine, initials, str_strip_numbers, strcmp_c,
+                          strcmp_naturally)
+
+# fmt: on
 
 
 class TestPureFunctions:
