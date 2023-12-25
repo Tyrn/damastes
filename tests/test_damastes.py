@@ -24,12 +24,12 @@ class TestPureFunctions:
         assert f"{-1:+d}" == "-1"
 
     def test_isdigit(self):
-        assert "".isdigit() == False
-        assert "0".isdigit() == True
-        assert "42".isdigit() == True
-        assert "-42".isdigit() == False
-        assert "4₂".isdigit() == True
-        assert "4²".isdigit() == True
+        assert "".isdigit() is False
+        assert "0".isdigit() is True
+        assert "42".isdigit() is True
+        assert "-42".isdigit() is False
+        assert "4₂".isdigit() is True
+        assert "4²".isdigit() is True
 
     def test_str_strip_numbers(self):
         assert str_strip_numbers("ab11cdd2k.144") == [11, 2, 144]
