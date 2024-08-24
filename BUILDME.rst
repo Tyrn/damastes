@@ -16,7 +16,7 @@ Development
     $ poetry build
     $ pip install dist/<...>.whl --user [-I]
 
-or
+or, preferably
 
 ::
 
