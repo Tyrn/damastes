@@ -77,6 +77,8 @@ class TestPureFunctions:
             == "W.J.D.,M.C.G."
         )
         assert initials("a.s , - . ,b.s.") == "A.S.,B.S."
+        assert initials("melroy van den berg") == "M.v.d.B."
+        assert initials("мелрой ван ден берг") == "М.в.д.Б."
         assert initials("A. Strugatsky, B...Strugatsky.") == "A.S.,B.S."
         assert initials("Иржи Кропачек,, Йозеф Новотный") == "И.К.,Й.Н."
         assert initials("Язон динАльт, Шарль д'Артаньян") == "Я.динА.,Ш.д'А."

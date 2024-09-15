@@ -525,6 +525,8 @@ def initials(authors: str) -> str:
             "дез",
             "del",
             "дель",
+            "den",
+            "ден",
             "di",
             "ди",
             "dos",
