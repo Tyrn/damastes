@@ -1,35 +1,35 @@
-[tool.poetry]
+[project]
 name = "damastes"
 version = "0.9.5"
 description = "Damastes a.k.a. Procrustes, audiobook builder: copy and edit on the fly"
-authors = ["Tyrn <a@b.com>"]
-license = "MIT"
+authors = [{ name = "Tyrn", email = "a@b.com" }]
 readme = "README.rst"
-homepage = "https://github.com/Tyrn/damastes"
+requires-python = ">=3.13,<4.0"
+dependencies = [
+    "mutagen (>=1.47.0,<2.0.0)",
+    "yaspin (>=3.1.0,<4.0.0)",
+    "click (>=8.2.1,<9.0.0)",
+]
 
-[tool.poetry.dependencies]
-python = "^3.13"
-mutagen = "^1.46"
-yaspin = "^2.3.0"
-click = "^8.1.3"
-
-[tool.poetry.scripts]
-damastes = "damastes.main:main"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.3"
-mypy = "^1.3.0"
-pytest-mock = "^3.10.0"
-pytest-cov = "^4.1.0"
-black = "^23.3.0"
-pre-commit = "^3.3.2"
-pylint = "^2.17.4"
-pyright = "^1.1.314"
-virtualenvwrapper = "^4.8.4"
+[tool.poetry]
+packages = [{ include = "damastes", from = "src" }]
 
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=8.4.2,<9.0.0)",
+    "mypy (>=1.18.1,<2.0.0)",
+    "pytest-mock (>=3.15.0,<4.0.0)",
+    "pytest-cov (>=7.0.0,<8.0.0)",
+    "black (>=25.1.0,<26.0.0)",
+    "pre-commit (>=4.3.0,<5.0.0)",
+    "pylint (>=3.3.8,<4.0.0)",
+    "pyright (>=1.1.405,<2.0.0)",
+    "virtualenvwrapper (>=6.1.1,<7.0.0)",
+]
 
 [tool.black]
 line-length = 88
