@@ -6,28 +6,25 @@ User's take
 
 ::
 
-    $ pip install --user git+https://github.com/Tyrn/damastes.git
+    uv tool install git+https://github.com/Tyrn/damastes
 
 Development
 ===========
 
 ::
 
-    $ poetry build
-    $ pip install dist/<...>.whl --user [-I]
-
-or, preferably
+    uv build
 
 ::
 
-    $ pipx install dist/<...>.whl
+    uv tool install dist/<...>.whl
 
 Use Git Hooks
 -------------
 
 ::
 
-    $ poetry shell
+    $ source .venv/bin/activate
     (.venv) $ pre-commit install
     ...
     (.venv) $ pre-commit run --all-files
@@ -35,54 +32,37 @@ Use Git Hooks
 Format
 ------
 
+*Probably, obsolete*
+
 ::
 
-    $ poetry shell
+    $ source .venv/bin/activate
     (.venv) $ black .
-
-or
-
-::
-
-    $ poetry run black .
 
 Test
 ----
 
 ::
 
-    $ poetry shell
+    $ source .venv/bin/activate
     (.venv) $ pytest [--doctest-modules] [-v]
     (.venv) $ mypy .
-
-Poetry shell
-------------
-
-To exit Poetry shell press **Ctrl+D**
 
 Publish
 -------
 
+*Probably, obsolete.* See `the docs <https://docs.astral.sh/uv/guides/package/#publishing-your-package>`__
+
 ::
 
-    $ poetry build
+    $ uv build
     $ twine check dist/<...>.whl
 
 then
 
 ::
 
-    $ poetry run twine upload --repository-url https://test.pypi.org/legacy/ dist/*
-
-or
-
-::
-
-    $ poetry config --list
-    $ poetry config repositories.testpypi https://test.pypi.org/legacy/
-    $ poetry publish -r testpypi
-
-- Poetry issue `#742 <https://github.com/python-poetry/poetry/issues/742>`__
+    $ uv run twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
 Containerize
 ************
