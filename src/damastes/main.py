@@ -2,9 +2,11 @@
 Audio album builder.
 """
 
-import sys
 import functools
+import sys
+
 import click
+
 from damastes import __version__  # type: ignore
 from damastes.shoot import _run  # type: ignore
 from damastes.shoot import _set_args_click  # type: ignore
@@ -141,7 +143,7 @@ def _print_clean_context_params() -> None:  # pragma: no cover
     print(f"}}  # {count} of them.")
 
 
-@click.command()
+@click.command(epilog=f"Running on Python {sys.version}")
 @click.help_option("-h", "--help")
 @click.version_option(__version__, "-V", "--version")
 @_steady_parameters
