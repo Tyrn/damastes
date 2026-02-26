@@ -8,6 +8,12 @@ User's take
 
     uv tool install git+https://github.com/Tyrn/damastes
 
+or
+
+::
+
+    uv tool install --python 3.13  git+https://github.com/Tyrn/damastes
+
 Development
 ===========
 
