@@ -303,7 +303,9 @@ def _album() -> _DirWalkIterator:  # pragma: no cover
     return _dir_walk(_ARGS.src, [], [_FILES_TOTAL, -1] if _ARGS.reverse else [1, 1])
 
 
-def human_rough(bytes: int, units=["", "kB", "MB", "GB", "TB", "PB", "EB"]) -> str:
+def human_rough(
+    bytes: int, units: tuple[str, ...] = ("", "kB", "MB", "GB", "TB", "PB", "EB")
+) -> str:
     """
     Returns a human readable string representation of bytes, roughly rounded.
 
@@ -450,7 +452,7 @@ def _show(
         return print(string, end=end, file=file, flush=flush)
 
 
-def safe_imports(*, unsafe: list[str] = ["run"]) -> list[str]:
+def safe_imports(*, unsafe: tuple[str, ...] = ("run",)) -> list[str]:
     """
     Returns a list of general purpose functions without side effects,
     presumably safe to import and run anywhere. The presence of a
