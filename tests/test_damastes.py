@@ -91,6 +91,7 @@ class TestPureFunctions:
         assert initials("Язон динАльт, Шарль д'Артаньян") == "Я.динА.,Ш.д'А."
         assert initials("Charles de Batz de Castelmore d'Artagnan") == "C.d.B.d.C.d'A."
         assert initials("Mario Del Monaco, Hutchinson of London") == "M.D.M.,H.o.L."
+        assert initials("bartolomé de las casas") == "B.d.l.C."
         assert initials("Anselm haut Rodric") == "A.h.R."
         assert initials("Ансельм от Родрик") == "А.о.Р."
         assert initials("Leonardo Wilhelm DiCaprio") == "L.W.DiC."
