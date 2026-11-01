@@ -2,13 +2,20 @@ import copy
 import os
 from pathlib import Path
 
-import src.damastes.shoot as shoot
-# fmt: off
-from src.damastes import (CLEAN_CONTEXT_PARAMS, RestrictedDotDict, __version__,
-                          human_fine, initials, str_strip_numbers, strcmp_c,
-                          strcmp_naturally)
+## fmt: off
+from src.damastes import (
+    CLEAN_CONTEXT_PARAMS,
+    RestrictedDotDict,
+    __version__,
+    human_fine,
+    initials,
+    shoot,
+    str_strip_numbers,
+    strcmp_c,
+    strcmp_naturally,
+)
 
-# fmt: on
+## fmt: on
 
 
 class TestPureFunctions:
