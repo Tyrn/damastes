@@ -7,9 +7,8 @@ import sys
 
 import click
 
-from damastes import __version__  # type: ignore
-from damastes.shoot import _run  # type: ignore
-from damastes.shoot import _set_args_click  # type: ignore
+from damastes import __version__
+from damastes.shoot import _run, _set_args_click
 
 
 def _steady_parameters(func):
@@ -171,7 +170,7 @@ def main(**kwargs) -> int:  # pragma: no cover
     """
     _set_args_click(click.get_current_context().params)
 
-    from damastes.shoot import _ARGS  # type: ignore
+    from damastes.shoot import _ARGS
 
     if _ARGS.context and not _ARGS.no_console:
         _print_clean_context_params()
