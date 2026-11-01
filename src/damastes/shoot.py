@@ -11,11 +11,11 @@ import re
 import shutil
 import sys
 import warnings
+from collections.abc import Iterator
 from math import log
 from pathlib import Path
 from tempfile import mkstemp
 from time import perf_counter
-from typing import Iterator, List, Tuple
 
 import mutagen
 from yaspin import yaspin  # type: ignore
@@ -27,7 +27,7 @@ assert sys.version_info >= PY_VERSION, (
 )
 
 
-def str_strip_numbers(str_alphanum: str) -> List[int]:
+def str_strip_numbers(str_alphanum: str) -> list[int]:
     """
     Returns a vector of integer numbers
     embedded in a string argument.
@@ -153,7 +153,7 @@ def _artist_part(*, prefix="", suffix="") -> str:
     return ""
 
 
-def _file_decorate(i: int, step_down: List[str], file: Path) -> str:
+def _file_decorate(i: int, step_down: list[str], file: Path) -> str:
     """
     Prepends zero padded decimal i to path name.
     """
@@ -171,12 +171,12 @@ def _file_decorate(i: int, step_down: List[str], file: Path) -> str:
     )
 
 
-_DirWalkItem = Tuple[int, List[str], Path]
+_DirWalkItem = tuple[int, list[str], Path]
 _DirWalkIterator = Iterator[_DirWalkItem]
 
 
 def _dir_walk(
-    src: Path, step_down: List[str], fcount: List[int]
+    src: Path, step_down: list[str], fcount: list[int]
 ) -> _DirWalkIterator:  # pragma: no cover
     """
     Walks down the src tree, accumulating step_down on each recursion level.
@@ -185,8 +185,8 @@ def _dir_walk(
     at destination if necessary, source audiofile name)
     """
     if _is_audiofile(src):
-        dirs: List[Path] = []
-        files: List[Path] = [Path(src.name)]
+        dirs: list[Path] = []
+        files: list[Path] = [Path(src.name)]
         src = src.parent
     else:
         lst = os.listdir(src)
@@ -207,13 +207,13 @@ def _dir_walk(
             ),
         )
 
-    def walk_into(dirs: List[Path]) -> _DirWalkIterator:
+    def walk_into(dirs: list[Path]) -> _DirWalkIterator:
         for directory in dirs:
             step = list(step_down)
             step.append(directory.name)
             yield from _dir_walk(src / directory, step, fcount)
 
-    def walk_along(files: List[Path]) -> _DirWalkIterator:
+    def walk_along(files: list[Path]) -> _DirWalkIterator:
         for file in files:
             yield fcount[0], step_down, file
             fcount[0] += fcount[1]  # [counter, const increment_by]
@@ -228,7 +228,7 @@ def _dir_walk(
 
 def _audiofiles_count(
     directory: Path, spinner=None
-) -> Tuple[int, int]:  # pragma: no cover
+) -> tuple[int, int]:  # pragma: no cover
     """
     Returns full recursive count of audiofiles in directory.
     """
@@ -390,7 +390,7 @@ def _album_copy() -> None:  # pragma: no cover
         shutil.copy(tmp, dst)
         os.remove(tmp)
 
-    def file_copy(entry: _DirWalkItem) -> Tuple[int, int]:
+    def file_copy(entry: _DirWalkItem) -> tuple[int, int]:
         i, step_down, src_file = entry
 
         src = _ARGS.src.joinpath(*step_down) / src_file
@@ -450,7 +450,7 @@ def _show(
         return print(string, end=end, file=file, flush=flush)
 
 
-def safe_imports(*, unsafe: List[str] = ["run"]) -> List[str]:
+def safe_imports(*, unsafe: list[str] = ["run"]) -> list[str]:
     """
     Returns a list of general purpose functions without side effects,
     presumably safe to import and run anywhere. The presence of a
@@ -629,7 +629,7 @@ _FILES_TOTAL = -1
 _INVALID_TOTAL = 0
 _SUSPICIOUS_TOTAL = 0
 _START_TIME = 0.0
-_SHORT_LOG: List[str] = []
+_SHORT_LOG: list[str] = []
 
 
 def _run() -> int:  # pragma: no cover
