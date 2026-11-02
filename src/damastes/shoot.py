@@ -394,11 +394,10 @@ def _album_copy() -> None:  # pragma: no cover
 
     def file_copy(entry: _DirWalkItem) -> tuple[int, int]:
         i, step_down, src_file = entry
+        joined_step_down = Path("").joinpath(*step_down)
 
-        src = _ARGS.src.joinpath(*step_down) / src_file
-        dst_path = (
-            _ARGS.dst_dir.joinpath(*step_down) if _ARGS.tree_dst else _ARGS.dst_dir
-        )
+        src = _ARGS.src / joined_step_down / src_file
+        dst_path = _ARGS.dst_dir / joined_step_down if _ARGS.tree_dst else _ARGS.dst_dir
         dst = dst_path / _file_decorate(i, step_down, src_file)
 
         src_bytes, dst_bytes = src.stat().st_size, 0
