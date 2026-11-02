@@ -174,11 +174,11 @@ One can still use it, with care.
     '/home/user/dir-src'
     >>> from damastes import run
     >>> run(verbose=True, artist='Vladimir Nabokov', unified_name='Ada', src='.', dst_dir='/home/user/dir-dst')
-       1/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/1-Ada - Vladimir Nabokov.mp3  ✔ +20277
-       2/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/2-Ada - Vladimir Nabokov.mp3  ✔ +20257
-       3/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/3-Ada - Vladimir Nabokov.mp3  ✔ +20081
-       4/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/4-Ada - Vladimir Nabokov.mp3  ✔ +20493
-       5/5 ✔ /home/user/dir-dst/Vladimir Nabokov - Ada/5-Ada - Vladimir Nabokov.mp3  ✔ +20383
+       1/5  /home/user/dir-dst/Vladimir Nabokov - Ada/1-Ada - Vladimir Nabokov.mp3   +20277
+       2/5  /home/user/dir-dst/Vladimir Nabokov - Ada/2-Ada - Vladimir Nabokov.mp3   +20257
+       3/5  /home/user/dir-dst/Vladimir Nabokov - Ada/3-Ada - Vladimir Nabokov.mp3   +20081
+       4/5  /home/user/dir-dst/Vladimir Nabokov - Ada/4-Ada - Vladimir Nabokov.mp3   +20493
+       5/5  /home/user/dir-dst/Vladimir Nabokov - Ada/5-Ada - Vladimir Nabokov.mp3   +20383
      🟢 Done (5, 91.6MB; 3.8s).
     0
     >>>
