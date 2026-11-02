@@ -430,6 +430,8 @@ def _album_copy() -> None:  # pragma: no cover
 
         return src_bytes, dst_bytes
 
+    _show(f" {_ARGS.dst_dir}{os.sep} >>>")
+
     if not _ARGS.verbose:
         _show("Starting ", end="", flush=True)
 
@@ -440,6 +442,9 @@ def _album_copy() -> None:  # pragma: no cover
         src_total += src_bytes
         dst_total += dst_bytes
         files_total += 1
+
+    if _ARGS.verbose:
+        _show(f" >>> {_ARGS.dst_dir}{os.sep}")
 
     _show(f" {DONE_ICON} Done ({files_total}, {human_fine(dst_total)}", end="")
     if _ARGS.dry_run:
