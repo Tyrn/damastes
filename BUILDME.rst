@@ -17,6 +17,20 @@ or
 Development
 ===========
 
+Initialize
+----------
+
+::
+
+    uv venv
+
+::
+
+    uv sync
+
+Build
+-----
+
 ::
 
     uv build
@@ -35,16 +49,6 @@ Use Git Hooks
     ...
     (.venv) $ pre-commit run --all-files
 
-Format
-------
-
-*Probably, obsolete*
-
-::
-
-    $ source .venv/bin/activate
-    (.venv) $ black .
-
 Test
 ----
 
@@ -52,7 +56,17 @@ Test
 
     $ source .venv/bin/activate
     (.venv) $ pytest [--doctest-modules] [-v]
-    (.venv) $ mypy .
+
+mypy (optional; make sure src/damastes/py.typed exists)
+-------------------------------------------------------
+
+::
+
+    uv run mypy -p damastes
+
+::
+
+    uv run mypy tests
 
 Publish
 -------
