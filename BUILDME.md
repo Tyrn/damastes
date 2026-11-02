@@ -36,6 +36,10 @@ or
 
     (.venv) $ pytest [--doctest-modules] [-v]
 
+or
+
+    uv run pytest -vv
+
 ### mypy (optional; make sure src/damastes/py.typed exists)
 
     uv run mypy -p damastes
@@ -70,7 +74,7 @@ _NB_ 2023-02-28: Only _Procrustesfile_ is under development!
 
 ### Run
 
-    $ docker run -it --name damastes --rm --mount type=bind,source="$HOME"/,target=/enjoy --mount type=bind,source=/run/media,target=/run/media,bind-propagation=shared -w /enjoy damastes:latest
+    docker run -it --name damastes --rm --mount type=bind,source="$HOME"/,target=/enjoy --mount type=bind,source=/run/media,target=/run/media,bind-propagation=shared -w /enjoy damastes:latest
 
 - `--name damastes` is the container name; `damastes[:latest]` is the image name.
 
