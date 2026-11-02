@@ -397,8 +397,10 @@ def _album_copy() -> None:  # pragma: no cover
         joined_step_down = Path("").joinpath(*step_down)
 
         src = _ARGS.src / joined_step_down / src_file
+        dst_file_name = _file_decorate(i, step_down, src_file)
+        dst_top = joined_step_down / dst_file_name
         dst_path = _ARGS.dst_dir / joined_step_down if _ARGS.tree_dst else _ARGS.dst_dir
-        dst = dst_path / _file_decorate(i, step_down, src_file)
+        dst = dst_path / dst_file_name
 
         src_bytes, dst_bytes = src.stat().st_size, 0
 
@@ -413,7 +415,7 @@ def _album_copy() -> None:  # pragma: no cover
                 dst_bytes = dst.stat().st_size
 
         if _ARGS.verbose:
-            _show(f"{i:>4}/{_FILES_TOTAL} {COLUMN_ICON} {dst}", end="")
+            _show(f"{i:>4}/{_FILES_TOTAL} {COLUMN_ICON} {dst_top}", end="")
             if dst_bytes != src_bytes:
                 if dst_bytes == 0:
                     _show(f"  {COLUMN_ICON} {human_fine(src_bytes)}", end="")
