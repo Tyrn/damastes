@@ -394,13 +394,13 @@ def _album_copy() -> None:  # pragma: no cover
 
     def file_copy(entry: _DirWalkItem) -> tuple[int, int]:
         i, step_down, src_file = entry
-        joined_step_down = Path("").joinpath(*step_down)
+        src_step_down = Path("").joinpath(*step_down)
+        dst_step_down = src_step_down if _ARGS.tree_dst else Path("")
 
-        src = _ARGS.src / joined_step_down / src_file
-        dst_file_name = _file_decorate(i, step_down, src_file)
-        dst_top = joined_step_down / dst_file_name
-        dst_path = _ARGS.dst_dir / joined_step_down if _ARGS.tree_dst else _ARGS.dst_dir
-        dst = dst_path / dst_file_name
+        src = _ARGS.src / src_step_down / src_file
+        dst_file = _file_decorate(i, step_down, src_file)
+        dst_path = _ARGS.dst_dir / dst_step_down
+        dst = dst_path / dst_file
 
         src_bytes, dst_bytes = src.stat().st_size, 0
 
@@ -415,7 +415,10 @@ def _album_copy() -> None:  # pragma: no cover
                 dst_bytes = dst.stat().st_size
 
         if _ARGS.verbose:
-            _show(f"{i:>4}/{_FILES_TOTAL} {COLUMN_ICON} {dst_top}", end="")
+            _show(
+                f"{i:>4}/{_FILES_TOTAL}  {dst_step_down / dst_file}",
+                end="",
+            )
             if dst_bytes != src_bytes:
                 if dst_bytes == 0:
                     _show(f"  {COLUMN_ICON} {human_fine(src_bytes)}", end="")
@@ -579,7 +582,7 @@ WARNING_ICON = "\U0001f4a7"
 INVALID_ICON = "\U0000274c"
 SUSPICIOUS_ICON = "\U00002754"
 DONE_ICON = "\U0001f7e2"
-COLUMN_ICON = "\U00002714"
+COLUMN_ICON = "\U00002b52"
 KNOWN_EXTENSIONS = ["MP3", "OGG", "M4A", "M4B", "OPUS", "WMA", "FLAC", "APE"]
 CLEAN_CONTEXT_PARAMS = {
     "context": False,
