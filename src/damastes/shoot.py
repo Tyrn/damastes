@@ -16,6 +16,7 @@ from math import log
 from pathlib import Path
 from tempfile import mkstemp
 from time import perf_counter
+from typing import Literal
 
 import mutagen
 from yaspin import yaspin
@@ -38,7 +39,7 @@ def str_strip_numbers(str_alphanum: str) -> list[int]:
     return [int(x) for x in re.compile(r"\d+").findall(str_alphanum)]
 
 
-Ordering = int
+Ordering = Literal[-1, 0, 1]
 """
 LT (negative), EQ (zero), GT (positive)
 """
