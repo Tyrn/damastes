@@ -38,10 +38,13 @@ def str_strip_numbers(str_alphanum: str) -> list[int]:
     return [int(x) for x in re.compile(r"\d+").findall(str_alphanum)]
 
 
-Ord = int  # LT (negative), EQ (zero) GT (positive).
+Ordering = int
+"""
+LT (negative), EQ (zero), GT (positive)
+"""
 
 
-def strcmp_c(str_x, str_y) -> Ord:
+def strcmp_c(str_x, str_y) -> Ordering:
     """
     Compares strings; also lists of integers using 'string semantics'.
 
@@ -57,7 +60,7 @@ def strcmp_c(str_x, str_y) -> Ord:
     return 0 if str_x == str_y else -1 if str_x < str_y else 1
 
 
-def strcmp_naturally(str_x: str, str_y: str) -> Ord:
+def strcmp_naturally(str_x: str, str_y: str) -> Ordering:
     """
     If both strings contain digits, returns numerical comparison based on the numeric
     values embedded in the strings, otherwise returns the standard string comparison.
@@ -78,7 +81,7 @@ def strcmp_naturally(str_x: str, str_y: str) -> Ord:
     )
 
 
-def _path_compare(path_x: Path, path_y: Path) -> Ord:
+def _path_compare(path_x: Path, path_y: Path) -> Ordering:
     """
     Compares two paths (directories).
     """
@@ -89,7 +92,7 @@ def _path_compare(path_x: Path, path_y: Path) -> Ord:
     )
 
 
-def _file_compare(path_x: Path, path_y: Path) -> Ord:
+def _file_compare(path_x: Path, path_y: Path) -> Ordering:
     """
     Compares two paths, filenames only, ignoring extensions.
     """
