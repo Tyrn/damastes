@@ -46,6 +46,16 @@ or
 
     uv run mypy tests
 
+### Upgrade
+
+- To available dependencies, within limits of `pyproject.toml`
+
+      uv lock --upgrade
+
+- To the most recent dependencies, modifying `pyproject.toml`
+
+      uvx uv-upsync
+
 ### Publish
 
 _Probably, obsolete._ See [the docs](https://docs.astral.sh/uv/guides/package/#publishing-your-package)
