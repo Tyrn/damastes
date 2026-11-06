@@ -48,13 +48,13 @@ or
 
 ### Upgrade
 
-- To available dependencies, within limits of `pyproject.toml`
-
-      uv lock --upgrade
-
-- To the most recent dependencies, modifying `pyproject.toml`
+- Modify `pyproject.toml` to the most recent dependencies
 
       uvx uv-upsync
+
+- The project to available dependencies, within limits of `pyproject.toml`
+
+      uv lock --upgrade
 
 ### Publish
 
