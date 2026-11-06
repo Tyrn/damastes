@@ -4,7 +4,7 @@
 
     uv tool install git+https://github.com/Tyrn/damastes
 
-or
+or, better (get the intended version from `.python-version`)
 
     uv tool install --python 3.13  git+https://github.com/Tyrn/damastes
 
@@ -21,6 +21,11 @@ or
     uv build
 
     uv tool install dist/<...>.whl
+
+If the project requires a pinned Python version (see `.python-version`),
+it's necessary to specify the version manually once
+
+    uv tool install --python 3.13 dist/<...>.whl
 
 ### Use Git Hooks
 
