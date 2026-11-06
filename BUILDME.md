@@ -7,7 +7,7 @@
 or, better (get the intended version
 from [`.python-version`](.python-version))
 
-    uv tool install --python 3.13  git+https://github.com/Tyrn/damastes
+    uv tool install --python 3.x  git+https://github.com/Tyrn/damastes
 
 ## Development
 
@@ -27,7 +27,7 @@ If the project requires a pinned Python version
 (see [`.python-version`](.python-version)),
 it may be necessary to specify the version manually once
 
-    uv tool install --python 3.13 dist/<...>.whl
+    uv tool install --python 3.x dist/<...>.whl
 
 ### Use Git Hooks
 
