@@ -8,7 +8,13 @@ import sys
 import click
 
 from damastes import __version__
-from damastes.shoot import _run, _set_args_click
+from damastes.shoot import (
+    INVALID_ICON,
+    SUSPICIOUS_ICON,
+    USE_ICON,
+    _run,
+    _set_args_click,
+)
 
 
 def _steady_parameters(func):
@@ -93,7 +99,7 @@ def _steady_parameters(func):
         "--unified-name",
         type=str,
         default=None,
-        help="Destination "
+        help=f"{USE_ICON} Destination "
         + click.style("directory name", fg="green")
         + " and "
         + click.style("file names", fg="green")
@@ -106,7 +112,7 @@ def _steady_parameters(func):
         "--artist",
         type=str,
         default=None,
-        help=click.style("Artist tag", fg="green") + ".",
+        help=click.style(f"{USE_ICON} Artist tag", fg="green") + ".",
     )
     @click.option(
         "-m",
@@ -142,12 +148,7 @@ def _print_clean_context_params() -> None:  # pragma: no cover
     print(f"}}  # {count} of them.")
 
 
-@click.command(epilog=f"Running on Python {sys.version}")
-@click.help_option("-h", "--help")
-@click.version_option(__version__, "-V", "--version")
-@_steady_parameters
-def main(**kwargs) -> int:  # pragma: no cover
-    """
+_MAIN_HELP = f"""
     Damastes a.k.a. Procrustes is a CLI utility for copying directories and subdirectories
     containing supported audio files in sequence, naturally sorted.
     The end result is a "flattened" copy of the source subtree. "Flattened" means
@@ -156,8 +157,9 @@ def main(**kwargs) -> int:  # pragma: no cover
     is set, tags "Title", "Artist", and "Album" can be replaced optionally.
     The writing process is strictly sequential: either starting with the number one file,
     or in the reverse order. This can be important for some mobile devices.
-    \U0000274c Broken media;
-    \U00002754 Suspicious media.
+    {USE_ICON} Really useful options;
+    {INVALID_ICON} Broken media;
+    {SUSPICIOUS_ICON} Suspicious media.
 
     Examples; SRC as a directory:
 
@@ -167,6 +169,16 @@ def main(**kwargs) -> int:  # pragma: no cover
     SRC as a single file:
 
     library $ damastes -va 'Vladimir Nabokov' -u 'Ada' ada.ogg .
+    """
+
+
+@click.command(help=_MAIN_HELP, epilog=f"Running on Python {sys.version}")
+@click.help_option("-h", "--help")
+@click.version_option(__version__, "-V", "--version")
+@_steady_parameters
+def main(**kwargs) -> int:  # pragma: no cover
+    """
+    Damastes a.k.a. Procrustes, audiobook builder
     """
     _set_args_click(click.get_current_context().params)
 
