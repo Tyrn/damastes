@@ -587,6 +587,8 @@ RE_BY_SEP = re.compile(rf"[\s{SEP}]+")
 RE_BY_HYPH = re.compile(rf"\s*(?:{HYPH}\s*)+")
 RE_QUOTED_SUBSTRING = re.compile(r"\"(?:\\.|[^\"\\])*\"")
 
+NBSP = "\U000000a0"
+NNBSP = "\U0000202f"
 WARNING_ICON = "\U0001f4a7"
 INVALID_ICON = "\U0000274c"
 SUSPICIOUS_ICON = "\U00002754"

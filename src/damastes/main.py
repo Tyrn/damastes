@@ -10,6 +10,7 @@ import click
 from damastes import __version__
 from damastes.shoot import (
     INVALID_ICON,
+    NBSP,
     SUSPICIOUS_ICON,
     USE_ICON,
     _run,
@@ -157,9 +158,9 @@ _MAIN_HELP = f"""
     is set, tags "Title", "Artist", and "Album" can be replaced optionally.
     The writing process is strictly sequential: either starting with the number one file,
     or in the reverse order. This can be important for some mobile devices.
-    {USE_ICON} Really useful options;
-    {INVALID_ICON} Broken media;
-    {SUSPICIOUS_ICON} Suspicious media.
+    {INVALID_ICON}{NBSP}Broken media;
+    {SUSPICIOUS_ICON}{NBSP}Suspicious media;
+    {USE_ICON}{NBSP}Really useful options.
 
     Examples; SRC as a directory:
 
