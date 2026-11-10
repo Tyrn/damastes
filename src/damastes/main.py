@@ -134,13 +134,13 @@ def _steady_parameters(func):
     @click.argument("src", type=click.Path(exists=True, resolve_path=True))
     @click.argument("dst_dir", type=click.Path(exists=True, resolve_path=True))
     @functools.wraps(func)
-    def parameters(**kwargs):  # pragma: no cover
+    def parameters(**kwargs):
         func(**kwargs)
 
     return parameters
 
 
-def _print_clean_context_params() -> None:  # pragma: no cover
+def _print_clean_context_params() -> None:
     print("CLEAN_CONTEXT_PARAMS = {")
     count = 0
     for k, v in click.get_current_context().params.items():
@@ -177,7 +177,7 @@ _MAIN_HELP = f"""
 @click.help_option("-h", "--help")
 @click.version_option(__version__, "-V", "--version")
 @_steady_parameters
-def main(**kwargs) -> int:  # pragma: no cover
+def main(**kwargs) -> int:
     """
     Damastes a.k.a. Procrustes, audiobook builder
     """
@@ -192,5 +192,5 @@ def main(**kwargs) -> int:  # pragma: no cover
     return _run()
 
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__":
     sys.exit(main())

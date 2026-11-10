@@ -11,6 +11,14 @@ from [`.python-version`](.python-version))
 
 ## Development
 
+### IDE tools
+
+_With these tools the project's source code is shaped_
+
+- `basedpyright` - type checker and language server
+
+- `ruff` - linter and formatter
+
 ### Initialize
 
     uv venv

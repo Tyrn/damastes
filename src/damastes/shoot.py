@@ -104,7 +104,7 @@ def _file_compare(path_x: Path, path_y: Path) -> Ordering:
     )
 
 
-def _mutagen_file(name: Path, spinner=None):  # pragma: no cover
+def _mutagen_file(name: Path, spinner=None):
     """
     Returns Mutagen thing, if name looks like an audio file path, else returns None.
     """
@@ -127,17 +127,17 @@ def _mutagen_file(name: Path, spinner=None):  # pragma: no cover
     except mutagen.MutagenError as mt_error:
         if spinner:
             spinner.write(f" {INVALID_ICON} >>{mt_error}>> {name_to_print}")
-        _INVALID_TOTAL += 1  # pylint:disable=undefined-variable
+        _INVALID_TOTAL += 1
         return None
 
     if file is None and ext in KNOWN_EXTENSIONS:
         if spinner:
             spinner.write(f" {SUSPICIOUS_ICON} {name_to_print}")
-        _SUSPICIOUS_TOTAL += 1  # pylint:disable=undefined-variable
+        _SUSPICIOUS_TOTAL += 1
     return file
 
 
-def _is_audiofile(name: Path, spinner=None) -> bool:  # pragma: no cover
+def _is_audiofile(name: Path, spinner=None) -> bool:
     """
     Returns True, if name is an audio file, else returns False.
     """
@@ -179,9 +179,7 @@ _DirWalkItem = tuple[int, list[str], Path]
 _DirWalkIterator = Iterator[_DirWalkItem]
 
 
-def _dir_walk(
-    src: Path, step_down: list[str], fcount: list[int]
-) -> _DirWalkIterator:  # pragma: no cover
+def _dir_walk(src: Path, step_down: list[str], fcount: list[int]) -> _DirWalkIterator:
     """
     Walks down the src tree, accumulating step_down on each recursion level.
     Yields a tuple of:
@@ -230,9 +228,7 @@ def _dir_walk(
         yield from walk_along(files)
 
 
-def _audiofiles_count(
-    directory: Path, spinner=None
-) -> tuple[int, int]:  # pragma: no cover
+def _audiofiles_count(directory: Path, spinner=None) -> tuple[int, int]:
     """
     Returns full recursive count of audiofiles in directory.
     """
@@ -276,7 +272,7 @@ def _dst_calculate() -> str:
     )
 
 
-def _album() -> _DirWalkIterator:  # pragma: no cover
+def _album() -> _DirWalkIterator:
     """
     Sets up boilerplate required by the options and returns the ammo belt generator of
     (index, list of subdirectories to be joined
@@ -350,7 +346,7 @@ def human_fine(bytes: int) -> str:
     return "1" if bytes == 1 else f"human_fine error; bytes: {bytes}"
 
 
-def _album_copy() -> None:  # pragma: no cover
+def _album_copy() -> None:
     """
     Runs through the ammo belt and does copying, in the reverse order if necessary.
     """
@@ -458,9 +454,7 @@ def _album_copy() -> None:  # pragma: no cover
         _show(f"Fatal error. files_total: {files_total}, _FILES_TOTAL: {_FILES_TOTAL}")
 
 
-def _show(
-    string: str, *, end="\n", file=sys.stdout, flush=False
-) -> None:  # pragma: no cover
+def _show(string: str, *, end="\n", file=sys.stdout, flush=False) -> None:
     if not _ARGS.no_console:
         return print(string, end=end, file=file, flush=flush)
 
@@ -622,7 +616,7 @@ CLEAN_CONTEXT_PARAMS = {
 }  # 22 of them.
 
 
-class RestrictedDotDict(dict):  # pragma: no cover
+class RestrictedDotDict(dict):
     """
     Enables access to dictionary entries via dot notation.
     An attempt at adding a new key raises an exception.
@@ -654,7 +648,7 @@ _START_TIME = 0.0
 _SHORT_LOG: list[str] = []
 
 
-def _run() -> int:  # pragma: no cover
+def _run() -> int:
     """
     Runs the whole Procrustes business according to
     preset context.
@@ -748,7 +742,7 @@ def _run() -> int:  # pragma: no cover
     return 0
 
 
-def _set_args_click(context_params: dict) -> None:  # pragma: no cover
+def _set_args_click(context_params: dict) -> None:
     """
     To be called once from main() before _run().
     """
@@ -757,7 +751,7 @@ def _set_args_click(context_params: dict) -> None:  # pragma: no cover
     _ARGS = RestrictedDotDict(copy.deepcopy(context_params))
 
 
-def run(**kwargs) -> int:  # pragma: no cover
+def run(**kwargs) -> int:
     """
     Sets up context parameters manually via kwargs
     and runs the whole Procrustes business.
@@ -776,7 +770,7 @@ def run(**kwargs) -> int:  # pragma: no cover
     return _run()
 
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__":
     print(
         f" {WARNING_ICON} Module [{Path(__file__).name}] is not runnable.",
         file=sys.stderr,
