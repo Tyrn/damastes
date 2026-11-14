@@ -136,6 +136,68 @@ def _dir_groom_cmp(src: Path) -> tuple[list[Path], list[Path]]:
     return dirs, files
 
 
+def str_key(str_x: str) -> tuple[int, list[int] | str]:
+    """
+    Key function for strings using 'string semantics'.
+
+    Returns a tuple whose first element is a discriminator and whose
+    second element is the value to compare. This preserves the
+    three-way comparator's fallback: strings with embedded numbers
+    are compared numerically, strings without them are compared
+    lexicographically, and a numbered string sorts before an
+    unnumbered one when their number lists differ in emptiness.
+
+    >>> str_key("aardvark") == str_key("bobo")
+    False
+    >>> str_key("aardvark") < str_key("bobo")
+    True
+    """
+    nums = str_strip_numbers(str_x)
+    if nums:
+        return (0, nums)
+    return (1, str_x)
+
+
+def path_key(p: Path) -> tuple[int, list[int] | str]:
+    """
+    Key for comparing paths (directories) in _dir_groom.
+    """
+    return str_key(str(p)) if not _ARGS.sort_lex else (0, str(p))
+
+
+def file_key(p: Path) -> tuple[int, list[int] | str]:
+    """
+    Key for comparing filenames only, ignoring extensions.
+    """
+    return str_key(p.stem) if not _ARGS.sort_lex else (0, p.stem)
+
+
+def _dir_groom(src: Path) -> tuple[list[Path], list[Path]]:
+    """
+    Returns (
+        a sorted list of directories in src directory,
+        a sorted list of audiofiles in src directory
+    )
+    """
+    if _is_audiofile(src):
+        dirs: list[Path] = []
+        files: list[Path] = [Path(src.name)]
+        src = src.parent
+    else:
+        lst = os.listdir(src)
+        dirs = sorted(
+            [Path(x) for x in lst if (src / x).is_dir()],
+            key=path_key,
+            reverse=_ARGS.reverse,
+        )
+        files = sorted(
+            [Path(x) for x in lst if _is_audiofile(src / x)],
+            key=file_key,
+            reverse=_ARGS.reverse,
+        )
+    return dirs, files
+
+
 type _DirWalkItem = tuple[int, Path, Path]
 """(index, step down, source audiofile)"""
 type _DirWalkIterator = Iterator[_DirWalkItem]
@@ -147,7 +209,7 @@ def _dir_walk(src: Path, step_down: Path, fcount: list[int]) -> _DirWalkIterator
     Walks down the src tree, accumulating step_down on each recursion level.
     Yields source audiofiles, one at a time.
     """
-    dirs, files = _dir_groom_cmp(src)
+    dirs, files = _dir_groom(src)
 
     def walk_into(dirs: list[Path]) -> _DirWalkIterator:
         for directory in dirs:

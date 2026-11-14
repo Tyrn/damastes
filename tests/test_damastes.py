@@ -7,9 +7,12 @@ from src.damastes import (
     CLEAN_CONTEXT_PARAMS,
     RestrictedDotDict,
     __version__,
+    file_key,
     human_fine,
     initials,
+    path_key,
     shoot,
+    str_key,
     str_strip_numbers,
     strcmp_c,
     strcmp_naturally,
@@ -58,6 +61,16 @@ class TestPureFunctions:
         assert strcmp_naturally("", "") == 0
         assert strcmp_naturally("2a", "10a") == -1
         assert strcmp_naturally("alfa", "bravo") == -1
+
+    def test_str_key(self):
+        # Numbered strings compare numerically.
+        assert str_key("2a") < str_key("10a")
+        # Unnumbered strings compare lexicographically.
+        assert str_key("alfa") < str_key("bravo")
+        # Equal strings produce equal keys.
+        assert str_key("") == str_key("")
+        # A numbered string and an unnumbered one have different discriminators.
+        assert str_key("2a") != str_key("alfa")
 
     def test_initials(self):
         """
@@ -149,9 +162,20 @@ class TestNonPureHelpers:
         assert shoot._file_compare(Path("10alfa"), Path("2bravo")) == -1
         assert shoot._file_compare(Path("alfa.ogg"), Path("alfa.mp3")) == 0
         assert shoot._file_compare(Path("Alfa.ogg"), Path("alfa.mp3")) == -1
+
+        assert file_key(Path("10a.mp3")) < file_key(Path("2a.mp3"))
+
+        assert path_key(Path("10a")) < path_key(Path("2a"))
+        assert path_key(Path("alfa")) < path_key(Path("bravo"))
+
         args.sort_lex = False
         assert shoot._path_compare(Path("10alfa"), Path("2bravo")) == 1
         assert shoot._file_compare(Path("10alfa"), Path("2bravo")) == 1
+
+        assert file_key(Path("2a.mp3")) < file_key(Path("10a.mp3"))
+
+        assert path_key(Path("2a")) < path_key(Path("10a"))
+        assert path_key(Path("alfa")) < path_key(Path("bravo"))
 
     def test_decorate(self, monkeypatch):
         args = self.new_args()
