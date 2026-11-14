@@ -184,9 +184,7 @@ type _DirWalkIterator = Iterator[_DirWalkItem]
 def _dir_walk(src: Path, step_down: Path, fcount: list[int]) -> _DirWalkIterator:
     """
     Walks down the src tree, accumulating step_down on each recursion level.
-    Yields a tuple of:
-    (index, list of subdirectories to be joined
-    at destination if necessary, source audiofile name)
+    Yields source audiofiles, one at a time.
     """
     if _is_audiofile(src):
         dirs: list[Path] = []
