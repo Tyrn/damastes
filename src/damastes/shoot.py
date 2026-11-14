@@ -119,19 +119,13 @@ def _dir_groom_cmp(src: Path) -> tuple[list[Path], list[Path]]:
         lst = os.listdir(src)
         dirs = sorted(
             [Path(x) for x in lst if (src / x).is_dir()],
-            key=functools.cmp_to_key(
-                (lambda xp, yp: _path_compare(yp, xp))
-                if _ARGS.reverse
-                else _path_compare
-            ),
+            key=functools.cmp_to_key(_path_compare),
+            reverse=_ARGS.reverse,
         )
         files = sorted(
             [Path(x) for x in lst if _is_audiofile(src / x)],
-            key=functools.cmp_to_key(
-                (lambda xf, yf: _file_compare(yf, xf))
-                if _ARGS.reverse
-                else _file_compare
-            ),
+            key=functools.cmp_to_key(_file_compare),
+            reverse=_ARGS.reverse,
         )
     return dirs, files
 
