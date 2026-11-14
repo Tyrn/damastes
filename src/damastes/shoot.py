@@ -104,7 +104,7 @@ def _file_compare(path_x: Path, path_y: Path) -> Ordering:
     )
 
 
-def _dir_groom(src: Path) -> tuple[list[Path], list[Path]]:
+def _dir_groom_cmp(src: Path) -> tuple[list[Path], list[Path]]:
     """
     Returns (
         a sorted list of directories in src directory,
@@ -147,7 +147,7 @@ def _dir_walk(src: Path, step_down: Path, fcount: list[int]) -> _DirWalkIterator
     Walks down the src tree, accumulating step_down on each recursion level.
     Yields source audiofiles, one at a time.
     """
-    dirs, files = _dir_groom(src)
+    dirs, files = _dir_groom_cmp(src)
 
     def walk_into(dirs: list[Path]) -> _DirWalkIterator:
         for directory in dirs:
