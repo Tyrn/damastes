@@ -7,10 +7,8 @@ from src.damastes import (
     CLEAN_CONTEXT_PARAMS,
     RestrictedDotDict,
     __version__,
-    file_key,
     human_fine,
     initials,
-    path_key,
     shoot,
     str_key,
     str_strip_numbers,
@@ -40,37 +38,6 @@ class TestPureFunctions:
         assert "-42".isdigit() is False
         assert "4₂".isdigit() is True
         assert "4²".isdigit() is True
-
-    def test_str_strip_numbers(self):
-        assert str_strip_numbers("ab11cdd2k.144") == [11, 2, 144]
-        assert str_strip_numbers("Ignacio Vazquez-Abrams") == []
-
-    def test_strcmp_c(self):
-        assert strcmp_c("aardvark", "bobo") == -1
-        assert strcmp_c([], []) == 0
-        assert strcmp_c([1], []) == 1
-        assert strcmp_c([3], []) == 1
-        assert strcmp_c([1, 2, 3], [1, 2, 3, 4, 5]) == -1
-        assert strcmp_c([1, 4], [1, 4, 16]) == -1
-        assert strcmp_c([2, 8], [2, 2, 3]) == 1
-        assert strcmp_c([0, 0, 2, 4], [0, 0, 15]) == -1
-        assert strcmp_c([0, 13], [0, 2, 2]) == 1
-        assert strcmp_c([11, 2], [11, 2]) == 0
-
-    def test_strcmp_naturally(self):
-        assert strcmp_naturally("", "") == 0
-        assert strcmp_naturally("2a", "10a") == -1
-        assert strcmp_naturally("alfa", "bravo") == -1
-
-    def test_str_key(self):
-        # Numbered strings compare numerically.
-        assert str_key("2a") < str_key("10a")
-        # Unnumbered strings compare lexicographically.
-        assert str_key("alfa") < str_key("bravo")
-        # Equal strings produce equal keys.
-        assert str_key("") == str_key("")
-        # A numbered string and an unnumbered one have different discriminators.
-        assert str_key("2a") != str_key("alfa")
 
     def test_initials(self):
         """
@@ -147,6 +114,37 @@ class TestPureFunctions:
         assert human_fine(1024**3) == "1.00GB"
         assert human_fine(1024**4) == "1.00TB"
 
+    def test_str_strip_numbers(self):
+        assert str_strip_numbers("ab11cdd2k.144") == [11, 2, 144]
+        assert str_strip_numbers("Ignacio Vazquez-Abrams") == []
+
+    def test_strcmp_c(self):
+        assert strcmp_c("aardvark", "bobo") == -1
+        assert strcmp_c([], []) == 0
+        assert strcmp_c([1], []) == 1
+        assert strcmp_c([3], []) == 1
+        assert strcmp_c([1, 2, 3], [1, 2, 3, 4, 5]) == -1
+        assert strcmp_c([1, 4], [1, 4, 16]) == -1
+        assert strcmp_c([2, 8], [2, 2, 3]) == 1
+        assert strcmp_c([0, 0, 2, 4], [0, 0, 15]) == -1
+        assert strcmp_c([0, 13], [0, 2, 2]) == 1
+        assert strcmp_c([11, 2], [11, 2]) == 0
+
+    def test_strcmp_naturally(self):
+        assert strcmp_naturally("", "") == 0
+        assert strcmp_naturally("2a", "10a") == -1
+        assert strcmp_naturally("alfa", "bravo") == -1
+
+    def test_str_key(self):
+        # Numbered strings compare numerically.
+        assert str_key("2a") < str_key("10a")
+        # Unnumbered strings compare lexicographically.
+        assert str_key("alfa") < str_key("bravo")
+        # Equal strings produce equal keys.
+        assert str_key("") == str_key("")
+        # A numbered string and an unnumbered one have different discriminators.
+        assert str_key("2a") != str_key("alfa")
+
 
 class TestNonPureHelpers:
     def new_args(self):
@@ -163,19 +161,19 @@ class TestNonPureHelpers:
         assert shoot._file_compare(Path("alfa.ogg"), Path("alfa.mp3")) == 0
         assert shoot._file_compare(Path("Alfa.ogg"), Path("alfa.mp3")) == -1
 
-        assert file_key(Path("10a.mp3")) < file_key(Path("2a.mp3"))
+        assert shoot._file_key(Path("10a.mp3")) < shoot._file_key(Path("2a.mp3"))
 
-        assert path_key(Path("10a")) < path_key(Path("2a"))
-        assert path_key(Path("alfa")) < path_key(Path("bravo"))
+        assert shoot._path_key(Path("10a")) < shoot._path_key(Path("2a"))
+        assert shoot._path_key(Path("alfa")) < shoot._path_key(Path("bravo"))
 
         args.sort_lex = False
         assert shoot._path_compare(Path("10alfa"), Path("2bravo")) == 1
         assert shoot._file_compare(Path("10alfa"), Path("2bravo")) == 1
 
-        assert file_key(Path("2a.mp3")) < file_key(Path("10a.mp3"))
+        assert shoot._file_key(Path("2a.mp3")) < shoot._file_key(Path("10a.mp3"))
 
-        assert path_key(Path("2a")) < path_key(Path("10a"))
-        assert path_key(Path("alfa")) < path_key(Path("bravo"))
+        assert shoot._path_key(Path("2a")) < shoot._path_key(Path("10a"))
+        assert shoot._path_key(Path("alfa")) < shoot._path_key(Path("bravo"))
 
     def test_decorate(self, monkeypatch):
         args = self.new_args()

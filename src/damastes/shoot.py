@@ -158,14 +158,14 @@ def str_key(str_x: str) -> tuple[int, list[int] | str]:
     return (1, str_x)
 
 
-def path_key(p: Path) -> tuple[int, list[int] | str]:
+def _path_key(p: Path) -> tuple[int, list[int] | str]:
     """
     Key for comparing paths (directories) in _dir_groom.
     """
     return str_key(str(p)) if not _ARGS.sort_lex else (0, str(p))
 
 
-def file_key(p: Path) -> tuple[int, list[int] | str]:
+def _file_key(p: Path) -> tuple[int, list[int] | str]:
     """
     Key for comparing filenames only, ignoring extensions.
     """
@@ -187,12 +187,12 @@ def _dir_groom(src: Path) -> tuple[list[Path], list[Path]]:
         lst = os.listdir(src)
         dirs = sorted(
             [Path(x) for x in lst if (src / x).is_dir()],
-            key=path_key,
+            key=_path_key,
             reverse=_ARGS.reverse,
         )
         files = sorted(
             [Path(x) for x in lst if _is_audiofile(src / x)],
-            key=file_key,
+            key=_file_key,
             reverse=_ARGS.reverse,
         )
     return dirs, files
