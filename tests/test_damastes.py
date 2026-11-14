@@ -136,14 +136,12 @@ class TestPureFunctions:
         assert strcmp_naturally("alfa", "bravo") == -1
 
     def test_str_key(self):
-        # Numbered strings compare numerically.
+        # Numbered strings compare numerically (naturally).
         assert str_key("2a") < str_key("10a")
         # Unnumbered strings compare lexicographically.
         assert str_key("alfa") < str_key("bravo")
         # Equal strings produce equal keys.
         assert str_key("") == str_key("")
-        # A numbered string and an unnumbered one have different discriminators.
-        assert str_key("2a") != str_key("alfa")
 
 
 class TestNonPureHelpers:

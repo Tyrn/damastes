@@ -141,9 +141,13 @@ def str_key(str: str) -> tuple[int, list[int] | str]:
     them are compared lexicographically, and a numbered string
     sorts before an unnumbered one.
 
-    >>> str_key("aardvark") == str_key("bobo")
-    False
-    >>> str_key("aardvark") < str_key("bobo")
+    >>> str_key("7a3b")
+    (0, [7, 3])
+    >>> str_key("10a2t")
+    (0, [10, 2])
+    >>> str_key("bravo")
+    (1, 'bravo')
+    >>> str_key("7a3b") < str_key("10a2t")
     True
     """
     nums = str_strip_numbers(str)
