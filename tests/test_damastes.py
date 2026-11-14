@@ -163,8 +163,8 @@ class TestNonPureHelpers:
 
         assert shoot._file_key(Path("10a.mp3")) < shoot._file_key(Path("2a.mp3"))
 
-        assert shoot._path_key(Path("10a")) < shoot._path_key(Path("2a"))
-        assert shoot._path_key(Path("alfa")) < shoot._path_key(Path("bravo"))
+        assert shoot._dir_key(Path("10a")) < shoot._dir_key(Path("2a"))
+        assert shoot._dir_key(Path("alfa")) < shoot._dir_key(Path("bravo"))
 
         args.sort_lex = False
         assert shoot._path_compare(Path("10alfa"), Path("2bravo")) == 1
@@ -172,8 +172,8 @@ class TestNonPureHelpers:
 
         assert shoot._file_key(Path("2a.mp3")) < shoot._file_key(Path("10a.mp3"))
 
-        assert shoot._path_key(Path("2a")) < shoot._path_key(Path("10a"))
-        assert shoot._path_key(Path("alfa")) < shoot._path_key(Path("bravo"))
+        assert shoot._dir_key(Path("2a")) < shoot._dir_key(Path("10a"))
+        assert shoot._dir_key(Path("alfa")) < shoot._dir_key(Path("bravo"))
 
     def test_decorate(self, monkeypatch):
         args = self.new_args()

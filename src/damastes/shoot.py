@@ -134,12 +134,11 @@ def str_key(str: str) -> tuple[int, list[int] | str]:
     """
     Key function for strings using 'string semantics'.
 
-    Returns a tuple whose first element is a discriminator and whose
-    second element is the value to compare. This preserves the
-    three-way comparator's fallback: strings with embedded numbers
-    are compared numerically, strings without them are compared
-    lexicographically, and a numbered string sorts before an
-    unnumbered one when their number lists differ in emptiness.
+    Returns a tuple whose first element is a discriminator and
+    whose second element is the value to compare. Strings with
+    embedded numbers are compared numerically, strings without
+    them are compared lexicographically, and a numbered string
+    sorts before an unnumbered one.
 
     >>> str_key("aardvark") == str_key("bobo")
     False
@@ -152,9 +151,9 @@ def str_key(str: str) -> tuple[int, list[int] | str]:
     return (1, str)
 
 
-def _path_key(p: Path) -> tuple[int, list[int] | str]:
+def _dir_key(p: Path) -> tuple[int, list[int] | str]:
     """
-    Key for comparing paths (directories) in _dir_groom.
+    Key for comparing directories.
     """
     return (1, str(p)) if _ARGS.sort_lex else str_key(str(p))
 
@@ -181,7 +180,7 @@ def _dir_groom(src: Path) -> tuple[list[Path], list[Path]]:
         lst = os.listdir(src)
         dirs = sorted(
             [Path(x) for x in lst if (src / x).is_dir()],
-            key=_path_key,
+            key=_dir_key,
             reverse=_ARGS.reverse,
         )
         files = sorted(
