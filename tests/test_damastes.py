@@ -161,19 +161,9 @@ class TestNonPureHelpers:
         assert shoot._file_compare(Path("alfa.ogg"), Path("alfa.mp3")) == 0
         assert shoot._file_compare(Path("Alfa.ogg"), Path("alfa.mp3")) == -1
 
-        assert shoot._file_key(Path("10a.mp3")) < shoot._file_key(Path("2a.mp3"))
-
-        assert shoot._dir_key(Path("10a")) < shoot._dir_key(Path("2a"))
-        assert shoot._dir_key(Path("alfa")) < shoot._dir_key(Path("bravo"))
-
         args.sort_lex = False
         assert shoot._path_compare(Path("10alfa"), Path("2bravo")) == 1
         assert shoot._file_compare(Path("10alfa"), Path("2bravo")) == 1
-
-        assert shoot._file_key(Path("2a.mp3")) < shoot._file_key(Path("10a.mp3"))
-
-        assert shoot._dir_key(Path("2a")) < shoot._dir_key(Path("10a"))
-        assert shoot._dir_key(Path("alfa")) < shoot._dir_key(Path("bravo"))
 
     def test_decorate(self, monkeypatch):
         args = self.new_args()

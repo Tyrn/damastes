@@ -132,7 +132,8 @@ def _dir_groom_cmp(src: Path) -> tuple[list[Path], list[Path]]:
 
 def str_key(str: str) -> tuple[int, list[int] | str]:
     """
-    Key function for strings using 'string semantics'.
+    Key function for strings; strings with embedded numbers
+    to be sorted naturally.
 
     Returns a tuple whose first element is a discriminator and
     whose second element is the value to compare. Strings with
@@ -151,20 +152,6 @@ def str_key(str: str) -> tuple[int, list[int] | str]:
     return (1, str)
 
 
-def _dir_key(p: Path) -> tuple[int, list[int] | str]:
-    """
-    Key for comparing directories.
-    """
-    return (1, str(p)) if _ARGS.sort_lex else str_key(str(p))
-
-
-def _file_key(p: Path) -> tuple[int, list[int] | str]:
-    """
-    Key for comparing filenames only, ignoring extensions.
-    """
-    return (1, p.stem) if _ARGS.sort_lex else str_key(p.stem)
-
-
 def _dir_groom(src: Path) -> tuple[list[Path], list[Path]]:
     """
     Returns (
@@ -177,15 +164,16 @@ def _dir_groom(src: Path) -> tuple[list[Path], list[Path]]:
         files: list[Path] = [Path(src.name)]
         src = src.parent
     else:
+        lex = _ARGS.sort_lex
         lst = os.listdir(src)
         dirs = sorted(
             [Path(x) for x in lst if (src / x).is_dir()],
-            key=_dir_key,
+            key=(lambda p: (1, str(p))) if lex else (lambda p: str_key(str(p))),
             reverse=_ARGS.reverse,
         )
         files = sorted(
             [Path(x) for x in lst if _is_audiofile(src / x)],
-            key=_file_key,
+            key=(lambda p: (1, p.stem)) if lex else (lambda p: str_key(p.stem)),
             reverse=_ARGS.reverse,
         )
     return dirs, files
