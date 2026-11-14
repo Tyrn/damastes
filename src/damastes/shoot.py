@@ -130,7 +130,7 @@ def _dir_groom_cmp(src: Path) -> tuple[list[Path], list[Path]]:
     return dirs, files
 
 
-def str_key(str_x: str) -> tuple[int, list[int] | str]:
+def str_key(str: str) -> tuple[int, list[int] | str]:
     """
     Key function for strings using 'string semantics'.
 
@@ -146,24 +146,24 @@ def str_key(str_x: str) -> tuple[int, list[int] | str]:
     >>> str_key("aardvark") < str_key("bobo")
     True
     """
-    nums = str_strip_numbers(str_x)
+    nums = str_strip_numbers(str)
     if nums:
         return (0, nums)
-    return (1, str_x)
+    return (1, str)
 
 
 def _path_key(p: Path) -> tuple[int, list[int] | str]:
     """
     Key for comparing paths (directories) in _dir_groom.
     """
-    return (0, str(p)) if _ARGS.sort_lex else str_key(str(p))
+    return (1, str(p)) if _ARGS.sort_lex else str_key(str(p))
 
 
 def _file_key(p: Path) -> tuple[int, list[int] | str]:
     """
     Key for comparing filenames only, ignoring extensions.
     """
-    return (0, p.stem) if _ARGS.sort_lex else str_key(p.stem)
+    return (1, p.stem) if _ARGS.sort_lex else str_key(p.stem)
 
 
 def _dir_groom(src: Path) -> tuple[list[Path], list[Path]]:
