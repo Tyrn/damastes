@@ -157,15 +157,15 @@ def _artist_part(*, prefix="", suffix="") -> str:
     return ""
 
 
-def _file_decorate(i: int, step_down: list[str], file: Path) -> str:
+def _file_decorate(i: int, step_down: Path, file: Path) -> str:
     """
     Prepends zero padded decimal i to path name.
     """
     if _ARGS.strip_decorations and _ARGS.tree_dst:
         return file.name
     prefix = str(i).zfill(len(str(_FILES_TOTAL))) + (
-        "-[" + "][".join(step_down) + "]-"
-        if _ARGS.prepend_subdir_name and not _ARGS.tree_dst and len(step_down) > 0
+        "-[" + str(step_down).replace(os.sep, "][") + "]-"
+        if _ARGS.prepend_subdir_name and not _ARGS.tree_dst and step_down.parts
         else "-"
     )
     return prefix + (
@@ -175,13 +175,13 @@ def _file_decorate(i: int, step_down: list[str], file: Path) -> str:
     )
 
 
-type _DirWalkItem = tuple[int, list[str], Path]
+type _DirWalkItem = tuple[int, Path, Path]
 """(index, step down, source audiofile)"""
 type _DirWalkIterator = Iterator[_DirWalkItem]
 """Iterator over source audiofiles"""
 
 
-def _dir_walk(src: Path, step_down: list[str], fcount: list[int]) -> _DirWalkIterator:
+def _dir_walk(src: Path, step_down: Path, fcount: list[int]) -> _DirWalkIterator:
     """
     Walks down the src tree, accumulating step_down on each recursion level.
     Yields a tuple of:
@@ -213,9 +213,7 @@ def _dir_walk(src: Path, step_down: list[str], fcount: list[int]) -> _DirWalkIte
 
     def walk_into(dirs: list[Path]) -> _DirWalkIterator:
         for directory in dirs:
-            step = list(step_down)
-            step.append(directory.name)
-            yield from _dir_walk(src / directory, step, fcount)
+            yield from _dir_walk(src / directory, step_down / directory.name, fcount)
 
     def walk_along(files: list[Path]) -> _DirWalkIterator:
         for file in files:
@@ -302,7 +300,9 @@ def _album() -> _DirWalkIterator:
                 sys.exit(1)
         _ARGS.dst_dir.mkdir()
 
-    return _dir_walk(_ARGS.src, [], [_FILES_TOTAL, -1] if _ARGS.reverse else [1, 1])
+    return _dir_walk(
+        _ARGS.src, Path(""), [_FILES_TOTAL, -1] if _ARGS.reverse else [1, 1]
+    )
 
 
 def human_rough(
@@ -395,12 +395,11 @@ def _album_copy() -> None:
         os.remove(tmp)
 
     def file_copy(entry: _DirWalkItem) -> tuple[int, int]:
-        i, step_down, src_file = entry
-        src_step_down = Path("").joinpath(*step_down)
+        i, src_step_down, src_file = entry
         dst_step_down = src_step_down if _ARGS.tree_dst else Path("")
 
         src = _ARGS.src / src_step_down / src_file
-        dst_file = _file_decorate(i, step_down, src_file)
+        dst_file = _file_decorate(i, src_step_down, src_file)
         dst_path = _ARGS.dst_dir / dst_step_down
         dst = dst_path / dst_file
 
