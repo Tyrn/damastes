@@ -213,7 +213,7 @@ def _dir_walk(src: Path, step_down: Path, fcount: list[int]) -> _DirWalkIterator
 
     def walk_into(dirs: list[Path]) -> _DirWalkIterator:
         for directory in dirs:
-            yield from _dir_walk(src / directory, step_down / directory.name, fcount)
+            yield from _dir_walk(src / directory, step_down / directory, fcount)
 
     def walk_along(files: list[Path]) -> _DirWalkIterator:
         for file in files:
