@@ -39,7 +39,7 @@ def str_strip_numbers(str_alphanum: str) -> list[int]:
     return [int(x) for x in re.compile(r"\d+").findall(str_alphanum)]
 
 
-Ordering = Literal[-1, 0, 1]
+type Ordering = Literal[-1, 0, 1]
 """
 LT (negative), EQ (zero), GT (positive)
 """
@@ -175,8 +175,10 @@ def _file_decorate(i: int, step_down: list[str], file: Path) -> str:
     )
 
 
-_DirWalkItem = tuple[int, list[str], Path]
-_DirWalkIterator = Iterator[_DirWalkItem]
+type _DirWalkItem = tuple[int, list[str], Path]
+"""(index, step down, source audiofile)"""
+type _DirWalkIterator = Iterator[_DirWalkItem]
+"""Iterator over source audiofiles"""
 
 
 def _dir_walk(src: Path, step_down: list[str], fcount: list[int]) -> _DirWalkIterator:
