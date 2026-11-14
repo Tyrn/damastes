@@ -104,87 +104,12 @@ def _file_compare(path_x: Path, path_y: Path) -> Ordering:
     )
 
 
-def _mutagen_file(name: Path, spinner=None):
+def _dir_groom(src: Path) -> tuple[list[Path], list[Path]]:
     """
-    Returns Mutagen thing, if name looks like an audio file path, else returns None.
-    """
-    global _INVALID_TOTAL, _SUSPICIOUS_TOTAL  # pylint:disable=global-statement
-    ext = name.suffix.lstrip(".").upper()
-    atp = _ARGS.file_type
-
-    if atp:
-        if "*" in atp or "?" in atp or "[" in atp:
-            if not fnmatch.fnmatch(name.name, atp):
-                return None
-        else:
-            if ext != atp.lstrip(".").upper():
-                return None
-
-    name_to_print: str = str(name) if _ARGS.verbose else name.name
-
-    try:
-        file = mutagen.File(name, easy=True)
-    except mutagen.MutagenError as mt_error:
-        if spinner:
-            spinner.write(f" {INVALID_ICON} >>{mt_error}>> {name_to_print}")
-        _INVALID_TOTAL += 1
-        return None
-
-    if file is None and ext in KNOWN_EXTENSIONS:
-        if spinner:
-            spinner.write(f" {SUSPICIOUS_ICON} {name_to_print}")
-        _SUSPICIOUS_TOTAL += 1
-    return file
-
-
-def _is_audiofile(name: Path, spinner=None) -> bool:
-    """
-    Returns True, if name is an audio file, else returns False.
-    """
-    if name.is_file():
-        file = _mutagen_file(name, spinner)
-        if file is not None:
-            return True
-    return False
-
-
-def _artist_part(*, prefix="", suffix="") -> str:
-    """
-    Returns Artist, nicely shaped to be a part of a directory/file name.
-    """
-    if _ARGS.artist:
-        return prefix + _ARGS.artist + suffix
-    return ""
-
-
-def _file_decorate(i: int, step_down: Path, file: Path) -> str:
-    """
-    Prepends zero padded decimal i to path name.
-    """
-    if _ARGS.strip_decorations and _ARGS.tree_dst:
-        return file.name
-    prefix = str(i).zfill(len(str(_FILES_TOTAL))) + (
-        "-[" + str(step_down).replace(os.sep, "][") + "]-"
-        if _ARGS.prepend_subdir_name and not _ARGS.tree_dst and step_down.parts
-        else "-"
+    Returns (
+        a sorted list of directories in src directory,
+        a sorted list of audiofiles in src directory
     )
-    return prefix + (
-        _ARGS.unified_name + _artist_part(prefix=" - ") + file.suffix
-        if _ARGS.unified_name
-        else file.name
-    )
-
-
-type _DirWalkItem = tuple[int, Path, Path]
-"""(index, step down, source audiofile)"""
-type _DirWalkIterator = Iterator[_DirWalkItem]
-"""Iterator over source audiofiles"""
-
-
-def _dir_walk(src: Path, step_down: Path, fcount: list[int]) -> _DirWalkIterator:
-    """
-    Walks down the src tree, accumulating step_down on each recursion level.
-    Yields source audiofiles, one at a time.
     """
     if _is_audiofile(src):
         dirs: list[Path] = []
@@ -208,6 +133,21 @@ def _dir_walk(src: Path, step_down: Path, fcount: list[int]) -> _DirWalkIterator
                 else _file_compare
             ),
         )
+    return dirs, files
+
+
+type _DirWalkItem = tuple[int, Path, Path]
+"""(index, step down, source audiofile)"""
+type _DirWalkIterator = Iterator[_DirWalkItem]
+"""Iterator over source audiofiles"""
+
+
+def _dir_walk(src: Path, step_down: Path, fcount: list[int]) -> _DirWalkIterator:
+    """
+    Walks down the src tree, accumulating step_down on each recursion level.
+    Yields source audiofiles, one at a time.
+    """
+    dirs, files = _dir_groom(src)
 
     def walk_into(dirs: list[Path]) -> _DirWalkIterator:
         for directory in dirs:
@@ -344,6 +284,77 @@ def human_fine(bytes: int) -> str:
     if bytes == 0:
         return "0"
     return "1" if bytes == 1 else f"human_fine error; bytes: {bytes}"
+
+
+def _artist_part(*, prefix="", suffix="") -> str:
+    """
+    Returns Artist, nicely shaped to be a part of a directory/file name.
+    """
+    if _ARGS.artist:
+        return prefix + _ARGS.artist + suffix
+    return ""
+
+
+def _file_decorate(i: int, step_down: Path, file: Path) -> str:
+    """
+    Prepends zero padded decimal i to path name.
+    """
+    if _ARGS.strip_decorations and _ARGS.tree_dst:
+        return file.name
+    prefix = str(i).zfill(len(str(_FILES_TOTAL))) + (
+        "-[" + str(step_down).replace(os.sep, "][") + "]-"
+        if _ARGS.prepend_subdir_name and not _ARGS.tree_dst and step_down.parts
+        else "-"
+    )
+    return prefix + (
+        _ARGS.unified_name + _artist_part(prefix=" - ") + file.suffix
+        if _ARGS.unified_name
+        else file.name
+    )
+
+
+def _mutagen_file(name: Path, spinner=None):
+    """
+    Returns Mutagen thing, if name looks like an audio file path, else returns None.
+    """
+    global _INVALID_TOTAL, _SUSPICIOUS_TOTAL  # pylint:disable=global-statement
+    ext = name.suffix.lstrip(".").upper()
+    atp = _ARGS.file_type
+
+    if atp:
+        if "*" in atp or "?" in atp or "[" in atp:
+            if not fnmatch.fnmatch(name.name, atp):
+                return None
+        else:
+            if ext != atp.lstrip(".").upper():
+                return None
+
+    name_to_print: str = str(name) if _ARGS.verbose else name.name
+
+    try:
+        file = mutagen.File(name, easy=True)
+    except mutagen.MutagenError as mt_error:
+        if spinner:
+            spinner.write(f" {INVALID_ICON} >>{mt_error}>> {name_to_print}")
+        _INVALID_TOTAL += 1
+        return None
+
+    if file is None and ext in KNOWN_EXTENSIONS:
+        if spinner:
+            spinner.write(f" {SUSPICIOUS_ICON} {name_to_print}")
+        _SUSPICIOUS_TOTAL += 1
+    return file
+
+
+def _is_audiofile(name: Path, spinner=None) -> bool:
+    """
+    Returns True, if name is an audio file, else returns False.
+    """
+    if name.is_file():
+        file = _mutagen_file(name, spinner)
+        if file is not None:
+            return True
+    return False
 
 
 def _album_copy() -> None:
