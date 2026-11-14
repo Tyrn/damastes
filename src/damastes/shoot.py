@@ -156,14 +156,14 @@ def _path_key(p: Path) -> tuple[int, list[int] | str]:
     """
     Key for comparing paths (directories) in _dir_groom.
     """
-    return str_key(str(p)) if not _ARGS.sort_lex else (0, str(p))
+    return (0, str(p)) if _ARGS.sort_lex else str_key(str(p))
 
 
 def _file_key(p: Path) -> tuple[int, list[int] | str]:
     """
     Key for comparing filenames only, ignoring extensions.
     """
-    return str_key(p.stem) if not _ARGS.sort_lex else (0, p.stem)
+    return (0, p.stem) if _ARGS.sort_lex else str_key(p.stem)
 
 
 def _dir_groom(src: Path) -> tuple[list[Path], list[Path]]:
