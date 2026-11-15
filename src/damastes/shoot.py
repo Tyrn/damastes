@@ -80,11 +80,15 @@ def strcmp_naturally(str_x: str, str_y: str) -> Ordering:
     """
     num_x = str_strip_numbers(str_x)
     num_y = str_strip_numbers(str_y)
-    if num_x and num_y:
-        return strcmp_c(num_x, num_y)
-    if not num_x and not num_y:
-        return strcmp_c(str_x, str_y)
-    return -1 if not num_x else 1  # Backwards if not num_y
+    match (bool(num_x), bool(num_y)):
+        case (True, True):
+            return strcmp_c(num_x, num_y)
+        case (False, False):
+            return strcmp_c(str_x, str_y)
+        case (False, True):
+            return -1
+        case _:
+            return 1
 
 
 def _path_compare(path_x: Path, path_y: Path) -> Ordering:
