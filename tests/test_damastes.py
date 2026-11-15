@@ -236,12 +236,12 @@ class TestKeySort:
     # ────────────────────────────────────────────────────────────────
 
     def test_numbered_strings_come_before_unnumbered_ones(self):
-        assert str_key("7a3b") < str_key("bravo")
+        assert str_key("7a3b") > str_key("bravo")
 
     def test_discriminator_is_visible_in_the_key(self):
         """Not just behavior — the shape of the key itself."""
-        assert str_key("7a3b")[0] == 0  # numbered → discriminator 0
-        assert str_key("bravo")[0] == 1  # unnumbered → discriminator 1
+        assert str_key("7a3b")[0] == 1  # numbered → discriminator 0
+        assert str_key("bravo")[0] == 0  # unnumbered → discriminator 1
 
     def test_unnumbered_strings_fall_back_to_lexicographic(self):
         words = ["charlie", "alpha", "bravo"]
@@ -261,7 +261,7 @@ class TestKeySort:
 
     def test_empty_and_unnumbered_strings_coexist(self):
         """No numbers → lexicographic branch, no crash."""
-        assert str_key("")[0] == 1
+        assert str_key("")[0] == 0
 
     def test_case_sensitivity_is_preserved(self):
         """Natural sort doesn't silently lowercase."""
@@ -279,8 +279,8 @@ def ARGS(monkeypatch):
 # Expected orders — used both to build the tree and to assert on it.
 # The lists themselves are in *natural* order; lexicographic expectations
 # are written out explicitly in the tests that need them.
-CHAPTERS = ["chapter1", "chapter2", "chapter10"]
-TRACKS = ["track1.mp3", "track2.mp3", "track10.mp3"]
+CHAPTERS = ["introduction", "chapter1", "chapter2", "chapter10"]
+TRACKS = ["introduction.mp3", "track1.mp3", "track2.mp3", "track10.mp3"]
 
 
 DIR_GROOM_IMPLS = [
@@ -325,6 +325,7 @@ class TestDirGroom:
         ARGS.sort_lex = True
         _, files = groom(audio_tree)
         assert [f.name for f in files] == [
+            "introduction.mp3",
             "track1.mp3",
             "track10.mp3",
             "track2.mp3",

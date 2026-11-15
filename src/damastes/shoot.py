@@ -67,19 +67,24 @@ def strcmp_naturally(str_x: str, str_y: str) -> Ordering:
     values embedded in the strings, otherwise returns the standard string comparison.
     The idea of the natural sort as opposed to the standard lexicographic sort is one of coping
     with the possible absence of the leading zeros in 'numbers' of files or directories.
+    Unnumbered strings sort before numbered ones.
 
     >>> strcmp_naturally("2charlie", "10alfa")
     -1
     >>> strcmp_naturally("charlie", "zulu")
     -1
+    >>> strcmp_naturally("charlie", "2alfa")
+    -1
+    >>> strcmp_naturally("2charlie", "charlie")
+    1
     """
     num_x = str_strip_numbers(str_x)
     num_y = str_strip_numbers(str_y)
-    return (
-        strcmp_c(num_x, num_y)
-        if num_x != [] and num_y != []
-        else strcmp_c(str_x, str_y)
-    )
+    if num_x and num_y:
+        return strcmp_c(num_x, num_y)
+    if not num_x and not num_y:
+        return strcmp_c(str_x, str_y)
+    return -1 if not num_x else 1
 
 
 def _path_compare(path_x: Path, path_y: Path) -> Ordering:
@@ -142,18 +147,18 @@ def str_key(str: str) -> tuple[int, list[int] | str]:
     sorts before an unnumbered one.
 
     >>> str_key("7a3b")
-    (0, [7, 3])
+    (1, [7, 3])
     >>> str_key("10a2t")
-    (0, [10, 2])
+    (1, [10, 2])
     >>> str_key("bravo")
-    (1, 'bravo')
+    (0, 'bravo')
     >>> str_key("7a3b") < str_key("10a2t")
     True
     """
     nums = str_strip_numbers(str)
     if nums:
-        return (0, nums)
-    return (1, str)
+        return (1, nums)
+    return (0, str)
 
 
 def _dir_groom(src: Path) -> tuple[list[Path], list[Path]]:
@@ -172,12 +177,12 @@ def _dir_groom(src: Path) -> tuple[list[Path], list[Path]]:
         lst = os.listdir(src)
         dirs = sorted(
             [Path(x) for x in lst if (src / x).is_dir()],
-            key=(lambda p: (1, str(p))) if lex else (lambda p: str_key(str(p))),
+            key=(lambda p: (0, str(p))) if lex else (lambda p: str_key(str(p))),
             reverse=_ARGS.reverse,
         )
         files = sorted(
             [Path(x) for x in lst if _is_audiofile(src / x)],
-            key=(lambda p: (1, p.stem)) if lex else (lambda p: str_key(p.stem)),
+            key=(lambda p: (0, p.stem)) if lex else (lambda p: str_key(p.stem)),
             reverse=_ARGS.reverse,
         )
     return dirs, files
