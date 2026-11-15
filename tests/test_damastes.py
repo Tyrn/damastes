@@ -2,7 +2,8 @@ import copy
 import os
 from pathlib import Path
 
-## fmt: off
+import pytest
+
 from src.damastes import (
     CLEAN_CONTEXT_PARAMS,
     RestrictedDotDict,
@@ -15,8 +16,6 @@ from src.damastes import (
     strcmp_c,
     strcmp_naturally,
 )
-
-## fmt: on
 
 
 class TestPureFunctions:
@@ -276,6 +275,13 @@ class TestKeySort:
         """Natural sort doesn't silently lowercase."""
         assert str_key("alpha")[1] == "alpha"
         assert str_key("Alpha")[1] == "Alpha"
+
+
+@pytest.fixture
+def patched_args(monkeypatch):
+    args = RestrictedDotDict(copy.deepcopy(CLEAN_CONTEXT_PARAMS))
+    monkeypatch.setattr(shoot, "_ARGS", args)
+    return args
 
 
 class TestDirGroom:
