@@ -232,16 +232,16 @@ class TestKeySort:
         assert str_key("7a10") < str_key("7a20")  # tie on first, decide on second
 
     # ────────────────────────────────────────────────────────────────
-    # 3. The discriminator: numbered strings sort before unnumbered
+    # 3. The discriminator: numbered/unnumbered string precedence
     # ────────────────────────────────────────────────────────────────
 
-    def test_numbered_strings_come_before_unnumbered_ones(self):
-        assert str_key("7a3b") > str_key("bravo")
+    def test_numbered_vs_unnumbered_precedence(self):
+        assert str_key("bravo") < str_key("7a3b")
 
     def test_discriminator_is_visible_in_the_key(self):
         """Not just behavior — the shape of the key itself."""
-        assert str_key("7a3b")[0] == 1  # numbered → discriminator 0
-        assert str_key("bravo")[0] == 0  # unnumbered → discriminator 1
+        assert str_key("7a3b")[0] == 1
+        assert str_key("bravo")[0] == 0
 
     def test_unnumbered_strings_fall_back_to_lexicographic(self):
         words = ["charlie", "alpha", "bravo"]

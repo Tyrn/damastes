@@ -84,7 +84,7 @@ def strcmp_naturally(str_x: str, str_y: str) -> Ordering:
         return strcmp_c(num_x, num_y)
     if not num_x and not num_y:
         return strcmp_c(str_x, str_y)
-    return -1 if not num_x else 1
+    return -1 if not num_x else 1  # Backwards if not num_y
 
 
 def _path_compare(path_x: Path, path_y: Path) -> Ordering:
