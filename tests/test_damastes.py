@@ -144,31 +144,23 @@ class TestPureFunctions:
 
 
 class TestNonPureHelpers:
-    def new_args(self):
-        return RestrictedDotDict(copy.deepcopy(CLEAN_CONTEXT_PARAMS))
-
-    def test_compare(self, monkeypatch):
-        args = self.new_args()
-        monkeypatch.setattr(shoot, "_ARGS", args)
-
-        args.sort_lex = True
+    def test_compare(self, monkeypatch, ARGS):
+        ARGS.sort_lex = True
         assert shoot._path_compare(Path("alfa"), Path("alfa" + os.path.sep)) == 0
         assert shoot._path_compare(Path("10alfa"), Path("2bravo")) == -1
         assert shoot._file_compare(Path("10alfa"), Path("2bravo")) == -1
         assert shoot._file_compare(Path("alfa.ogg"), Path("alfa.mp3")) == 0
         assert shoot._file_compare(Path("Alfa.ogg"), Path("alfa.mp3")) == -1
 
-        args.sort_lex = False
+        ARGS.sort_lex = False
         assert shoot._path_compare(Path("10alfa"), Path("2bravo")) == 1
         assert shoot._file_compare(Path("10alfa"), Path("2bravo")) == 1
 
-    def test_decorate(self, monkeypatch):
-        args = self.new_args()
-        monkeypatch.setattr(shoot, "_ARGS", args)
+    def test_decorate(self, monkeypatch, ARGS):
         monkeypatch.setattr(shoot, "_FILES_TOTAL", 42)
 
         assert shoot._artist_part(prefix=" - ", suffix=" - ") == ""
-        args.artist = "Daniel Defoe"
+        ARGS.artist = "Daniel Defoe"
         assert shoot._artist_part(prefix=" - ", suffix=" - ") == " - Daniel Defoe - "
         assert shoot._artist_part(prefix=" - ") == " - Daniel Defoe"
         assert shoot._artist_part() == "Daniel Defoe"
@@ -176,22 +168,22 @@ class TestNonPureHelpers:
         assert (
             shoot._file_decorate(7, Path("deeper"), Path("delta.m4a")) == "07-delta.m4a"
         )
-        args.prepend_subdir_name = True
+        ARGS.prepend_subdir_name = True
         assert shoot._file_decorate(7, Path(""), Path("delta.m4a")) == "07-delta.m4a"
         assert (
             shoot._file_decorate(7, Path("deeper", "yet"), Path("delta.m4a"))
             == "07-[deeper][yet]-delta.m4a"
         )
-        args.strip_decorations = True
+        ARGS.strip_decorations = True
         assert (
             shoot._file_decorate(7, Path("deeper"), Path("delta.m4a"))
             == "07-[deeper]-delta.m4a"
         )
-        args.tree_dst = True
+        ARGS.tree_dst = True
         assert shoot._file_decorate(7, Path("deeper"), Path("delta.m4a")) == "delta.m4a"
         monkeypatch.setattr(shoot, "_FILES_TOTAL", 533)
-        args.strip_decorations = False
-        args.tree_dst = False
+        ARGS.strip_decorations = False
+        ARGS.tree_dst = False
         assert (
             shoot._file_decorate(7, Path("deeper"), Path("delta.m4a"))
             == "007-[deeper]-delta.m4a"
@@ -209,7 +201,7 @@ class TestKeySort:
 
     def test_lexicographic_sorting_would_get_this_wrong(self):
         """Proof by contrast — this is what we're avoiding."""
-        assert "10" < "9"  # plain string comparison: wrong for us
+        assert "10" < "9"  # noqa: PLR0133  # plain string comparison: wrong for us
         assert str_key("9") < str_key("10")  # natural sort: right
 
     # ────────────────────────────────────────────────────────────────
@@ -278,7 +270,7 @@ class TestKeySort:
 
 
 @pytest.fixture
-def patched_args(monkeypatch):
+def ARGS(monkeypatch):
     args = RestrictedDotDict(copy.deepcopy(CLEAN_CONTEXT_PARAMS))
     monkeypatch.setattr(shoot, "_ARGS", args)
     return args
@@ -290,10 +282,10 @@ class TestDirGroom:
     # ────────────────────────────────────────────────────────────────
 
     def test_directories_and_files_share_natural_ordering(
-        self, monkeypatch, tmp_path, patched_args
+        self, monkeypatch, tmp_path, ARGS
     ):
-        patched_args.sort_lex = False
-        patched_args.reverse = False
+        ARGS.sort_lex = False
+        ARGS.reverse = False
         monkeypatch.setattr(shoot, "_is_audiofile", lambda p: p.suffix == ".mp3")
 
         for name in ["chapter10", "chapter2", "chapter1"]:
@@ -305,11 +297,9 @@ class TestDirGroom:
         assert [d.name for d in dirs] == ["chapter1", "chapter2", "chapter10"]
         assert [f.name for f in files] == ["track1.mp3", "track2.mp3", "track10.mp3"]
 
-    def test_lex_mode_orders_files_lexicographically(
-        self, monkeypatch, tmp_path, patched_args
-    ):
-        patched_args.sort_lex = True
-        patched_args.reverse = False
+    def test_lex_mode_orders_files_lexicographically(self, monkeypatch, tmp_path, ARGS):
+        ARGS.sort_lex = True
+        ARGS.reverse = False
         monkeypatch.setattr(shoot, "_is_audiofile", lambda p: p.suffix == ".mp3")
 
         for name in ["track10.mp3", "track2.mp3", "track1.mp3"]:
