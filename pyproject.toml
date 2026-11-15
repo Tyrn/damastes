@@ -33,6 +33,17 @@ include = ["src/damastes"]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.pytest.ini_options]
+addopts = "--durations=7 --doctest-modules --cov src/"
+
+[tool.coverage.run]
+branch = true
+# omit = ["some/thing/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
 [dependency-groups]
 dev = [
     "pytest (>=8.4.2,<9.0.0)",
