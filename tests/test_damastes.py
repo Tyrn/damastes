@@ -197,3 +197,107 @@ class TestNonPureHelpers:
             shoot._file_decorate(7, Path("deeper"), Path("delta.m4a"))
             == "007-[deeper]-delta.m4a"
         )
+
+
+class TestKeySort:
+    # ────────────────────────────────────────────────────────────────
+    # 1. The core promise: numbers sort numerically, not lexically
+    # ────────────────────────────────────────────────────────────────
+
+    def test_numbers_are_compared_numerically_not_lexically(self):
+        """The whole point: '9' < '10', even though '10' < '9' as strings."""
+        assert str_key("9") < str_key("10")
+
+    def test_lexicographic_sorting_would_get_this_wrong(self):
+        """Proof by contrast — this is what we're avoiding."""
+        assert "10" < "9"  # plain string comparison: wrong for us
+        assert str_key("9") < str_key("10")  # natural sort: right
+
+    # ────────────────────────────────────────────────────────────────
+    # 2. Real-world names: track numbers, episode numbers, dates
+    # ────────────────────────────────────────────────────────────────
+
+    def test_album_track_order(self):
+        tracks = ["track9", "track10", "track1", "track2"]
+        assert sorted(tracks, key=str_key) == [
+            "track1",
+            "track2",
+            "track9",
+            "track10",
+        ]
+
+    def test_episode_order_across_seasons(self):
+        episodes = ["S1E10", "S1E2", "S2E1", "S1E1"]
+        assert sorted(episodes, key=str_key) == [
+            "S1E1",
+            "S1E2",
+            "S1E10",
+            "S2E1",
+        ]
+
+    def test_multiple_number_groups_are_compared_left_to_right(self):
+        """'7a3b' vs '10a2t' — the first number decides."""
+        assert str_key("7a3b") < str_key("10a2t")
+        assert str_key("7a10") < str_key("7a20")  # tie on first, decide on second
+
+    # ────────────────────────────────────────────────────────────────
+    # 3. The discriminator: numbered strings sort before unnumbered
+    # ────────────────────────────────────────────────────────────────
+
+    def test_numbered_strings_come_before_unnumbered_ones(self):
+        assert str_key("7a3b") < str_key("bravo")
+
+    def test_discriminator_is_visible_in_the_key(self):
+        """Not just behavior — the shape of the key itself."""
+        assert str_key("7a3b")[0] == 0  # numbered → discriminator 0
+        assert str_key("bravo")[0] == 1  # unnumbered → discriminator 1
+
+    def test_unnumbered_strings_fall_back_to_lexicographic(self):
+        words = ["charlie", "alpha", "bravo"]
+        assert sorted(words, key=str_key) == ["alpha", "bravo", "charlie"]
+
+    # ────────────────────────────────────────────────────────────────
+    # 4. Edge cases the reader should be aware of
+    # ────────────────────────────────────────────────────────────────
+
+    def test_leading_zeros_are_ignored_numerically(self):
+        """'007' and '7' are the same number."""
+        assert str_key("007") == str_key("7")
+
+    def test_pure_number_and_number_with_suffix(self):
+        assert str_key("7") < str_key("10")
+        assert str_key("7a") < str_key("10a")
+
+    def test_empty_and_unnumbered_strings_coexist(self):
+        """No numbers → lexicographic branch, no crash."""
+        assert str_key("")[0] == 1
+
+    def test_case_sensitivity_is_preserved(self):
+        """Natural sort doesn't silently lowercase."""
+        assert str_key("alpha")[1] == "alpha"
+        assert str_key("Alpha")[1] == "Alpha"
+
+
+class TestDirGroom:
+    def new_args(self):
+        return RestrictedDotDict(copy.deepcopy(CLEAN_CONTEXT_PARAMS))
+
+    # ────────────────────────────────────────────────────────────────
+    # 5. Integration: _dir_groom uses the same idea for dirs and files
+    # ────────────────────────────────────────────────────────────────
+
+    def test_directories_and_files_share_natural_ordering(self, monkeypatch, tmp_path):
+        args = self.new_args()
+        monkeypatch.setattr(shoot, "_ARGS", args)
+        args.sort_lex = False
+        args.reverse = False
+        monkeypatch.setattr(shoot, "_is_audiofile", lambda p: p.suffix == ".mp3")
+
+        for name in ["chapter10", "chapter2", "chapter1"]:
+            (tmp_path / name).mkdir()
+        for name in ["track10.mp3", "track2.mp3", "track1.mp3"]:
+            (tmp_path / name).write_bytes(b"")
+
+        dirs, files = shoot._dir_groom(tmp_path)
+        assert [d.name for d in dirs] == ["chapter1", "chapter2", "chapter10"]
+        assert [f.name for f in files] == ["track1.mp3", "track2.mp3", "track10.mp3"]
