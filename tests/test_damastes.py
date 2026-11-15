@@ -307,3 +307,32 @@ class TestDirGroom:
 
         _, files = shoot._dir_groom(tmp_path)
         assert [f.name for f in files] == ["track1.mp3", "track10.mp3", "track2.mp3"]
+
+
+class TestDirGroomCmp:
+    def test_directories_and_files_share_natural_ordering(
+        self, monkeypatch, tmp_path, ARGS
+    ):
+        ARGS.sort_lex = False
+        ARGS.reverse = False
+        monkeypatch.setattr(shoot, "_is_audiofile", lambda p: p.suffix == ".mp3")
+
+        for name in ["chapter10", "chapter2", "chapter1"]:
+            (tmp_path / name).mkdir()
+        for name in ["track10.mp3", "track2.mp3", "track1.mp3"]:
+            (tmp_path / name).write_bytes(b"")
+
+        dirs, files = shoot._dir_groom_cmp(tmp_path)
+        assert [d.name for d in dirs] == ["chapter1", "chapter2", "chapter10"]
+        assert [f.name for f in files] == ["track1.mp3", "track2.mp3", "track10.mp3"]
+
+    def test_lex_mode_orders_files_lexicographically(self, monkeypatch, tmp_path, ARGS):
+        ARGS.sort_lex = True
+        ARGS.reverse = False
+        monkeypatch.setattr(shoot, "_is_audiofile", lambda p: p.suffix == ".mp3")
+
+        for name in ["track10.mp3", "track2.mp3", "track1.mp3"]:
+            (tmp_path / name).write_bytes(b"")
+
+        _, files = shoot._dir_groom_cmp(tmp_path)
+        assert [f.name for f in files] == ["track1.mp3", "track10.mp3", "track2.mp3"]
