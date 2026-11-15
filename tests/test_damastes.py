@@ -301,3 +301,16 @@ class TestDirGroom:
         dirs, files = shoot._dir_groom(tmp_path)
         assert [d.name for d in dirs] == ["chapter1", "chapter2", "chapter10"]
         assert [f.name for f in files] == ["track1.mp3", "track2.mp3", "track10.mp3"]
+
+    def test_lex_mode_orders_files_lexicographically(self, monkeypatch, tmp_path):
+        args = self.new_args()
+        monkeypatch.setattr(shoot, "_ARGS", args)
+        args.sort_lex = True
+        args.reverse = False
+        monkeypatch.setattr(shoot, "_is_audiofile", lambda p: p.suffix == ".mp3")
+
+        for name in ["track10.mp3", "track2.mp3", "track1.mp3"]:
+            (tmp_path / name).write_bytes(b"")
+
+        _, files = shoot._dir_groom(tmp_path)
+        assert [f.name for f in files] == ["track1.mp3", "track10.mp3", "track2.mp3"]
