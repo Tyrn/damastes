@@ -285,18 +285,15 @@ def patched_args(monkeypatch):
 
 
 class TestDirGroom:
-    def new_args(self):
-        return RestrictedDotDict(copy.deepcopy(CLEAN_CONTEXT_PARAMS))
-
     # ────────────────────────────────────────────────────────────────
     # 5. Integration: _dir_groom uses the same idea for dirs and files
     # ────────────────────────────────────────────────────────────────
 
-    def test_directories_and_files_share_natural_ordering(self, monkeypatch, tmp_path):
-        args = self.new_args()
-        monkeypatch.setattr(shoot, "_ARGS", args)
-        args.sort_lex = False
-        args.reverse = False
+    def test_directories_and_files_share_natural_ordering(
+        self, monkeypatch, tmp_path, patched_args
+    ):
+        patched_args.sort_lex = False
+        patched_args.reverse = False
         monkeypatch.setattr(shoot, "_is_audiofile", lambda p: p.suffix == ".mp3")
 
         for name in ["chapter10", "chapter2", "chapter1"]:
@@ -308,11 +305,11 @@ class TestDirGroom:
         assert [d.name for d in dirs] == ["chapter1", "chapter2", "chapter10"]
         assert [f.name for f in files] == ["track1.mp3", "track2.mp3", "track10.mp3"]
 
-    def test_lex_mode_orders_files_lexicographically(self, monkeypatch, tmp_path):
-        args = self.new_args()
-        monkeypatch.setattr(shoot, "_ARGS", args)
-        args.sort_lex = True
-        args.reverse = False
+    def test_lex_mode_orders_files_lexicographically(
+        self, monkeypatch, tmp_path, patched_args
+    ):
+        patched_args.sort_lex = True
+        patched_args.reverse = False
         monkeypatch.setattr(shoot, "_is_audiofile", lambda p: p.suffix == ".mp3")
 
         for name in ["track10.mp3", "track2.mp3", "track1.mp3"]:
