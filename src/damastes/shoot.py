@@ -33,8 +33,10 @@ def str_strip_numbers(str_alphanum: str) -> list[int]:
     Returns a vector of integer numbers
     embedded in a string argument.
 
-    >>> str_strip_numbers("ab11cdd2k.144")
+    >>> str_strip_numbers("ab11cdd02k.144")
     [11, 2, 144]
+    >>> str_strip_numbers("foxtrot")
+    []
     """
     return [int(x) for x in re.compile(r"\d+").findall(str_alphanum)]
 
