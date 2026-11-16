@@ -149,8 +149,8 @@ def str_key(str: str) -> tuple[int, list[int] | str]:
     Returns a tuple whose first element is a discriminator and
     whose second element is the value to compare. Strings with
     embedded numbers are compared numerically, strings without
-    them are compared lexicographically, and a numbered string
-    sorts before an unnumbered one.
+    them are compared lexicographically, and a string with
+    a lesser discriminator sorts first.
 
     >>> str_key("7a3b")
     (1, [7, 3])
