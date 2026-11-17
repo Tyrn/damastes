@@ -86,12 +86,12 @@ def _dir_groom(src: Path) -> tuple[list[Path], list[Path]]:
         lst = os.listdir(src)
         dirs = sorted(
             [Path(x) for x in lst if (src / x).is_dir()],
-            key=(lambda p: (0, str(p))) if lex else (lambda p: str_key(str(p))),
+            key=(lambda p: (0, str(p))) if lex else lambda p: str_key(str(p)),
             reverse=_ARGS.reverse,
         )
         files = sorted(
             [Path(x) for x in lst if _is_audiofile(src / x)],
-            key=(lambda p: (0, p.stem)) if lex else (lambda p: str_key(p.stem)),
+            key=(lambda p: (0, p.stem)) if lex else lambda p: str_key(p.stem),
             reverse=_ARGS.reverse,
         )
     return dirs, files
