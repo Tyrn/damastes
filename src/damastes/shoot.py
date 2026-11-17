@@ -98,7 +98,7 @@ def _dir_groom(src: Path) -> tuple[list[Path], list[Path]]:
 
 
 type _DirWalkItem = tuple[int, Path, Path]
-"""(index, step down, source audiofile)"""
+"""(index, source: staircase down the tree, source: audiofile)"""
 type _DirWalkIterator = Iterator[_DirWalkItem]
 """Iterator over source audiofiles"""
 
@@ -515,7 +515,8 @@ def _album_copy() -> None:
     src_total, dst_total, files_total = 0, 0, 0
 
     for entry in _album():
-        src_bytes, dst_bytes = file_copy(entry)
+        track: _DirWalkItem = entry
+        src_bytes, dst_bytes = file_copy(track)
         src_total += src_bytes
         dst_total += dst_bytes
         files_total += 1
