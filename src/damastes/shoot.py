@@ -282,10 +282,7 @@ def _album() -> _DirWalkIterator:
     at destination if necessary, source audiofile name) tuples.
     """
     if _FILES_TOTAL < 1:
-        _show(
-            f" {WARNING_ICON} There are no supported audio files"
-            + f' in the source directory "{_ARGS.src}".'
-        )
+        _show(f' {WARNING_ICON} No supported audio files here: "{_ARGS.src}".')
         sys.exit(1)
 
     if not _ARGS.drop_dst and not _ARGS.dry_run:
@@ -310,7 +307,7 @@ def _album() -> _DirWalkIterator:
             _ARGS.src = src.parent
         else:
             _show(f' {WARNING_ICON} Not an audio file: "{src}".')
-            sys.exit(0)
+            sys.exit(1)
 
     return _dir_walk(src, Path(""), [_FILES_TOTAL, -1] if _ARGS.reverse else [1, 1])
 
