@@ -80,7 +80,6 @@ def _dir_groom(src: Path) -> tuple[list[Path], list[Path]]:
     if _is_audiofile(src):
         dirs: list[Path] = []
         files: list[Path] = [Path(src.name)]
-        src = src.parent
     else:
         lex = _ARGS.sort_lex
         lst = os.listdir(src)
@@ -214,7 +213,6 @@ def _dir_groom_cmp(src: Path) -> tuple[list[Path], list[Path]]:
     if _is_audiofile(src):
         dirs: list[Path] = []
         files: list[Path] = [Path(src.name)]
-        src = src.parent
     else:
         lst = os.listdir(src)
         dirs = sorted(
@@ -305,9 +303,16 @@ def _album() -> _DirWalkIterator:
                 sys.exit(1)
         _ARGS.dst_dir.mkdir()
 
-    return _dir_walk(
-        _ARGS.src, Path(""), [_FILES_TOTAL, -1] if _ARGS.reverse else [1, 1]
-    )
+    src = _ARGS.src
+    # A very special case of a single file as the source.
+    if src.is_file():
+        if _is_audiofile(src):
+            _ARGS.src = src.parent
+        else:
+            _show(f' {WARNING_ICON} Not an audio file: "{src}".')
+            sys.exit(0)
+
+    return _dir_walk(src, Path(""), [_FILES_TOTAL, -1] if _ARGS.reverse else [1, 1])
 
 
 def human_rough(
