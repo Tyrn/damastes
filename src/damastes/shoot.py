@@ -28,17 +28,106 @@ assert sys.version_info >= PY_VERSION, (
 )
 
 
+RE_INT = re.compile(r"\d+")
+
+
 def str_strip_numbers(str_alphanum: str) -> list[int]:
     """
     Returns a vector of integer numbers
     embedded in a string argument.
 
-    >>> str_strip_numbers("ab11cdd02k.144")
+    >>> str_strip_numbers("ab11cdd02.144")
     [11, 2, 144]
     >>> str_strip_numbers("foxtrot")
     []
     """
-    return [int(x) for x in re.compile(r"\d+").findall(str_alphanum)]
+    return [int(x) for x in RE_INT.findall(str_alphanum)]
+
+
+def str_key(str: str) -> tuple[int, list[int] | str]:
+    """
+    Key function for strings; strings with embedded numbers
+    to be sorted naturally.
+
+    Returns a tuple whose first element is a discriminator and
+    whose second element is the value to compare. Strings with
+    embedded numbers are compared numerically, strings without
+    them are compared lexicographically, and a string with
+    a lesser discriminator sorts first.
+
+    >>> str_key("7a3b")
+    (1, [7, 3])
+    >>> str_key("10a2t")
+    (1, [10, 2])
+    >>> str_key("bravo")
+    (0, 'bravo')
+    >>> str_key("7a3b") < str_key("10a2t")
+    True
+    """
+    nums = str_strip_numbers(str)
+    if nums:
+        return (1, nums)
+    return (0, str)
+
+
+def _dir_groom(src: Path) -> tuple[list[Path], list[Path]]:
+    """
+    Returns (
+        a sorted list of directories in src directory,
+        a sorted list of audiofiles in src directory
+    )
+    """
+    if _is_audiofile(src):
+        dirs: list[Path] = []
+        files: list[Path] = [Path(src.name)]
+        src = src.parent
+    else:
+        lex = _ARGS.sort_lex
+        lst = os.listdir(src)
+        dirs = sorted(
+            [Path(x) for x in lst if (src / x).is_dir()],
+            key=(lambda p: (0, str(p))) if lex else (lambda p: str_key(str(p))),
+            reverse=_ARGS.reverse,
+        )
+        files = sorted(
+            [Path(x) for x in lst if _is_audiofile(src / x)],
+            key=(lambda p: (0, p.stem)) if lex else (lambda p: str_key(p.stem)),
+            reverse=_ARGS.reverse,
+        )
+    return dirs, files
+
+
+type _DirWalkItem = tuple[int, Path, Path]
+"""(index, step down, source audiofile)"""
+type _DirWalkIterator = Iterator[_DirWalkItem]
+"""Iterator over source audiofiles"""
+
+
+def _dir_walk(src: Path, step_down: Path, fcount: list[int]) -> _DirWalkIterator:
+    """
+    Walks down the src tree, accumulating step_down on each recursion level.
+    Yields source audiofiles, one at a time.
+    """
+    dirs, files = _dir_groom(src)
+
+    def walk_into(dirs: list[Path]) -> _DirWalkIterator:
+        for directory in dirs:
+            yield from _dir_walk(src / directory, step_down / directory, fcount)
+
+    def walk_along(files: list[Path]) -> _DirWalkIterator:
+        for file in files:
+            yield fcount[0], step_down, file
+            fcount[0] += fcount[1]  # [counter, const increment_by]
+
+    if _ARGS.reverse:
+        yield from walk_along(files)
+        yield from walk_into(dirs)
+    else:
+        yield from walk_into(dirs)
+        yield from walk_along(files)
+
+
+# ⮟ ⮟ ⮟ Legacy three-way sorting ⮟ ⮟ ⮟
 
 
 type Ordering = Literal[-1, 0, 1]
@@ -141,87 +230,7 @@ def _dir_groom_cmp(src: Path) -> tuple[list[Path], list[Path]]:
     return dirs, files
 
 
-def str_key(str: str) -> tuple[int, list[int] | str]:
-    """
-    Key function for strings; strings with embedded numbers
-    to be sorted naturally.
-
-    Returns a tuple whose first element is a discriminator and
-    whose second element is the value to compare. Strings with
-    embedded numbers are compared numerically, strings without
-    them are compared lexicographically, and a string with
-    a lesser discriminator sorts first.
-
-    >>> str_key("7a3b")
-    (1, [7, 3])
-    >>> str_key("10a2t")
-    (1, [10, 2])
-    >>> str_key("bravo")
-    (0, 'bravo')
-    >>> str_key("7a3b") < str_key("10a2t")
-    True
-    """
-    nums = str_strip_numbers(str)
-    if nums:
-        return (1, nums)
-    return (0, str)
-
-
-def _dir_groom(src: Path) -> tuple[list[Path], list[Path]]:
-    """
-    Returns (
-        a sorted list of directories in src directory,
-        a sorted list of audiofiles in src directory
-    )
-    """
-    if _is_audiofile(src):
-        dirs: list[Path] = []
-        files: list[Path] = [Path(src.name)]
-        src = src.parent
-    else:
-        lex = _ARGS.sort_lex
-        lst = os.listdir(src)
-        dirs = sorted(
-            [Path(x) for x in lst if (src / x).is_dir()],
-            key=(lambda p: (0, str(p))) if lex else (lambda p: str_key(str(p))),
-            reverse=_ARGS.reverse,
-        )
-        files = sorted(
-            [Path(x) for x in lst if _is_audiofile(src / x)],
-            key=(lambda p: (0, p.stem)) if lex else (lambda p: str_key(p.stem)),
-            reverse=_ARGS.reverse,
-        )
-    return dirs, files
-
-
-type _DirWalkItem = tuple[int, Path, Path]
-"""(index, step down, source audiofile)"""
-type _DirWalkIterator = Iterator[_DirWalkItem]
-"""Iterator over source audiofiles"""
-
-
-def _dir_walk(src: Path, step_down: Path, fcount: list[int]) -> _DirWalkIterator:
-    """
-    Walks down the src tree, accumulating step_down on each recursion level.
-    Yields source audiofiles, one at a time.
-    """
-    dirs, files = _dir_groom(src)
-
-    def walk_into(dirs: list[Path]) -> _DirWalkIterator:
-        for directory in dirs:
-            yield from _dir_walk(src / directory, step_down / directory, fcount)
-
-    def walk_along(files: list[Path]) -> _DirWalkIterator:
-        for file in files:
-            yield fcount[0], step_down, file
-            fcount[0] += fcount[1]  # [counter, const increment_by]
-
-    if _ARGS.reverse:
-        yield from walk_along(files)
-        yield from walk_into(dirs)
-    else:
-        yield from walk_into(dirs)
-        yield from walk_along(files)
+# ⮝ ⮝ ⮝ Legacy three-way sorting ⮝ ⮝ ⮝
 
 
 def _audiofiles_count(directory: Path, spinner=None) -> tuple[int, int]:
