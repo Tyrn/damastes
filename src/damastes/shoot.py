@@ -98,7 +98,7 @@ def _dir_groom(src: Path) -> tuple[list[Path], list[Path]]:
 
 
 type _DirWalkItem = tuple[int, Path, Path]
-"""(index, source: staircase down the tree, source: audiofile)"""
+"""🔸| index,  staircase down the tree from source root to  🎧 ⮞⮞,  audiofile  🎧 |🔸"""
 type _DirWalkIterator = Iterator[_DirWalkItem]
 """Iterator over source audiofiles"""
 
