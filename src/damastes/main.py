@@ -26,7 +26,10 @@ def _steady_parameters(func):
         help=click.style("Verbose output", fg="green") + ".",
     )
     @click.option(
-        "-d", "--drop-tracknumber", is_flag=True, help="Do not set track numbers."
+        "-d",
+        "--drop-tracknumber",
+        is_flag=True,
+        help="Do not set the track number tag.",
     )
     @click.option(
         "-s",
@@ -35,7 +38,7 @@ def _steady_parameters(func):
         help="Strip file and directory name decorations.",
     )
     @click.option(
-        "-f", "--file-title", is_flag=True, help="Use file name for title tag."
+        "-f", "--file-title", is_flag=True, help="Use file name for the title tag."
     )
     @click.option(
         "-F",

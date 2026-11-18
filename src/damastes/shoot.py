@@ -370,11 +370,14 @@ def _file_decorate(i: int, step_down: Path, file: Path) -> str:
     """
     if _ARGS.strip_decorations and _ARGS.tree_dst:
         return file.name
-    prefix = str(i).zfill(len(str(_FILES_TOTAL))) + (
-        "-[" + str(step_down).replace(os.sep, "][") + "]-"
-        if _ARGS.prepend_subdir_name and not _ARGS.tree_dst and step_down.parts
-        else "-"
-    )
+    if _ARGS.strip_decorations and _FILES_TOTAL == 1:
+        prefix = ""
+    else:
+        prefix = str(i).zfill(len(str(_FILES_TOTAL))) + (
+            "-[" + str(step_down).replace(os.sep, "][") + "]-"
+            if _ARGS.prepend_subdir_name and not _ARGS.tree_dst and step_down.parts
+            else "-"
+        )
     return prefix + (
         _ARGS.unified_name + _artist_part(prefix=" - ") + file.suffix
         if _ARGS.unified_name
@@ -386,7 +389,7 @@ def _mutagen_file(name: Path, spinner=None):
     """
     Returns Mutagen thing, if name looks like an audio file path, else returns None.
     """
-    global _INVALID_TOTAL, _SUSPICIOUS_TOTAL  # pylint:disable=global-statement
+    global _INVALID_TOTAL, _SUSPICIOUS_TOTAL
     ext = name.suffix.lstrip(".").upper()
     atp = _ARGS.file_type
 
