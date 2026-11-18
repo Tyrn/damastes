@@ -172,7 +172,7 @@ _MAIN_HELP = f"""
 
     SRC as a single file:
 
-    library $ damastes -va 'Vladimir Nabokov' -u 'Ada' ada.ogg .
+    library $ damastes -vspa 'Vladimir Nabokov' -u Ada ada.ogg .
     """
 
 
