@@ -115,7 +115,8 @@ def _dir_walk(src: Path, step_down: Path, fcount: list[int]) -> _DirWalkIterator
 
     def walk_along(files: list[Path]) -> _DirWalkIterator:
         for file in files:
-            yield fcount[0], step_down, file
+            item: _DirWalkItem = fcount[0], step_down, file
+            yield item
             fcount[0] += fcount[1]  # [counter, const increment_by]
 
     if _ARGS.reverse:
