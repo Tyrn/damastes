@@ -96,9 +96,9 @@ def _dir_groom(src: Path) -> tuple[list[Path], list[Path]]:
     return dirs, files
 
 
-type _DirWalkItem = tuple[int, Path, Path]
+type _DirWalkEntry = tuple[int, Path, Path]
 """🔸| index,  staircase down the tree from source root to  🎧 ⮞⮞,  audiofile  🎧 |🔸"""
-type _DirWalkIterator = Iterator[_DirWalkItem]
+type _DirWalkIterator = Iterator[_DirWalkEntry]
 """Iterator over source audiofiles"""
 
 
@@ -115,8 +115,8 @@ def _dir_walk(src: Path, step_down: Path, fcount: list[int]) -> _DirWalkIterator
 
     def walk_along(files: list[Path]) -> _DirWalkIterator:
         for file in files:
-            item: _DirWalkItem = fcount[0], step_down, file
-            yield item
+            entry: _DirWalkEntry = fcount[0], step_down, file
+            yield entry
             fcount[0] += fcount[1]  # [counter, const increment_by]
 
     if _ARGS.reverse:
@@ -476,7 +476,7 @@ def _album_copy() -> None:
         shutil.copy(tmp, dst)
         os.remove(tmp)
 
-    def file_copy(entry: _DirWalkItem) -> tuple[int, int]:
+    def file_copy(entry: _DirWalkEntry) -> tuple[int, int]:
         i, src_step_down, src_file = entry
         dst_step_down = src_step_down if _ARGS.tree_dst else Path("")
 
@@ -520,9 +520,9 @@ def _album_copy() -> None:
 
     src_total, dst_total, files_total = 0, 0, 0
 
-    for entry in _album():
-        track: _DirWalkItem = entry
-        src_bytes, dst_bytes = file_copy(track)
+    for track in _album():
+        entry: _DirWalkEntry = track
+        src_bytes, dst_bytes = file_copy(entry)
         src_total += src_bytes
         dst_total += dst_bytes
         files_total += 1
